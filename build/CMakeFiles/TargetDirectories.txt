@@ -1,3 +1,0 @@
-C:/Users/giuli/OneDrive/Desktop/Giulia/FCG/Trabalho/fcg-trabfinal/build/CMakeFiles/main.dir
-C:/Users/giuli/OneDrive/Desktop/Giulia/FCG/Trabalho/fcg-trabfinal/build/CMakeFiles/edit_cache.dir
-C:/Users/giuli/OneDrive/Desktop/Giulia/FCG/Trabalho/fcg-trabfinal/build/CMakeFiles/rebuild_cache.dir
