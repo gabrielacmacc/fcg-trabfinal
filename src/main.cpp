@@ -7,18 +7,12 @@
 //
 //
 
-// Arquivos "headers" padrões de C podem ser incluídos em um
-// programa C++, sendo necessário somente adicionar o caractere
-// "c" antes de seu nome, e remover o sufixo ".h". Exemplo:
-//    #include <stdio.h> // Em C
-//  vira
-//    #include <cstdio> // Em C++
-//
+// "headers" padrões de C
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 
-// Headers abaixo são específicos de C++
+// Headers específicos de C++
 #include <map>
 #include <stack>
 #include <string>
@@ -201,15 +195,7 @@ const float CAMERA_SPEED = 0.02f;
 bool moveForward = false;
 bool moveBackward = false;
 bool moveRight = false;
-bool moveLeft = false; 
-
-// Variáveis que controlam rotação do antebraço
-float g_ForearmAngleZ = 0.0f;
-float g_ForearmAngleX = 0.0f;
-
-// Variáveis que controlam translação do torso
-float g_TorsoPositionX = 0.0f;
-float g_TorsoPositionY = 0.0f;
+bool moveLeft = false;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -359,34 +345,38 @@ int main(int argc, char *argv[])
         float z = r * g_CameraPhiCos * g_CameraThetaCos;
         float x = r * g_CameraPhiCos * g_CameraThetaSin;
 
-        if (moveBackward) {
+        if (moveBackward)
+        {
             g_CameraPosY += (CAMERA_SPEED * g_CameraPhiSin);
             g_CameraPosZ += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
             g_CameraPosX += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
         }
 
-        if (moveForward) {
+        if (moveForward)
+        {
             g_CameraPosY -= (CAMERA_SPEED * g_CameraPhiSin);
             g_CameraPosZ -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
             g_CameraPosX -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
         }
 
-        if (moveRight) {
+        if (moveRight)
+        {
             g_CameraPosX += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
             g_CameraPosZ -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
         }
 
-        if (moveLeft) {
+        if (moveLeft)
+        {
             g_CameraPosX -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
             g_CameraPosZ += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
         }
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::vec4 camera_position_c = glm::vec4(x,y,z,1.0f) + glm::vec4(g_CameraPosX,g_CameraPosY,g_CameraPosZ,0.0f); // Ponto "c", centro da câmera
-        glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);      // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = glm::vec4(-x,-y,-z,0.0f); //camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-        glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);     // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+        glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f) + glm::vec4(g_CameraPosX, g_CameraPosY, g_CameraPosZ, 0.0f); // Ponto "c", centro da câmera
+        glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);                                                      // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+        glm::vec4 camera_view_vector = glm::vec4(-x, -y, -z, 0.0f);                                                         // camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+        glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);                                                     // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -1030,10 +1020,6 @@ void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY;
 
-        // Atualizamos parâmetros da antebraço com os deslocamentos
-        g_ForearmAngleZ -= 0.01f * dx;
-        g_ForearmAngleX += 0.01f * dy;
-
         // Atualizamos as variáveis globais para armazenar a posição atual do
         // cursor como sendo a última posição conhecida do cursor.
         g_LastCursorPosX = xpos;
@@ -1045,10 +1031,6 @@ void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY;
-
-        // Atualizamos parâmetros da antebraço com os deslocamentos
-        g_TorsoPositionX += 0.01f * dx;
-        g_TorsoPositionY -= 0.01f * dy;
 
         // Atualizamos as variáveis globais para armazenar a posição atual do
         // cursor como sendo a última posição conhecida do cursor.
@@ -1120,10 +1102,6 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
         g_AngleX = 0.0f;
         g_AngleY = 0.0f;
         g_AngleZ = 0.0f;
-        g_ForearmAngleX = 0.0f;
-        g_ForearmAngleZ = 0.0f;
-        g_TorsoPositionX = 0.0f;
-        g_TorsoPositionY = 0.0f;
     }
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
@@ -1153,37 +1131,53 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla A, movemos a câmera para esquerda
-    if (key == GLFW_KEY_A) {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+    if (key == GLFW_KEY_A)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
             moveLeft = true;
-        } else {
+        }
+        else
+        {
             moveLeft = false;
         }
     }
 
     // Se o usuário apertar a tecla W, movemos a câmera para frente
-    if (key == GLFW_KEY_W) {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+    if (key == GLFW_KEY_W)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
             moveForward = true;
-        } else {
+        }
+        else
+        {
             moveForward = false;
         }
     }
 
     // Se o usuário apertar a tecla D, movemos a câmera para direita
-    if (key == GLFW_KEY_D) {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+    if (key == GLFW_KEY_D)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
             moveRight = true;
-        } else {
+        }
+        else
+        {
             moveRight = false;
         }
     }
 
     // Se o usuário apertar a tecla S, movemos a câmera para trás
-    if (key == GLFW_KEY_S) {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+    if (key == GLFW_KEY_S)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
             moveBackward = true;
-        } else {
+        }
+        else
+        {
             moveBackward = false;
         }
     }
