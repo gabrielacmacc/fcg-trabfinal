@@ -186,16 +186,18 @@ float g_CameraPhi = 0.0f;      // Ângulo em relação ao eixo Y
 float g_CameraDistance = 3.5f; // Distância da câmera para a origem
 
 // Variáveis que controlam a posição e movimentação da câmera
-float g_CameraPosX = 0.0f;
-float g_CameraPosY = 0.0f;
-float g_CameraPosZ = 0.0f;
+glm::vec4 camera_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-const float CAMERA_SPEED = 0.02f;
+const float CAMERA_SPEED = 3.0f;
+const float GHOST_SPEED = 0.0f;
+
+float previousTime = (float)glfwGetTime();
 
 bool moveForward = false;
 bool moveBackward = false;
 bool moveRight = false;
 bool moveLeft = false;
+bool isFreeCamOn = false;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -330,6 +332,9 @@ int main(int argc, char *argv[])
         // os shaders de vértice e fragmentos).
         glUseProgram(g_GpuProgramID);
 
+        float currentTime = (float)glfwGetTime();
+        float ellapsedTime = currentTime - previousTime;
+
         // Computamos a posição da câmera utilizando coordenadas esféricas.  As
         // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
         // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
@@ -345,38 +350,42 @@ int main(int argc, char *argv[])
         float z = r * g_CameraPhiCos * g_CameraThetaCos;
         float x = r * g_CameraPhiCos * g_CameraThetaSin;
 
+        // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
+        // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+        glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);             // Ponto "c", centro da câmera
+        glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);      // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+        glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);     // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+        if (isFreeCamOn)
+        {
+            camera_position_c = camera_position_c + camera_movement;
+            camera_view_vector = glm::vec4(-x, -y, -z, 0.0f);
+        }
+
+        glm::vec4 camera_view_unit = camera_view_vector / norm(camera_view_vector);
+        glm::vec4 camera_side_view = crossproduct(camera_up_vector, camera_view_unit);
+        glm::vec4 camera_side_view_unit = camera_side_view / norm(camera_side_view);
+
         if (moveBackward)
         {
-            g_CameraPosY += (CAMERA_SPEED * g_CameraPhiSin);
-            g_CameraPosZ += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
-            g_CameraPosX += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
+            camera_movement -= camera_view_unit * CAMERA_SPEED * ellapsedTime;
         }
 
         if (moveForward)
         {
-            g_CameraPosY -= (CAMERA_SPEED * g_CameraPhiSin);
-            g_CameraPosZ -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
-            g_CameraPosX -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
+            camera_movement += camera_view_unit * CAMERA_SPEED * ellapsedTime;
         }
 
         if (moveRight)
         {
-            g_CameraPosX += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
-            g_CameraPosZ -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
+            camera_movement -= camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
         }
 
         if (moveLeft)
         {
-            g_CameraPosX -= (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaCos);
-            g_CameraPosZ += (CAMERA_SPEED * g_CameraPhiCos * g_CameraThetaSin);
+            camera_movement += camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
         }
-
-        // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
-        // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f) + glm::vec4(g_CameraPosX, g_CameraPosY, g_CameraPosZ, 0.0f); // Ponto "c", centro da câmera
-        glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);                                                      // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = glm::vec4(-x, -y, -z, 0.0f);                                                         // camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-        glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);                                                     // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -433,6 +442,8 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
+
+        previousTime = currentTime;
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
@@ -1131,7 +1142,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla A, movemos a câmera para esquerda
-    if (key == GLFW_KEY_A)
+    if (key == GLFW_KEY_A && isFreeCamOn)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -1144,7 +1155,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla W, movemos a câmera para frente
-    if (key == GLFW_KEY_W)
+    if (key == GLFW_KEY_W && isFreeCamOn)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -1157,7 +1168,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla D, movemos a câmera para direita
-    if (key == GLFW_KEY_D)
+    if (key == GLFW_KEY_D && isFreeCamOn)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -1170,7 +1181,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla S, movemos a câmera para trás
-    if (key == GLFW_KEY_S)
+    if (key == GLFW_KEY_S && isFreeCamOn)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -1180,6 +1191,16 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
         {
             moveBackward = false;
         }
+    }
+
+    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+    {
+        isFreeCamOn = true;
+    }
+
+    if (key == GLFW_KEY_L && action == GLFW_PRESS)
+    {
+        isFreeCamOn = false;
     }
 }
 
