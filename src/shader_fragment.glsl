@@ -17,8 +17,16 @@ uniform mat4 projection;
 #define PLANE  2
 uniform int object_id;
 
+// Parâmetros da axis-aligned bounding box (AABB) do modelo
+uniform vec4 bbox_min;
+uniform vec4 bbox_max;
+
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
+
+// Constantes
+#define M_PI   3.14159265358979323846
+#define M_PI_2 1.57079632679489661923
 
 void main()
 {
@@ -46,6 +54,10 @@ void main()
 
     // Vetor que define o sentido da reflexão especular ideal.
     vec4 r = -l + 2*n*(dot(n,l)); // vetor de reflexão especular ideal
+
+    // Coordenadas de textura U e V
+    float U = 0.0;
+    float V = 0.0;
 
     // Parâmetros que definem as propriedades espectrais da superfície
     vec3 Kd; // Refletância difusa
