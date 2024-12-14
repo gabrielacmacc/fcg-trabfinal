@@ -286,11 +286,11 @@ int main(int argc, char *argv[])
     LoadShadersFromFiles();
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
-    ObjModel spheremodel("../../data/models/sphere.obj");
+    ObjModel spheremodel("../../resources/models/sphere.obj");
     ComputeNormals(&spheremodel);
     BuildTrianglesAndAddToVirtualScene(&spheremodel);
 
-    ObjModel planemodel("../../data/models/plane.obj");
+    ObjModel planemodel("../../resources/models/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
 
@@ -526,8 +526,8 @@ void LoadShadersFromFiles()
     //       |
     //       o-- shader_fragment.glsl
     //
-    GLuint vertex_shader_id = LoadShader_Vertex("../../src/shader_vertex.glsl");
-    GLuint fragment_shader_id = LoadShader_Fragment("../../src/shader_fragment.glsl");
+    GLuint vertex_shader_id = LoadShader_Vertex("../../resources/shaders/shader_vertex.glsl");
+    GLuint fragment_shader_id = LoadShader_Fragment("../../resources/shaders/shader_fragment.glsl");
 
     // Deletamos o programa de GPU anterior, caso ele exista.
     if (g_GpuProgramID != 0)
@@ -1195,12 +1195,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
-        isFreeCamOn = true;
-    }
-
-    if (key == GLFW_KEY_L && action == GLFW_PRESS)
-    {
-        isFreeCamOn = false;
+        isFreeCamOn = !isFreeCamOn;
     }
 }
 

@@ -15,6 +15,7 @@ uniform mat4 projection;
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
 #define PLANE  2
+#define BACKGROUND 3
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -55,6 +56,8 @@ void main()
     // Vetor que define o sentido da reflexão especular ideal.
     vec4 r = -l + 2*n*(dot(n,l)); // vetor de reflexão especular ideal
 
+    vec4 h = (v + l) / (abs(v + l));
+
     // Coordenadas de textura U e V
     float U = 0.0;
     float V = 0.0;
@@ -72,6 +75,14 @@ void main()
         Ks = vec3(0.0, 0.0, 0.0);
         Ka = vec3(0.4, 0.2, 0.04);
         q = 1.0;
+    }
+    else if ( object_id == BACKGROUND )
+    {
+        // Propriedades espectrais do plano
+        Kd = vec3(0.2, 0.2, 0.2);
+        Ks = vec3(0.3, 0.3, 0.3);
+        Ka = vec3(0.0, 0.0, 0.0);
+        q = 20.0;
     }
     else if ( object_id == PLANE )
     {
@@ -96,14 +107,15 @@ void main()
     vec3 Ia = vec3(0.2, 0.2, 0.2); // espectro da luz ambiente
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
-    
-    vec3 lambert_diffuse_term =  Kd * I * dot(n,l); // termo difuso de Lambert: 𝑘𝑑 𝐼 max(0, 𝑛 ⋅ 𝑙), em que n . l = cos(theta)
+    vec3 lambert_diffuse_term = Kd * I * max(0, dot(n, l)); // termo difuso de Lambert
 
     // Termo ambiente
     vec3 ambient_term = Ka * Ia; // termo ambiente
 
     // Termo especular utilizando o modelo de iluminação de Phong
-    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // termo especular de Phong
+    vec3 phong_specular_term  = Ks * I * max(0, pow(dot(r, v), q)); // termo especular de Phong 
+
+    vec3 blinn_phong_specular_term  = Ks * I * (pow(dot(n, h), q)); // termo especular de Blinn-Phong
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:

@@ -79,18 +79,18 @@ if(WIN32)
       # string ucrt64 no output do compilador, pois a string "mingw64"
       # sempre aparece no output (mesmo quando ucrt64 é a libc utilizada).
       if (COMPILER_VERSION_OUTPUT MATCHES "ucrt64")
-        set(LIBGLFW ${PROJECT_SOURCE_DIR}/lib-ucrt-64/libglfw3.a)
+        set(LIBGLFW ${PROJECT_SOURCE_DIR}/libs/lib-ucrt-64/libglfw3.a)
       elseif (COMPILER_VERSION_OUTPUT MATCHES "mingw64")
-        set(LIBGLFW ${PROJECT_SOURCE_DIR}/lib-mingw-64/libglfw3.a)
+        set(LIBGLFW ${PROJECT_SOURCE_DIR}/libs/lib-mingw-64/libglfw3.a)
       else()
-        set(LIBGLFW ${PROJECT_SOURCE_DIR}/lib-mingw-32/libglfw3.a)
+        set(LIBGLFW ${PROJECT_SOURCE_DIR}/libs/lib-mingw-32/libglfw3.a)
       endif()
     else()
       message(FATAL_ERROR "Failed to get MinGW compiler version.")
     endif()
 
   elseif(MSVC)
-    set(LIBGLFW ${PROJECT_SOURCE_DIR}/lib-vc2022/glfw3.lib)
+    set(LIBGLFW ${PROJECT_SOURCE_DIR}/libs/lib-vc2022/glfw3.lib)
   else()
     message(FATAL_ERROR "This CMakeLists.txt file only supports MINGW or MSVC toolchain on Windows.")
   endif()
@@ -118,7 +118,7 @@ elseif(UNIX)
   target_link_libraries(${EXECUTABLE_NAME}
     ${CMAKE_DL_LIBS}
     ${MATH_LIBRARY}
-    ${PROJECT_SOURCE_DIR}/lib-linux/libglfw3.a
+    ${PROJECT_SOURCE_DIR}/libs/lib-linux/libglfw3.a
     ${CMAKE_THREAD_LIBS_INIT}
     ${OPENGL_LIBRARIES}
     ${X11_LIBRARIES}
