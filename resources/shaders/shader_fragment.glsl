@@ -159,7 +159,7 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
 
-        Kd = texture(LabTexture1, vec2(U,V)).rgb;
+        Kd = texture(LabTexture, vec2(U,V)).rgb;
         lambert_diffuse_term = Kd * I * lambert;
         color.rgb = lambert_diffuse_term;
     }
