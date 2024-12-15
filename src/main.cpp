@@ -33,11 +33,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // Headers da biblioteca para carregar modelos obj
-#include <tiny_obj_loader.h>
+#include "external/tiny_obj_loader.h"
 
 // Headers locais, definidos na pasta "include/"
-#include "utils.h"
+#include "utils/utils.h"
+#include "utils/shader_utils.h"
+#include "utils/texture_utils.h"
 #include "matrices.h"
+#include "globals/globals.h"
 
 // Estrutura que representa um modelo geométrico carregado a partir de um
 // arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
@@ -105,12 +108,7 @@ void PopMatrix(glm::mat4 &M);
 // logo após a definição de main() neste arquivo.
 void BuildTrianglesAndAddToVirtualScene(ObjModel *);                         // Constrói representação de um ObjModel como malha de triângulos para renderização
 void ComputeNormals(ObjModel *model);                                        // Computa normais de um ObjModel, caso não existam.
-void LoadShadersFromFiles();                                                 // Carrega os shaders de vértice e fragmento, criando um programa de GPU
 void DrawVirtualObject(const char *object_name);                             // Desenha um objeto armazenado em g_VirtualScene
-GLuint LoadShader_Vertex(const char *filename);                              // Carrega um vertex shader
-GLuint LoadShader_Fragment(const char *filename);                            // Carrega um fragment shader
-void LoadShader(const char *filename, GLuint shader_id);                     // Função utilizada pelas duas acima
-GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Cria um programa de GPU
 void PrintObjModelInfo(ObjModel *);                                          // Função para debugging
 
 // Declaração de funções auxiliares para renderizar texto dentro da janela
@@ -150,6 +148,8 @@ struct SceneObject
     size_t num_indices;            // Número de índices do objeto dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
     GLenum rendering_mode;         // Modo de rasterização (GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.)
     GLuint vertex_array_object_id; // ID do VAO onde estão armazenados os atributos do modelo
+    glm::vec3 bbox_min;            // Axis-Aligned Bounding Box do objeto
+    glm::vec3 bbox_max;
 };
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
@@ -204,13 +204,6 @@ bool g_UsePerspectiveProjection = true;
 
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
-
-// Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
-GLuint g_GpuProgramID = 0;
-GLint g_model_uniform;
-GLint g_view_uniform;
-GLint g_projection_uniform;
-GLint g_object_id_uniform;
 
 int main(int argc, char *argv[])
 {
@@ -285,6 +278,10 @@ int main(int argc, char *argv[])
     //
     LoadShadersFromFiles();
 
+    LoadTextureImage("../../resources/textures/asphalt_track_diff_4k.jpg");
+    LoadTextureImage("../../resources/textures/teste1.jpg");
+    LoadTextureImage("../../resources/textures/teste2.png");
+
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../resources/models/sphere.obj");
     ComputeNormals(&spheremodel);
@@ -293,6 +290,10 @@ int main(int argc, char *argv[])
     ObjModel planemodel("../../resources/models/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
+
+    ObjModel cubemodel("../../resources/models/cube.obj");
+    ComputeNormals(&cubemodel);
+    BuildTrianglesAndAddToVirtualScene(&cubemodel);
 
     if (argc > 1)
     {
@@ -429,16 +430,24 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(g_projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
 #define SPHERE 0
-#define PLANE 2
+#define PLANE 4
+#define BACKGROUND 5
+        
+        glDepthFunc(GL_ALWAYS); // Desativa Z-buffer
 
-        // Desenhamos o modelo da esfera
+        glm::mat4 skyModel = Matrix_Scale(farplane/2,farplane/2,farplane/2);
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(skyModel));
+        glUniform1i(g_object_id_uniform, BACKGROUND);
+        DrawVirtualObject("Cube");
+        
+        glDepthFunc(GL_LESS); // Reativa o Z-buffer
+
         model = Matrix_Translate(-1.0f, 0.0f, 0.0f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
 
-        // Desenhamos o modelo do plano
-        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(2.0f, 1.0f, 2.0f);
+        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(5.0f, 1.0f, 5.0f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
@@ -487,6 +496,13 @@ void DrawVirtualObject(const char *object_name)
     // comentários detalhados dentro da definição de BuildTrianglesAndAddToVirtualScene().
     glBindVertexArray(g_VirtualScene[object_name].vertex_array_object_id);
 
+    // Setamos as variáveis "bbox_min" e "bbox_max" do fragment shader
+    // com os parâmetros da axis-aligned bounding box (AABB) do modelo.
+    glm::vec3 bbox_min = g_VirtualScene[object_name].bbox_min;
+    glm::vec3 bbox_max = g_VirtualScene[object_name].bbox_max;
+    glUniform4f(g_bbox_min_uniform, bbox_min.x, bbox_min.y, bbox_min.z, 1.0f);
+    glUniform4f(g_bbox_max_uniform, bbox_max.x, bbox_max.y, bbox_max.z, 1.0f);
+
     // Pedimos para a GPU rasterizar os vértices dos eixos XYZ
     // apontados pelo VAO como linhas. Veja a definição de
     // g_VirtualScene[""] dentro da função BuildTrianglesAndAddToVirtualScene(), e veja
@@ -501,48 +517,6 @@ void DrawVirtualObject(const char *object_name)
     // "Desligamos" o VAO, evitando assim que operações posteriores venham a
     // alterar o mesmo. Isso evita bugs.
     glBindVertexArray(0);
-}
-
-// Função que carrega os shaders de vértices e de fragmentos que serão
-// utilizados para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
-//
-void LoadShadersFromFiles()
-{
-    // Note que o caminho para os arquivos "shader_vertex.glsl" e
-    // "shader_fragment.glsl" estão fixados, sendo que assumimos a existência
-    // da seguinte estrutura no sistema de arquivos:
-    //
-    //    + FCG_Lab_01/
-    //    |
-    //    +--+ bin/
-    //    |  |
-    //    |  +--+ Release/  (ou Debug/ ou Linux/)
-    //    |     |
-    //    |     o-- main.exe
-    //    |
-    //    +--+ src/
-    //       |
-    //       o-- shader_vertex.glsl
-    //       |
-    //       o-- shader_fragment.glsl
-    //
-    GLuint vertex_shader_id = LoadShader_Vertex("../../resources/shaders/shader_vertex.glsl");
-    GLuint fragment_shader_id = LoadShader_Fragment("../../resources/shaders/shader_fragment.glsl");
-
-    // Deletamos o programa de GPU anterior, caso ele exista.
-    if (g_GpuProgramID != 0)
-        glDeleteProgram(g_GpuProgramID);
-
-    // Criamos um programa de GPU utilizando os shaders carregados acima.
-    g_GpuProgramID = CreateGpuProgram(vertex_shader_id, fragment_shader_id);
-
-    // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
-    // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
-    // (GPU)! Veja arquivo "shader_vertex.glsl" e "shader_fragment.glsl".
-    g_model_uniform = glGetUniformLocation(g_GpuProgramID, "model");           // Variável da matriz "model"
-    g_view_uniform = glGetUniformLocation(g_GpuProgramID, "view");             // Variável da matriz "view" em shader_vertex.glsl
-    g_projection_uniform = glGetUniformLocation(g_GpuProgramID, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
-    g_object_id_uniform = glGetUniformLocation(g_GpuProgramID, "object_id");   // Variável "object_id" em shader_fragment.glsl
 }
 
 // Função que pega a matriz M e guarda a mesma no topo da pilha
@@ -647,6 +621,12 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *model)
         size_t first_index = indices.size();
         size_t num_triangles = model->shapes[shape].mesh.num_face_vertices.size();
 
+        const float minval = std::numeric_limits<float>::min();
+        const float maxval = std::numeric_limits<float>::max();
+
+        glm::vec3 bbox_min = glm::vec3(maxval, maxval, maxval);
+        glm::vec3 bbox_max = glm::vec3(minval, minval, minval);
+
         for (size_t triangle = 0; triangle < num_triangles; ++triangle)
         {
             assert(model->shapes[shape].mesh.num_face_vertices[triangle] == 3);
@@ -665,6 +645,13 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *model)
                 model_coefficients.push_back(vy);   // Y
                 model_coefficients.push_back(vz);   // Z
                 model_coefficients.push_back(1.0f); // W
+
+                bbox_min.x = std::min(bbox_min.x, vx);
+                bbox_min.y = std::min(bbox_min.y, vy);
+                bbox_min.z = std::min(bbox_min.z, vz);
+                bbox_max.x = std::max(bbox_max.x, vx);
+                bbox_max.y = std::max(bbox_max.y, vy);
+                bbox_max.z = std::max(bbox_max.z, vz);
 
                 // Inspecionando o código da tinyobjloader, o aluno Bernardo
                 // Sulzbach (2017/1) apontou que a maneira correta de testar se
@@ -700,6 +687,9 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *model)
         theobject.num_indices = last_index - first_index + 1; // Número de indices
         theobject.rendering_mode = GL_TRIANGLES;              // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
         theobject.vertex_array_object_id = vertex_array_object_id;
+
+        theobject.bbox_min = bbox_min;
+        theobject.bbox_max = bbox_max;
 
         g_VirtualScene[model->shapes[shape].name] = theobject;
     }
@@ -756,158 +746,6 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *model)
     // "Desligamos" o VAO, evitando assim que operações posteriores venham a
     // alterar o mesmo. Isso evita bugs.
     glBindVertexArray(0);
-}
-
-// Carrega um Vertex Shader de um arquivo GLSL. Veja definição de LoadShader() abaixo.
-GLuint LoadShader_Vertex(const char *filename)
-{
-    // Criamos um identificador (ID) para este shader, informando que o mesmo
-    // será aplicado nos vértices.
-    GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-
-    // Carregamos e compilamos o shader
-    LoadShader(filename, vertex_shader_id);
-
-    // Retorna o ID gerado acima
-    return vertex_shader_id;
-}
-
-// Carrega um Fragment Shader de um arquivo GLSL . Veja definição de LoadShader() abaixo.
-GLuint LoadShader_Fragment(const char *filename)
-{
-    // Criamos um identificador (ID) para este shader, informando que o mesmo
-    // será aplicado nos fragmentos.
-    GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Carregamos e compilamos o shader
-    LoadShader(filename, fragment_shader_id);
-
-    // Retorna o ID gerado acima
-    return fragment_shader_id;
-}
-
-// Função auxilar, utilizada pelas duas funções acima. Carrega código de GPU de
-// um arquivo GLSL e faz sua compilação.
-void LoadShader(const char *filename, GLuint shader_id)
-{
-    // Lemos o arquivo de texto indicado pela variável "filename"
-    // e colocamos seu conteúdo em memória, apontado pela variável
-    // "shader_string".
-    std::ifstream file;
-    try
-    {
-        file.exceptions(std::ifstream::failbit);
-        file.open(filename);
-    }
-    catch (std::exception &e)
-    {
-        fprintf(stderr, "ERROR: Cannot open file \"%s\".\n", filename);
-        std::exit(EXIT_FAILURE);
-    }
-    std::stringstream shader;
-    shader << file.rdbuf();
-    std::string str = shader.str();
-    const GLchar *shader_string = str.c_str();
-    const GLint shader_string_length = static_cast<GLint>(str.length());
-
-    // Define o código do shader GLSL, contido na string "shader_string"
-    glShaderSource(shader_id, 1, &shader_string, &shader_string_length);
-
-    // Compila o código do shader GLSL (em tempo de execução)
-    glCompileShader(shader_id);
-
-    // Verificamos se ocorreu algum erro ou "warning" durante a compilação
-    GLint compiled_ok;
-    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compiled_ok);
-
-    GLint log_length = 0;
-    glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &log_length);
-
-    // Alocamos memória para guardar o log de compilação.
-    // A chamada "new" em C++ é equivalente ao "malloc()" do C.
-    GLchar *log = new GLchar[log_length];
-    glGetShaderInfoLog(shader_id, log_length, &log_length, log);
-
-    // Imprime no terminal qualquer erro ou "warning" de compilação
-    if (log_length != 0)
-    {
-        std::string output;
-
-        if (!compiled_ok)
-        {
-            output += "ERROR: OpenGL compilation of \"";
-            output += filename;
-            output += "\" failed.\n";
-            output += "== Start of compilation log\n";
-            output += log;
-            output += "== End of compilation log\n";
-        }
-        else
-        {
-            output += "WARNING: OpenGL compilation of \"";
-            output += filename;
-            output += "\".\n";
-            output += "== Start of compilation log\n";
-            output += log;
-            output += "== End of compilation log\n";
-        }
-
-        fprintf(stderr, "%s", output.c_str());
-    }
-
-    // A chamada "delete" em C++ é equivalente ao "free()" do C
-    delete[] log;
-}
-
-// Esta função cria um programa de GPU, o qual contém obrigatoriamente um
-// Vertex Shader e um Fragment Shader.
-GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id)
-{
-    // Criamos um identificador (ID) para este programa de GPU
-    GLuint program_id = glCreateProgram();
-
-    // Definição dos dois shaders GLSL que devem ser executados pelo programa
-    glAttachShader(program_id, vertex_shader_id);
-    glAttachShader(program_id, fragment_shader_id);
-
-    // Linkagem dos shaders acima ao programa
-    glLinkProgram(program_id);
-
-    // Verificamos se ocorreu algum erro durante a linkagem
-    GLint linked_ok = GL_FALSE;
-    glGetProgramiv(program_id, GL_LINK_STATUS, &linked_ok);
-
-    // Imprime no terminal qualquer erro de linkagem
-    if (linked_ok == GL_FALSE)
-    {
-        GLint log_length = 0;
-        glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &log_length);
-
-        // Alocamos memória para guardar o log de compilação.
-        // A chamada "new" em C++ é equivalente ao "malloc()" do C.
-        GLchar *log = new GLchar[log_length];
-
-        glGetProgramInfoLog(program_id, log_length, &log_length, log);
-
-        std::string output;
-
-        output += "ERROR: OpenGL linking of program failed.\n";
-        output += "== Start of link log\n";
-        output += log;
-        output += "\n== End of link log\n";
-
-        // A chamada "delete" em C++ é equivalente ao "free()" do C
-        delete[] log;
-
-        fprintf(stderr, "%s", output.c_str());
-    }
-
-    // Os "Shader Objects" podem ser marcados para deleção após serem linkados
-    glDeleteShader(vertex_shader_id);
-    glDeleteShader(fragment_shader_id);
-
-    // Retornamos o ID gerado acima
-    return program_id;
 }
 
 // Definição da função que será chamada sempre que a janela do sistema
