@@ -183,7 +183,7 @@ bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mous
 // renderização.
 float g_CameraTheta = 0.0f;    // Ângulo no plano ZX em relação ao eixo Z
 float g_CameraPhi = 0.0f;      // Ângulo em relação ao eixo Y
-float g_CameraDistance = 3.5f; // Distância da câmera para a origem
+float g_CameraDistance = 4.5f; // Distância da câmera para a origem
 
 // Variáveis que controlam a posição e movimentação da câmera
 glm::vec4 camera_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -279,6 +279,7 @@ int main(int argc, char *argv[])
     LoadShadersFromFiles();
 
     LoadTextureImage("../../resources/textures/asphalt_track_diff_4k.jpg");
+    LoadTextureImage("../../resources/textures/blue.jpg");
     LoadTextureImage("../../resources/textures/teste1.jpg");
     LoadTextureImage("../../resources/textures/teste2.png");
 
@@ -287,13 +288,25 @@ int main(int argc, char *argv[])
     ComputeNormals(&spheremodel);
     BuildTrianglesAndAddToVirtualScene(&spheremodel);
 
-    ObjModel planemodel("../../resources/models/plane.obj");
+    ObjModel planemodel("../../resources/models/skybox/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
 
-    ObjModel cubemodel("../../resources/models/cube.obj");
+    ObjModel cubemodel("../../resources/models/skybox/cube.obj");
     ComputeNormals(&cubemodel);
     BuildTrianglesAndAddToVirtualScene(&cubemodel);
+
+    ObjModel pieceone("../../resources/models/labirinth/p1.obj");
+    ComputeNormals(&pieceone);
+    BuildTrianglesAndAddToVirtualScene(&pieceone);
+
+    ObjModel piecetwo("../../resources/models/labirinth/p2.obj");
+    ComputeNormals(&piecetwo);
+    BuildTrianglesAndAddToVirtualScene(&piecetwo);
+
+    ObjModel piecethree("../../resources/models/labirinth/p3.obj");
+    ComputeNormals(&piecethree);
+    BuildTrianglesAndAddToVirtualScene(&piecethree);
 
     if (argc > 1)
     {
@@ -363,6 +376,13 @@ int main(int argc, char *argv[])
             camera_position_c = camera_position_c + camera_movement;
             camera_view_vector = glm::vec4(-x, -y, -z, 0.0f);
         }
+        else
+        {
+            float fixedHeight = r;
+            camera_position_c = glm::vec4(0.0f, fixedHeight, 0.0f, 1.0f);
+            camera_up_vector = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+            camera_view_vector = camera_lookat_l - camera_position_c;
+        }
 
         glm::vec4 camera_view_unit = camera_view_vector / norm(camera_view_vector);
         glm::vec4 camera_side_view = crossproduct(camera_up_vector, camera_view_unit);
@@ -430,6 +450,9 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(g_projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
 #define SPHERE 0
+#define LABYRINTH_1 1
+#define LABYRINTH_2 2
+#define LABYRINTH_3 3
 #define PLANE 4
 #define BACKGROUND 5
         
@@ -451,6 +474,71 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
+
+        model = Matrix_Translate(0.0f, -1.0f, 3.0f) * Matrix_Rotate_Y(-3.14159/2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_1);
+        DrawVirtualObject("p1");
+
+        model = Matrix_Translate(0.0f, -1.0f, -2.2f) * Matrix_Rotate_Y(-3.14159/2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_1);
+        DrawVirtualObject("p1");
+
+        model = Matrix_Translate(3.0f, -1.0f, -2.4f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-3.0f, -1.0f, -2.4f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(3.0f, -1.0f, 2.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-3.0f, -1.0f, 2.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(1.4f, -1.0f, -3.2f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-1.4f, -1.0f, -3.2f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-3.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(3.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(1.4f, -1.0f, 2.0f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-1.4f, -1.0f, 2.0f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(0.0f, -1.4f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_3);
+        DrawVirtualObject("p3");
 
         previousTime = currentTime;
 

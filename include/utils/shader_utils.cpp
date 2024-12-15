@@ -167,8 +167,9 @@ void LoadShadersFromFiles()
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "FloorTexture"), 0);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test1"), 1);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test2"), 2);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabTexture"), 1);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test1"), 2);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test2"), 3);
     glUseProgram(0);
 }
 

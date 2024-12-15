@@ -20,6 +20,9 @@ uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
+#define LABYRINTH_1 1
+#define LABYRINTH_2 2
+#define LABYRINTH_3 3
 #define PLANE  4
 #define BACKGROUND 5
 uniform int object_id;
@@ -30,6 +33,7 @@ uniform vec4 bbox_max;
 
 // Variáveis para acesso das imagens de textura
 uniform sampler2D FloorTexture;
+uniform sampler2D LabTexture;
 uniform sampler2D Test1;
 uniform sampler2D Test2;
 
@@ -149,6 +153,15 @@ void main()
 
         Kd = texture(Test2, vec2(U,V)).rgb;
         color.rgb = Kd;
+    }
+    else if ( object_id == LABYRINTH_1 || object_id == LABYRINTH_2 || object_id == LABYRINTH_3)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+
+        Kd = texture(LabTexture1, vec2(U,V)).rgb;
+        lambert_diffuse_term = Kd * I * lambert;
+        color.rgb = lambert_diffuse_term;
     }
     else // Objeto desconhecido = preto
     {
