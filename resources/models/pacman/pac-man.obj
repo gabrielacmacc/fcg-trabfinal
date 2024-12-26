@@ -1,7 +1,7 @@
 # Blender 4.3.0
 # www.blender.org
 mtllib pac-man.mtl
-o Sphere
+o Pacman
 v 3.565113 1.310472 -4.713656
 v 3.783474 1.456673 -4.788638
 v 3.984716 1.591412 -4.910400
