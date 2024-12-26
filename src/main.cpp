@@ -46,63 +46,6 @@
 #include "utils/shader_utils.hpp"
 #include "utils/texture_utils.hpp"
 
-// Estrutura que representa um modelo geométrico carregado a partir de um
-// arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
-struct ObjModel
-{
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-
-    // Este construtor lê o modelo de um arquivo utilizando a biblioteca tinyobjloader.
-    // Veja: https://github.com/syoyo/tinyobjloader
-    ObjModel(const char *filename, const char *basepath = NULL, bool triangulate = true)
-    {
-        printf("Carregando objetos do arquivo \"%s\"...\n", filename);
-
-        // Se basepath == NULL, então setamos basepath como o dirname do
-        // filename, para que os arquivos MTL sejam corretamente carregados caso
-        // estejam no mesmo diretório dos arquivos OBJ.
-        std::string fullpath(filename);
-        std::string dirname;
-        if (basepath == NULL)
-        {
-            auto i = fullpath.find_last_of("/");
-            if (i != std::string::npos)
-            {
-                dirname = fullpath.substr(0, i + 1);
-                basepath = dirname.c_str();
-            }
-        }
-
-        std::string warn;
-        std::string err;
-        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename, basepath, triangulate);
-
-        if (!err.empty())
-            fprintf(stderr, "\n%s\n", err.c_str());
-
-        if (!ret)
-            throw std::runtime_error("Erro ao carregar modelo.");
-
-        for (size_t shape = 0; shape < shapes.size(); ++shape)
-        {
-            if (shapes[shape].name.empty())
-            {
-                fprintf(stderr,
-                        "*********************************************\n"
-                        "Erro: Objeto sem nome dentro do arquivo '%s'.\n"
-                        "Veja https://www.inf.ufrgs.br/~eslgastal/fcg-faq-etc.html#Modelos-3D-no-formato-OBJ .\n"
-                        "*********************************************\n",
-                        filename);
-                throw std::runtime_error("Objeto sem nome.");
-            }
-            printf("- Objeto '%s'\n", shapes[shape].name.c_str());
-        }
-
-        printf("OK.\n");
-    }
-};
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);
@@ -142,19 +85,6 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
 void CursorPosCallback(GLFWwindow *window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
-
-// Definimos uma estrutura que armazenará dados necessários para renderizar
-// cada objeto da cena virtual.
-struct SceneObject
-{
-    std::string name;              // Nome do objeto
-    size_t first_index;            // Índice do primeiro vértice dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
-    size_t num_indices;            // Número de índices do objeto dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
-    GLenum rendering_mode;         // Modo de rasterização (GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.)
-    GLuint vertex_array_object_id; // ID do VAO onde estão armazenados os atributos do modelo
-    glm::vec3 bbox_min;            // Axis-Aligned Bounding Box do objeto
-    glm::vec3 bbox_max;
-};
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -242,11 +172,12 @@ int main(int argc, char *argv[])
 
     LoadTextureImage("../../resources/textures/asphalt_track_diff_4k.jpg");
     LoadTextureImage("../../resources/textures/blue.jpg");
+    LoadTextureImage("../../resources/textures/yellow.png");
     LoadTextureImage("../../resources/textures/teste1.jpg");
     LoadTextureImage("../../resources/textures/teste2.png");
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
-    ObjModel spheremodel("../../resources/models/sphere.obj");
+    ObjModel spheremodel("../../resources/models/food/sphere.obj");
     ComputeNormals(&spheremodel);
     BuildTrianglesAndAddToVirtualScene(&spheremodel);
 
@@ -258,15 +189,15 @@ int main(int argc, char *argv[])
     ComputeNormals(&cubemodel);
     BuildTrianglesAndAddToVirtualScene(&cubemodel);
 
-    ObjModel pieceone("../../resources/models/labirinth/p1.obj");
+    ObjModel pieceone("../../resources/models/labyrinth/p1.obj");
     ComputeNormals(&pieceone);
     BuildTrianglesAndAddToVirtualScene(&pieceone);
 
-    ObjModel piecetwo("../../resources/models/labirinth/p2.obj");
+    ObjModel piecetwo("../../resources/models/labyrinth/p2.obj");
     ComputeNormals(&piecetwo);
     BuildTrianglesAndAddToVirtualScene(&piecetwo);
 
-    ObjModel piecethree("../../resources/models/labirinth/p3.obj");
+    ObjModel piecethree("../../resources/models/labyrinth/p3.obj");
     ComputeNormals(&piecethree);
     BuildTrianglesAndAddToVirtualScene(&piecethree);
 
@@ -310,6 +241,7 @@ int main(int argc, char *argv[])
 
         float currentTime = (float)glfwGetTime();
         float ellapsedTime = currentTime - previousTime;
+        previousTime = currentTime;
 
         // Computamos a posição da câmera utilizando coordenadas esféricas.  As
         // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
@@ -330,19 +262,22 @@ int main(int argc, char *argv[])
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
         glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);             // Ponto "c", centro da câmera
         glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);      // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+        glm::vec4 camera_view_vector; // Vetor "view", sentido para onde a câmera está virada
         glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);     // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
         if (isFreeCamOn)
         {
-            camera_position_c = camera_position_c + camera_movement;
+            camera_movement.y = -0.5f;
+            camera_movement += camera_offset;
+            camera_position_c = camera_position_initial + camera_movement;
             camera_view_vector = glm::vec4(-x, -y, -z, 0.0f);
+            camera_offset = glm::vec4(0.0f,0.0f,0.0f,0.0f);
         }
         else
         {
             float fixedHeight = r;
             camera_position_c = glm::vec4(0.0f, fixedHeight, 0.0f, 1.0f);
-            camera_up_vector = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+            camera_up_vector = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
             camera_view_vector = camera_lookat_l - camera_position_c;
         }
 
@@ -380,7 +315,7 @@ int main(int argc, char *argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f; // Posição do "near plane"
-        float farplane = -10.0f; // Posição do "far plane"
+        float farplane = -40.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -420,89 +355,206 @@ int main(int argc, char *argv[])
         
         glDepthFunc(GL_ALWAYS); // Desativa Z-buffer
 
-        glm::mat4 skyModel = Matrix_Scale(farplane/2,farplane/2,farplane/2);
+        glm::mat4 skyModel = Matrix_Scale(farplane/4,farplane/4,farplane/4);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(skyModel));
         glUniform1i(g_object_id_uniform, BACKGROUND);
         DrawVirtualObject("Cube");
         
         glDepthFunc(GL_LESS); // Reativa o Z-buffer
 
-        model = Matrix_Translate(-1.0f, 0.0f, 0.0f);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, SPHERE);
-        DrawVirtualObject("the_sphere");
-
-        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(5.0f, 1.0f, 5.0f);
+        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane/4, 1.0f, farplane/4);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
 
-        model = Matrix_Translate(0.0f, -1.0f, 3.0f) * Matrix_Rotate_Y(-3.14159/2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, LABYRINTH_1);
-        DrawVirtualObject("p1");
-
-        model = Matrix_Translate(0.0f, -1.0f, -2.2f) * Matrix_Rotate_Y(-3.14159/2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, LABYRINTH_1);
-        DrawVirtualObject("p1");
-
-        model = Matrix_Translate(3.0f, -1.0f, -2.4f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        model = Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(-3.0f, -1.0f, -2.4f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        model = Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.6f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(3.0f, -1.0f, 2.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        model = Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(-3.0f, -1.0f, 2.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        model = Matrix_Translate(3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(1.4f, -1.0f, -3.2f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        model = Matrix_Translate(-3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(-1.4f, -1.0f, -3.2f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        model = Matrix_Translate(7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.2f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(-3.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        model = Matrix_Translate(-7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.2f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(3.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        model = Matrix_Translate(5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(1.4f, -1.0f, 2.0f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        model = Matrix_Translate(-5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(-1.4f, -1.0f, 2.0f) * Matrix_Scale(0.2f, 0.5f, 0.1f);
+        model = Matrix_Translate(8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.2f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_2);
         DrawVirtualObject("p2");
 
-        model = Matrix_Translate(0.0f, -1.4f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        model = Matrix_Translate(-8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(0.0f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, LABYRINTH_2);
+        DrawVirtualObject("p2");
+
+        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, LABYRINTH_3);
         DrawVirtualObject("p3");
 
-        previousTime = currentTime;
+        glm::vec3 camera_position_vec3 = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
+
+        glm::vec3 boxMin = camera_position_vec3 - camera_bbox_aux;
+        glm::vec3 boxMax = camera_position_vec3 + camera_bbox_aux;
+
+        AABB camera_bbox = {boxMin, boxMax};
+
+        glm::vec3 skyboxMin = glm::vec3(farplane/4, farplane, farplane/4);
+        glm::vec3 skyboxMax = glm::vec3(-farplane/4, -farplane, -farplane/4);
+
+        AABB skybbox = {skyboxMin, skyboxMax};
+
+        camera_offset = checkPlaneCollision(camera_bbox, skybbox);
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.

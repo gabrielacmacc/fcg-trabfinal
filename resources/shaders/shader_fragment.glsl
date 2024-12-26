@@ -33,7 +33,8 @@ uniform vec4 bbox_max;
 
 // Variáveis para acesso das imagens de textura
 uniform sampler2D FloorTexture;
-uniform sampler2D LabTexture;
+uniform sampler2D LabTexture1;
+uniform sampler2D LabTexture2;
 uniform sampler2D Test1;
 uniform sampler2D Test2;
 
@@ -131,7 +132,7 @@ void main()
 
         float radius = length(bbox_max - bbox_center);
 
-       vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
+        vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
         //vec4 p_vector = position_model - bbox_center;
 
         //float px = p_vector.x;
@@ -159,7 +160,7 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
 
-        Kd = texture(LabTexture, vec2(U,V)).rgb;
+        Kd = texture(LabTexture1, vec2(U,V)).rgb;
         lambert_diffuse_term = Kd * I * lambert;
         color.rgb = lambert_diffuse_term;
     }
