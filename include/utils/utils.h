@@ -1,8 +1,8 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <external/glad/glad.h>
+#include <external/GLFW/glfw3.h>
 #include <cstdio>
 
 static GLenum glCheckError_(const char *file, int line)

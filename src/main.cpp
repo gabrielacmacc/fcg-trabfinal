@@ -24,13 +24,13 @@
 #include <algorithm>
 
 // Headers das bibliotecas OpenGL
-#include <glad/glad.h>  // Criação de contexto OpenGL 3.3
-#include <GLFW/glfw3.h> // Criação de janelas do sistema operacional
+#include <external/glad/glad.h>  // Criação de contexto OpenGL 3.3
+#include <external/GLFW/glfw3.h> // Criação de janelas do sistema operacional
 
 // Headers da biblioteca GLM: criação de matrizes e vetores.
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <external/glm/mat4x4.hpp>
+#include <external/glm/vec4.hpp>
+#include <external/glm/gtc/type_ptr.hpp>
 
 // Headers da biblioteca para carregar modelos obj
 #include "external/tiny_obj_loader.h"
@@ -116,12 +116,12 @@ void PrintObjModelInfo(ObjModel *);                                          // 
 void TextRendering_Init();
 float TextRendering_LineHeight(GLFWwindow *window);
 float TextRendering_CharWidth(GLFWwindow *window);
-void TextRendering_PrintString(GLFWwindow *window, const std::string &str, float x, float y, float scale = 1.0f);
-void TextRendering_PrintMatrix(GLFWwindow *window, glm::mat4 M, float x, float y, float scale = 1.0f);
-void TextRendering_PrintVector(GLFWwindow *window, glm::vec4 v, float x, float y, float scale = 1.0f);
-void TextRendering_PrintMatrixVectorProduct(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
-void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
-void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
+void TextRendering_PrintString(GLFWwindow *window, const std::string &str, float x, float y);
+void TextRendering_PrintMatrix(GLFWwindow *window, glm::mat4 M, float x, float y);
+void TextRendering_PrintVector(GLFWwindow *window, glm::vec4 v, float x, float y);
+void TextRendering_PrintMatrixVectorProduct(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y);
+void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y);
+void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y);
 
 // Funções abaixo renderizam como texto na janela OpenGL algumas matrizes e
 // outras informações do programa. Definidas após main().
@@ -162,48 +162,6 @@ std::map<std::string, SceneObject> g_VirtualScene;
 
 // Pilha que guardará as matrizes de modelagem.
 std::stack<glm::mat4> g_MatrixStack;
-
-// Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
-float g_ScreenRatio = 1.0f;
-
-// Ângulos de Euler que controlam a rotação de um dos cubos da cena virtual
-float g_AngleX = 0.0f;
-float g_AngleY = 0.0f;
-float g_AngleZ = 0.0f;
-
-// "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
-// pressionado no momento atual. Veja função MouseButtonCallback().
-bool g_LeftMouseButtonPressed = false;
-bool g_RightMouseButtonPressed = false;  // Análogo para botão direito do mouse
-bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
-
-// Variáveis que definem a câmera em coordenadas esféricas, controladas pelo
-// usuário através do mouse (veja função CursorPosCallback()). A posição
-// efetiva da câmera é calculada dentro da função main(), dentro do loop de
-// renderização.
-float g_CameraTheta = 0.0f;    // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;      // Ângulo em relação ao eixo Y
-float g_CameraDistance = 4.5f; // Distância da câmera para a origem
-
-// Variáveis que controlam a posição e movimentação da câmera
-glm::vec4 camera_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-const float CAMERA_SPEED = 3.0f;
-const float GHOST_SPEED = 0.0f;
-
-float previousTime = (float)glfwGetTime();
-
-bool moveForward = false;
-bool moveBackward = false;
-bool moveRight = false;
-bool moveLeft = false;
-bool isFreeCamOn = false;
-
-// Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
-bool g_UsePerspectiveProjection = true;
-
-// Variável que controla se o texto informativo será mostrado na tela.
-bool g_ShowInfoText = true;
 
 int main(int argc, char *argv[])
 {

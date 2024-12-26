@@ -1,3 +1,5 @@
+#pragma once
+
 // "headers" padrões de C
 #include <cmath>
 #include <cstdio>
@@ -14,11 +16,10 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include <glad/glad.h>
+#include <external/glad/glad.h>
 
 #include "external/stb_image.h"
-#include "globals/globals.h"
-#include "texture_utils.h"
+#include "globals/globals.hpp"
 
 // Função que carrega uma imagem para ser utilizada como textura
 void LoadTextureImage(const char *filename)

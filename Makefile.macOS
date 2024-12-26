@@ -1,7 +1,7 @@
 # Library load path para o homebrew em M1 Macs atualizado com base na sugestão
 # do aluno Matheus de Moraes Costa em 2022/2.
 
-./bin/macOS/main: src/main.cpp src/glad.c src/textrendering.cpp include/matrices.h include/utils.h include/dejavufont.h src/tiny_obj_loader.cpp
+./bin/macOS/main: src/main.cpp src/glad.c include/matrices.h include/utils.h include/external/dejavufont.h src/external/tiny_obj_loader.cpp
 	mkdir -p bin/macOS
 	g++ -std=c++11 -Wall -Wno-deprecated-declarations -Wno-unused-function -g -I ./include/ -o ./bin/macOS/main src/main.cpp src/glad.c src/textrendering.cpp src/tiny_obj_loader.cpp -framework OpenGL -L/usr/local/lib -L/opt/homebrew/Cellar -lglfw -lm -ldl -lpthread
 

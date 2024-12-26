@@ -4,9 +4,9 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <external/glm/mat4x4.hpp>
+#include <external/glm/vec4.hpp>
+#include <external/glm/gtc/matrix_transform.hpp>
 
 // Esta função Matrix() auxilia na criação de matrizes usando a biblioteca GLM.
 // Note que em OpenGL (e GLM) as matrizes são definidas como "column-major",

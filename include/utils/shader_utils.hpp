@@ -1,52 +1,25 @@
+#pragma once
+
 // "headers" padrões de C
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
+//#include <cmath>
+//#include <cstdio>
+//#include <cstdlib>
 
 // Headers específicos de C++
-#include <map>
-#include <stack>
-#include <string>
-#include <vector>
-#include <limits>
-#include <fstream>
+//#include <map>
+//#include <stack>
+//#include <string>
+//#include <vector>
+//#include <limits>
+//#include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
 
-#include <glad/glad.h>
+#include <external/glad/glad.h>
 
 #include "external/stb_image.h"
-#include "globals/globals.h"
-#include "shader_utils.h"
-
-// Carrega um Vertex Shader de um arquivo GLSL. Veja definição de LoadShader() abaixo.
-GLuint LoadShader_Vertex(const char *filename)
-{
-    // Criamos um identificador (ID) para este shader, informando que o mesmo
-    // será aplicado nos vértices.
-    GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-
-    // Carregamos e compilamos o shader
-    LoadShader(filename, vertex_shader_id);
-
-    // Retorna o ID gerado acima
-    return vertex_shader_id;
-}
-
-// Carrega um Fragment Shader de um arquivo GLSL . Veja definição de LoadShader() abaixo.
-GLuint LoadShader_Fragment(const char *filename)
-{
-    // Criamos um identificador (ID) para este shader, informando que o mesmo
-    // será aplicado nos fragmentos.
-    GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Carregamos e compilamos o shader
-    LoadShader(filename, fragment_shader_id);
-
-    // Retorna o ID gerado acima
-    return fragment_shader_id;
-}
+#include "globals/globals.hpp"
 
 // Função auxilar, utilizada pelas duas funções acima. Carrega código de GPU de
 // um arquivo GLSL e faz sua compilação.
@@ -121,56 +94,32 @@ void LoadShader(const char *filename, GLuint shader_id)
     delete[] log;
 }
 
-// Função que carrega os shaders de vértices e de fragmentos que serão
-// utilizados para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
-//
-void LoadShadersFromFiles()
+// Carrega um Vertex Shader de um arquivo GLSL. Veja definição de LoadShader() abaixo.
+GLuint LoadShader_Vertex(const char *filename)
 {
-    // Note que o caminho para os arquivos "shader_vertex.glsl" e
-    // "shader_fragment.glsl" estão fixados, sendo que assumimos a existência
-    // da seguinte estrutura no sistema de arquivos:
-    //
-    //    + FCG_Lab_01/
-    //    |
-    //    +--+ bin/
-    //    |  |
-    //    |  +--+ Release/  (ou Debug/ ou Linux/)
-    //    |     |
-    //    |     o-- main.exe
-    //    |
-    //    +--+ src/
-    //       |
-    //       o-- shader_vertex.glsl
-    //       |
-    //       o-- shader_fragment.glsl
-    //
-    GLuint vertex_shader_id = LoadShader_Vertex("../../resources/shaders/shader_vertex.glsl");
-    GLuint fragment_shader_id = LoadShader_Fragment("../../resources/shaders/shader_fragment.glsl");
+    // Criamos um identificador (ID) para este shader, informando que o mesmo
+    // será aplicado nos vértices.
+    GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 
-    // Deletamos o programa de GPU anterior, caso ele exista.
-    if (g_GpuProgramID != 0)
-        glDeleteProgram(g_GpuProgramID);
+    // Carregamos e compilamos o shader
+    LoadShader(filename, vertex_shader_id);
 
-    // Criamos um programa de GPU utilizando os shaders carregados acima.
-    g_GpuProgramID = CreateGpuProgram(vertex_shader_id, fragment_shader_id);
+    // Retorna o ID gerado acima
+    return vertex_shader_id;
+}
 
-    // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
-    // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
-    // (GPU)! Veja arquivo "shader_vertex.glsl" e "shader_fragment.glsl".
-    g_model_uniform      = glGetUniformLocation(g_GpuProgramID, "model"); // Variável da matriz "model"
-    g_view_uniform       = glGetUniformLocation(g_GpuProgramID, "view"); // Variável da matriz "view" em shader_vertex.glsl
-    g_projection_uniform = glGetUniformLocation(g_GpuProgramID, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
-    g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
-    g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
-    g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");
+// Carrega um Fragment Shader de um arquivo GLSL . Veja definição de LoadShader() abaixo.
+GLuint LoadShader_Fragment(const char *filename)
+{
+    // Criamos um identificador (ID) para este shader, informando que o mesmo
+    // será aplicado nos fragmentos.
+    GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
-    // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
-    glUseProgram(g_GpuProgramID);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "FloorTexture"), 0);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabTexture"), 1);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test1"), 2);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test2"), 3);
-    glUseProgram(0);
+    // Carregamos e compilamos o shader
+    LoadShader(filename, fragment_shader_id);
+
+    // Retorna o ID gerado acima
+    return fragment_shader_id;
 }
 
 // Esta função cria um programa de GPU, o qual contém obrigatoriamente um
@@ -222,4 +171,57 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id)
 
     // Retornamos o ID gerado acima
     return program_id;
+}
+
+// Função que carrega os shaders de vértices e de fragmentos que serão
+// utilizados para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
+//
+void LoadShadersFromFiles()
+{
+    // Note que o caminho para os arquivos "shader_vertex.glsl" e
+    // "shader_fragment.glsl" estão fixados, sendo que assumimos a existência
+    // da seguinte estrutura no sistema de arquivos:
+    //
+    //    + FCG_Lab_01/
+    //    |
+    //    +--+ bin/
+    //    |  |
+    //    |  +--+ Release/  (ou Debug/ ou Linux/)
+    //    |     |
+    //    |     o-- main.exe
+    //    |
+    //    +--+ src/
+    //       |
+    //       o-- shader_vertex.glsl
+    //       |
+    //       o-- shader_fragment.glsl
+    //
+    GLuint vertex_shader_id = LoadShader_Vertex("../../resources/shaders/shader_vertex.glsl");
+    GLuint fragment_shader_id = LoadShader_Fragment("../../resources/shaders/shader_fragment.glsl");
+
+    // Deletamos o programa de GPU anterior, caso ele exista.
+    if (g_GpuProgramID != 0)
+        glDeleteProgram(g_GpuProgramID);
+
+    // Criamos um programa de GPU utilizando os shaders carregados acima.
+    g_GpuProgramID = CreateGpuProgram(vertex_shader_id, fragment_shader_id);
+
+    // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
+    // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
+    // (GPU)! Veja arquivo "shader_vertex.glsl" e "shader_fragment.glsl".
+    g_model_uniform      = glGetUniformLocation(g_GpuProgramID, "model"); // Variável da matriz "model"
+    g_view_uniform       = glGetUniformLocation(g_GpuProgramID, "view"); // Variável da matriz "view" em shader_vertex.glsl
+    g_projection_uniform = glGetUniformLocation(g_GpuProgramID, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
+    g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
+    g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
+    g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");
+
+    // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
+    glUseProgram(g_GpuProgramID);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "FloorTexture"), 0);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabTexture1"), 1);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabTexture2"), 2);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test1"), 3);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "Test2"), 4);
+    glUseProgram(0);
 }

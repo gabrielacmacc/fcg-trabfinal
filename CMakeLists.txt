@@ -7,13 +7,9 @@
 # ser compilados.
 set(SOURCES
   src/main.cpp
-  src/textrendering.cpp
   src/glad.c
   include/external/tiny_obj_loader.cpp
   include/external/stb_image.cpp
-  include/utils/shader_utils.cpp
-  include/utils/texture_utils.cpp
-  include/globals/globals.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)

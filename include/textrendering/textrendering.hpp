@@ -1,15 +1,36 @@
+#pragma once
+
 // Based on http://hamelot.io/visualization/opengl-text-without-any-external-libraries/
 //   and on https://github.com/rougier/freetype-gl
+
+// "headers" padrões de C
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+
+// Headers específicos de C++
+#include <map>
+#include <stack>
 #include <string>
+#include <vector>
+#include <limits>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include <algorithm>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+// Headers das bibliotecas OpenGL
+#include <external/glad/glad.h>  // Criação de contexto OpenGL 3.3
+#include <external/GLFW/glfw3.h> // Criação de janelas do sistema operacional
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
+// Headers da biblioteca GLM: criação de matrizes e vetores.
+#include <external/glm/mat4x4.hpp>
+#include <external/glm/vec4.hpp>
+#include <external/glm/gtc/type_ptr.hpp>
 
+#include "globals/globals.hpp"
 #include "utils/utils.h"
-#include "dejavufont.h"
+#include "external/dejavufont.h"
 
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp
 
@@ -34,6 +55,23 @@ const GLchar* const textfragmentshader_source = ""
     "fragColor = vec4(0, 0, 0, texture(tex, texCoords).r);\n"
 "}\n"
 "\0";
+
+GLuint textVAO;
+GLuint textVBO;
+GLuint textprogram_id;
+GLuint texttexture_id;
+
+// Declaração de funções auxiliares para renderizar texto dentro da janela
+// OpenGL. Estas funções estão definidas no arquivo "textrendering.cpp".
+//void TextRendering_Init();
+//float TextRendering_LineHeight(GLFWwindow *window);
+//float TextRendering_CharWidth(GLFWwindow *window);
+//void TextRendering_PrintString(GLFWwindow *window, const std::string &str, float x, float y, float scale = 1.0f);
+//void TextRendering_PrintMatrix(GLFWwindow *window, glm::mat4 M, float x, float y, float scale = 1.0f);
+//void TextRendering_PrintVector(GLFWwindow *window, glm::vec4 v, float x, float y, float scale = 1.0f);
+//void TextRendering_PrintMatrixVectorProduct(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
+//void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
+//void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
 
 void TextRendering_LoadShader(const GLchar* const shader_string, GLuint shader_id)
 {
@@ -81,11 +119,6 @@ void TextRendering_LoadShader(const GLchar* const shader_string, GLuint shader_i
     // A chamada "delete" em C++ é equivalente ao "free()" do C
     delete [] log;
 }
-
-GLuint textVAO;
-GLuint textVBO;
-GLuint textprogram_id;
-GLuint texttexture_id;
 
 void TextRendering_Init()
 {
@@ -303,4 +336,70 @@ void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M,
     TextRendering_PrintString(window, buffer, x, y - 2*lineheight, scale);
     snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]        [%+0.2f]\n", M[0][3], M[1][3], M[2][3], M[3][3], v[3], r[3], r[3]/w);
     TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
+}
+
+// Escrevemos na tela os ângulos de Euler definidos nas variáveis globais
+// g_AngleX, g_AngleY, e g_AngleZ.
+void TextRendering_ShowEulerAngles(GLFWwindow *window)
+{
+    if (!g_ShowInfoText)
+        return;
+
+    float pad = TextRendering_LineHeight(window);
+
+    char buffer[80];
+    snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
+
+    TextRendering_PrintString(window, buffer, -1.0f + pad / 10, -1.0f + 2 * pad / 10, 1.0f);
+}
+
+// Escrevemos na tela qual matriz de projeção está sendo utilizada.
+void TextRendering_ShowProjection(GLFWwindow *window)
+{
+    if (!g_ShowInfoText)
+        return;
+
+    float lineheight = TextRendering_LineHeight(window);
+    float charwidth = TextRendering_CharWidth(window);
+
+    if (g_UsePerspectiveProjection)
+        TextRendering_PrintString(window, "Perspective", 1.0f - 13 * charwidth, -1.0f + 2 * lineheight / 10, 1.0f);
+    else
+        TextRendering_PrintString(window, "Orthographic", 1.0f - 13 * charwidth, -1.0f + 2 * lineheight / 10, 1.0f);
+}
+
+// Escrevemos na tela o número de quadros renderizados por segundo (frames per
+// second).
+void TextRendering_ShowFramesPerSecond(GLFWwindow *window)
+{
+    if (!g_ShowInfoText)
+        return;
+
+    // Variáveis estáticas (static) mantém seus valores entre chamadas
+    // subsequentes da função!
+    static float old_seconds = (float)glfwGetTime();
+    static int ellapsed_frames = 0;
+    static char buffer[20] = "?? fps";
+    static int numchars = 7;
+
+    ellapsed_frames += 1;
+
+    // Recuperamos o número de segundos que passou desde a execução do programa
+    float seconds = (float)glfwGetTime();
+
+    // Número de segundos desde o último cálculo do fps
+    float ellapsed_seconds = seconds - old_seconds;
+
+    if (ellapsed_seconds > 1.0f)
+    {
+        numchars = snprintf(buffer, 20, "%.2f fps", ellapsed_frames / ellapsed_seconds);
+
+        old_seconds = seconds;
+        ellapsed_frames = 0;
+    }
+
+    float lineheight = TextRendering_LineHeight(window);
+    float charwidth = TextRendering_CharWidth(window);
+
+    TextRendering_PrintString(window, buffer, 1.0f - (numchars + 1) * charwidth, 1.0f - lineheight, 1.0f);
 }
