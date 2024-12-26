@@ -92,7 +92,7 @@ void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE && isFreeCamOn)
     {
         // Quando o usuário soltar o botão esquerdo do mouse, atualizamos a
-        // variável abaixo para false. 
+        // variável abaixo para false.
         g_RightMouseButtonPressed = false;
     }
     if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS && isFreeCamOn)
@@ -123,7 +123,7 @@ void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
     // parâmetros que definem a posição da câmera dentro da cena virtual.
     // Assim, temos que o usuário consegue controlar a câmera.
 
-    if (g_LeftMouseButtonPressed)
+    if (!g_LeftMouseButtonPressed && isFreeCamOn) // câmera controlada pelo cursor na câmera livre
     {
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;

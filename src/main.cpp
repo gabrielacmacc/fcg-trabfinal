@@ -46,17 +46,16 @@
 #include "utils/shader_utils.hpp"
 #include "utils/texture_utils.hpp"
 
-
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);
 void PopMatrix(glm::mat4 &M);
 
 // Declaração de várias funções utilizadas em main().  Essas estão definidas
 // logo após a definição de main() neste arquivo.
-void BuildTrianglesAndAddToVirtualScene(ObjModel *);                         // Constrói representação de um ObjModel como malha de triângulos para renderização
-void ComputeNormals(ObjModel *model);                                        // Computa normais de um ObjModel, caso não existam.
-void DrawVirtualObject(const char *object_name);                             // Desenha um objeto armazenado em g_VirtualScene
-void PrintObjModelInfo(ObjModel *);                                          // Função para debugging
+void BuildTrianglesAndAddToVirtualScene(ObjModel *); // Constrói representação de um ObjModel como malha de triângulos para renderização
+void ComputeNormals(ObjModel *model);                // Computa normais de um ObjModel, caso não existam.
+void DrawVirtualObject(const char *object_name);     // Desenha um objeto armazenado em g_VirtualScene
+void PrintObjModelInfo(ObjModel *);                  // Função para debugging
 
 void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
 void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
@@ -71,6 +70,15 @@ std::map<std::string, SceneObject> g_VirtualScene;
 
 // Pilha que guardará as matrizes de modelagem.
 std::stack<glm::mat4> g_MatrixStack;
+
+// Struct que guarda o id, o tipo e o nome dos objetos a serem instanciados (usada pro labirinto)
+struct ObjectTransform
+{
+    glm::mat4 modelMatrix;
+    int objectId;
+    int objectType;
+    std::string objectName;
+};
 
 int main(int argc, char *argv[])
 {
@@ -232,11 +240,11 @@ int main(int argc, char *argv[])
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);             // Ponto "c", centro da câmera
-        glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);      // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector; // Vetor "view", sentido para onde a câmera está virada
-        glm::vec4 camera_view_unit; // Vetor "view" unitário
-        glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);     // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+        glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);         // Ponto "c", centro da câmera
+        glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);  // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+        glm::vec4 camera_view_vector;                                   // Vetor "view", sentido para onde a câmera está virada
+        glm::vec4 camera_view_unit;                                     // Vetor "view" unitário
+        glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); // Vetor "up" fixado para apontar para o "céu" (eixo Y global)
 
         if (isFreeCamOn)
         {
@@ -251,6 +259,7 @@ int main(int argc, char *argv[])
             pacman_position_c = camera_position_c + glm::vec4(camera_view_unit * pacmanDistance);
             pacman_position_c.y = (pacman_position_c.y - pacmanDistance) < -1.0f ? -1.0f: (pacman_position_c.y - pacmanDistance);
             pacman_rotation = -atan2(camera_view_unit.z, camera_view_unit.x);
+            camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
         }
         else
         {
@@ -323,14 +332,14 @@ int main(int argc, char *argv[])
         
         glDepthFunc(GL_ALWAYS);
 
-        glm::mat4 skyModel = Matrix_Scale(farplane/4,farplane/4,farplane/4);
-        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(skyModel));
+        glm::mat4 skyModel = Matrix_Scale(farplane / 4, farplane / 4, farplane / 4);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(skyModel));
         glUniform1i(g_object_id_uniform, BACKGROUND);
         DrawVirtualObject("Cube");
         
         glDepthFunc(GL_LESS);
 
-        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane/4, 1.0f, farplane/4);
+        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane / 4, 1.0f, farplane / 4);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
@@ -342,10 +351,12 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
 
-        model = Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f);
+        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z)
+        * Matrix_Rotate_Y(pacman_rotation)
+        * Matrix_Scale(pacman_size.x, pacman_size.y, pacman_size.z);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, LABYRINTH_2);
-        DrawVirtualObject("p2");
+        glUniform1i(g_object_id_uniform, PACMAN);
+        DrawVirtualObject("pacman");
 
         model = Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159/2) * Matrix_Scale(0.2f, 0.5f, 0.6f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
@@ -525,8 +536,8 @@ int main(int argc, char *argv[])
 
         AABB camera_bbox = {boxMin, boxMax};
 
-        glm::vec3 skyboxMin = glm::vec3(farplane/4, farplane/2, farplane/4);
-        glm::vec3 skyboxMax = glm::vec3(-farplane/4, -farplane/2, -farplane/4);
+        glm::vec3 skyboxMin = glm::vec3(farplane / 4, farplane / 2, farplane / 4);
+        glm::vec3 skyboxMax = glm::vec3(-farplane / 4, -farplane / 2, -farplane / 4);
 
         AABB sky_bbox = {skyboxMin, skyboxMax};
         Sphere pacman_sphere = {pacman_position_c, 0.5};
