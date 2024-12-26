@@ -56,14 +56,13 @@ float g_AngleZ = 0.0f;
 // renderização.
 float g_CameraTheta = 0.0f;    // Ângulo no plano ZX em relação ao eixo Z
 float g_CameraPhi = 0.0f;      // Ângulo em relação ao eixo Y
-float g_CameraDistance = 5.0f; // Distância da câmera para a origem
+float g_CameraDistance = 15.0f; // Distância da câmera para a origem
 
 // Variáveis que controlam a posição e movimentação da câmera
 glm::vec4 camera_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 const float CAMERA_SPEED = 3.0f;
-const float GHOST_SPEED = 0.0f;
 
 float previousTime = (float)glfwGetTime();
 
@@ -92,3 +91,35 @@ float camera_height = 0.5f;
 float camera_depth = 0.5f;
 
 glm::vec3 camera_bbox_aux = glm::vec3(camera_width, camera_height, camera_depth);
+
+//Variáveis para controle de movimento do pacman
+float pacmanDistance = 0.5f;
+
+glm::vec3 pacman_freecam_size = glm::vec3(0.1f, 0.1f, 0.1f);
+glm::vec3 pacman_lookat_size = glm::vec3(0.3f, 0.3f, 0.3f);
+glm::vec3 pacman_size = pacman_lookat_size;
+
+glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+glm::vec4 pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+const float PACMAN_SPEED = 3.0f;
+
+bool movePacmanForward = false;
+bool movePacmanBackward = false;
+bool movePacmanRight = false;
+bool movePacmanLeft = false;
+
+float pacman_initial_rotation = 3.14159f/2;
+float pacman_rotation = pacman_initial_rotation;
+
+float g_PacmanTheta = 0.0f;
+float g_PacmanPhi = 0.0f;
+float g_PacmanDistance = -1.0f;
+
+float r_initial_pacman = g_PacmanDistance;
+float x_initial_pacman = r_initial_pacman * cos(g_PacmanPhi) * sin(g_PacmanTheta);
+float y_initial_pacman = r_initial_pacman;
+float z_initial_pacman = r_initial_pacman * cos(g_PacmanPhi) * cos(g_PacmanTheta);
+
+glm::vec4 pacman_position_initial = glm::vec4(x_initial_pacman, y_initial_pacman, z_initial_pacman, 1.0f);
+glm::vec4 pacman_position_c = pacman_position_initial;

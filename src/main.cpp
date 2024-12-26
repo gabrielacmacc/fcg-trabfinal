@@ -58,33 +58,8 @@ void ComputeNormals(ObjModel *model);                                        // 
 void DrawVirtualObject(const char *object_name);                             // Desenha um objeto armazenado em g_VirtualScene
 void PrintObjModelInfo(ObjModel *);                                          // Função para debugging
 
-// Declaração de funções auxiliares para renderizar texto dentro da janela
-// OpenGL. Estas funções estão definidas no arquivo "textrendering.cpp".
-void TextRendering_Init();
-float TextRendering_LineHeight(GLFWwindow *window);
-float TextRendering_CharWidth(GLFWwindow *window);
-void TextRendering_PrintString(GLFWwindow *window, const std::string &str, float x, float y);
-void TextRendering_PrintMatrix(GLFWwindow *window, glm::mat4 M, float x, float y);
-void TextRendering_PrintVector(GLFWwindow *window, glm::vec4 v, float x, float y);
-void TextRendering_PrintMatrixVectorProduct(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y);
-void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y);
-void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y);
-
-// Funções abaixo renderizam como texto na janela OpenGL algumas matrizes e
-// outras informações do programa. Definidas após main().
-void TextRendering_ShowModelViewProjection(GLFWwindow *window, glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec4 p_model);
-void TextRendering_ShowEulerAngles(GLFWwindow *window);
-void TextRendering_ShowProjection(GLFWwindow *window);
-void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
-
-// Funções callback para comunicação com o sistema operacional e interação do
-// usuário. Veja mais comentários nas definições das mesmas, abaixo.
-void FramebufferSizeCallback(GLFWwindow *window, int width, int height);
-void ErrorCallback(int error, const char *description);
-void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
-void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
-void CursorPosCallback(GLFWwindow *window, double xpos, double ypos);
-void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
+void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -166,15 +141,8 @@ int main(int argc, char *argv[])
     printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
     // Carregamos os shaders de vértices e de fragmentos que serão utilizados
-    // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
-    //
     LoadShadersFromFiles();
-
-    LoadTextureImage("../../resources/textures/asphalt_track_diff_4k.jpg");
-    LoadTextureImage("../../resources/textures/blue.jpg");
-    LoadTextureImage("../../resources/textures/yellow.png");
-    LoadTextureImage("../../resources/textures/teste1.jpg");
-    LoadTextureImage("../../resources/textures/teste2.png");
+    LoadTexturesFromFiles();
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../resources/models/food/sphere.obj");
@@ -200,6 +168,10 @@ int main(int argc, char *argv[])
     ObjModel piecethree("../../resources/models/labyrinth/p3.obj");
     ComputeNormals(&piecethree);
     BuildTrianglesAndAddToVirtualScene(&piecethree);
+
+    ObjModel pacmodel("../../resources/models/pacman/pacman.obj");
+    ComputeNormals(&pacmodel);
+    BuildTrianglesAndAddToVirtualScene(&pacmodel);
 
     if (argc > 1)
     {
@@ -263,6 +235,7 @@ int main(int argc, char *argv[])
         glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);             // Ponto "c", centro da câmera
         glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);      // Ponto "l", para onde a câmera (look-at) estará sempre olhando
         glm::vec4 camera_view_vector; // Vetor "view", sentido para onde a câmera está virada
+        glm::vec4 camera_view_unit; // Vetor "view" unitário
         glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);     // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
         if (isFreeCamOn)
@@ -272,6 +245,12 @@ int main(int argc, char *argv[])
             camera_position_c = camera_position_initial + camera_movement;
             camera_view_vector = glm::vec4(-x, -y, -z, 0.0f);
             camera_offset = glm::vec4(0.0f,0.0f,0.0f,0.0f);
+
+            camera_view_unit = camera_view_vector / norm(camera_view_vector);
+
+            pacman_position_c = camera_position_c + glm::vec4(camera_view_unit * pacmanDistance);
+            pacman_position_c.y = (pacman_position_c.y - pacmanDistance) < -1.0f ? -1.0f: (pacman_position_c.y - pacmanDistance);
+            pacman_rotation = -atan2(camera_view_unit.z, camera_view_unit.x);
         }
         else
         {
@@ -279,31 +258,19 @@ int main(int argc, char *argv[])
             camera_position_c = glm::vec4(0.0f, fixedHeight, 0.0f, 1.0f);
             camera_up_vector = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
             camera_view_vector = camera_lookat_l - camera_position_c;
+            
+            pacman_movement += pacman_offset;
+            pacman_position_c = pacman_position_initial + pacman_movement;
+            pacman_offset = glm::vec4(0.0f,0.0f,0.0f,0.0f);
         }
 
-        glm::vec4 camera_view_unit = camera_view_vector / norm(camera_view_vector);
+        camera_view_unit = camera_view_vector / norm(camera_view_vector);
         glm::vec4 camera_side_view = crossproduct(camera_up_vector, camera_view_unit);
         glm::vec4 camera_side_view_unit = camera_side_view / norm(camera_side_view);
+        glm::vec4 camera_up_unit = camera_up_vector / norm(camera_up_vector);
 
-        if (moveBackward)
-        {
-            camera_movement -= camera_view_unit * CAMERA_SPEED * ellapsedTime;
-        }
-
-        if (moveForward)
-        {
-            camera_movement += camera_view_unit * CAMERA_SPEED * ellapsedTime;
-        }
-
-        if (moveRight)
-        {
-            camera_movement -= camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
-        }
-
-        if (moveLeft)
-        {
-            camera_movement += camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
-        }
+        MooveCamera(camera_view_unit, camera_side_view_unit, ellapsedTime);
+        MoovePacman(camera_up_unit, camera_side_view_unit, ellapsedTime);
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -352,20 +319,28 @@ int main(int argc, char *argv[])
 #define LABYRINTH_3 3
 #define PLANE 4
 #define BACKGROUND 5
+#define PACMAN 6
         
-        glDepthFunc(GL_ALWAYS); // Desativa Z-buffer
+        glDepthFunc(GL_ALWAYS);
 
         glm::mat4 skyModel = Matrix_Scale(farplane/4,farplane/4,farplane/4);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(skyModel));
         glUniform1i(g_object_id_uniform, BACKGROUND);
         DrawVirtualObject("Cube");
         
-        glDepthFunc(GL_LESS); // Reativa o Z-buffer
+        glDepthFunc(GL_LESS);
 
         model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane/4, 1.0f, farplane/4);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
+
+        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z)
+        * Matrix_Rotate_Y(pacman_rotation)
+        * Matrix_Scale(pacman_size.x, pacman_size.y, pacman_size.z);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, PACMAN);
+        DrawVirtualObject("pacman");
 
         model = Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
@@ -542,6 +517,7 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, LABYRINTH_3);
         DrawVirtualObject("p3");
 
+        //Testes de colisão
         glm::vec3 camera_position_vec3 = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
 
         glm::vec3 boxMin = camera_position_vec3 - camera_bbox_aux;
@@ -549,12 +525,14 @@ int main(int argc, char *argv[])
 
         AABB camera_bbox = {boxMin, boxMax};
 
-        glm::vec3 skyboxMin = glm::vec3(farplane/4, farplane, farplane/4);
-        glm::vec3 skyboxMax = glm::vec3(-farplane/4, -farplane, -farplane/4);
+        glm::vec3 skyboxMin = glm::vec3(farplane/4, farplane/2, farplane/4);
+        glm::vec3 skyboxMax = glm::vec3(-farplane/4, -farplane/2, -farplane/4);
 
-        AABB skybbox = {skyboxMin, skyboxMax};
+        AABB sky_bbox = {skyboxMin, skyboxMax};
+        Sphere pacman_sphere = {pacman_position_c, 0.5};
 
-        camera_offset = checkPlaneCollision(camera_bbox, skybbox);
+        camera_offset = checkAABBToPlaneCollision(camera_bbox, sky_bbox);
+        pacman_offset = checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
@@ -587,6 +565,46 @@ int main(int argc, char *argv[])
 
     // Fim do programa
     return 0;
+}
+
+void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime) {
+    if (moveBackward)
+        camera_movement -= camera_view_unit * CAMERA_SPEED * ellapsedTime;
+
+    if (moveForward)
+        camera_movement += camera_view_unit * CAMERA_SPEED * ellapsedTime;
+
+    if (moveRight)
+        camera_movement -= camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
+
+    if (moveLeft)
+        camera_movement += camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
+}
+
+void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime) {
+    if (movePacmanBackward)
+    {
+        pacman_movement -= camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_rotation = -3.14159f/2;
+    }
+
+    if (movePacmanForward)
+    {
+        pacman_movement += camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_rotation = 3.14159f/2;
+    }
+
+    if (movePacmanRight)
+    {
+        pacman_movement -= camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_rotation = 0.0f;
+    }
+
+    if (movePacmanLeft)
+    {
+        pacman_movement += camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_rotation = 3.14159f;
+    }
 }
 
 // Função que desenha um objeto armazenado em g_VirtualScene. Veja definição
@@ -638,71 +656,6 @@ void PopMatrix(glm::mat4 &M)
     {
         M = g_MatrixStack.top();
         g_MatrixStack.pop();
-    }
-}
-
-// Função que computa as normais de um ObjModel, caso elas não tenham sido
-// especificadas dentro do arquivo ".obj"
-void ComputeNormals(ObjModel *model)
-{
-    if (!model->attrib.normals.empty())
-        return;
-
-    // Primeiro computamos as normais para todos os TRIÂNGULOS.
-    // Segundo, computamos as normais dos VÉRTICES através do método proposto
-    // por Gouraud, onde a normal de cada vértice vai ser a média das normais de
-    // todas as faces que compartilham este vértice.
-
-    size_t num_vertices = model->attrib.vertices.size() / 3;
-
-    std::vector<int> num_triangles_per_vertex(num_vertices, 0);
-    std::vector<glm::vec4> vertex_normals(num_vertices, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-
-    for (size_t shape = 0; shape < model->shapes.size(); ++shape)
-    {
-        size_t num_triangles = model->shapes[shape].mesh.num_face_vertices.size();
-
-        for (size_t triangle = 0; triangle < num_triangles; ++triangle)
-        {
-            assert(model->shapes[shape].mesh.num_face_vertices[triangle] == 3);
-
-            glm::vec4 vertices[3];
-            for (size_t vertex = 0; vertex < 3; ++vertex)
-            {
-                tinyobj::index_t idx = model->shapes[shape].mesh.indices[3 * triangle + vertex];
-                const float vx = model->attrib.vertices[3 * idx.vertex_index + 0];
-                const float vy = model->attrib.vertices[3 * idx.vertex_index + 1];
-                const float vz = model->attrib.vertices[3 * idx.vertex_index + 2];
-                vertices[vertex] = glm::vec4(vx, vy, vz, 1.0);
-            }
-
-            const glm::vec4 a = vertices[0];
-            const glm::vec4 b = vertices[1];
-            const glm::vec4 c = vertices[2];
-
-            // PREENCHA AQUI o cálculo da normal de um triângulo cujos vértices
-            // estão nos pontos "a", "b", e "c", definidos no sentido anti-horário.
-            const glm::vec4 n = crossproduct(c - b, a - b);
-
-            for (size_t vertex = 0; vertex < 3; ++vertex)
-            {
-                tinyobj::index_t idx = model->shapes[shape].mesh.indices[3 * triangle + vertex];
-                num_triangles_per_vertex[idx.vertex_index] += 1;
-                vertex_normals[idx.vertex_index] += n;
-                model->shapes[shape].mesh.indices[3 * triangle + vertex].normal_index = idx.vertex_index;
-            }
-        }
-    }
-
-    model->attrib.normals.resize(3 * num_vertices);
-
-    for (size_t i = 0; i < vertex_normals.size(); ++i)
-    {
-        glm::vec4 n = vertex_normals[i] / (float)num_triangles_per_vertex[i];
-        n /= norm(n);
-        model->attrib.normals[3 * i + 0] = n.x;
-        model->attrib.normals[3 * i + 1] = n.y;
-        model->attrib.normals[3 * i + 2] = n.z;
     }
 }
 

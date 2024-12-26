@@ -25,6 +25,8 @@ uniform mat4 projection;
 #define LABYRINTH_3 3
 #define PLANE  4
 #define BACKGROUND 5
+#define PACMAN 6
+
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -32,11 +34,10 @@ uniform vec4 bbox_min;
 uniform vec4 bbox_max;
 
 // Variáveis para acesso das imagens de textura
+uniform sampler2D SkyBoxTexture;
 uniform sampler2D FloorTexture;
-uniform sampler2D LabTexture1;
-uniform sampler2D LabTexture2;
-uniform sampler2D Test1;
-uniform sampler2D Test2;
+uniform sampler2D LabyrinthTexture;
+uniform sampler2D PacmanTexture;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -123,25 +124,70 @@ void main()
     {
         U = texcoords.x + 10.0f;
         V = texcoords.y + 10.0f;
-        Kd = texture(Test2, vec2(U,V)).rgb;
+        
+        U *= 3.0f;
+        V *= 3.0f;
+
+        Kd = texture(FloorTexture, vec2(U,V)).rgb;
         color.rgb = Kd;
     }
     else if ( object_id == BACKGROUND )
     {
         vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
 
+        vec4 position_cube = position_model - bbox_center;
+
+        vec4 abs_pos = abs(position_cube);
+        float max_axis = max(max(abs_pos.x, abs_pos.y), abs_pos.z);
+
+        if (max_axis == abs_pos.x) {
+            if (position_cube.x > 0) {
+                U = -position_cube.z;
+                V = position_cube.y;
+            } else {
+                U = position_cube.z;
+                V = position_cube.y;
+            }
+        } else if (max_axis == abs_pos.y) {
+            if (position_cube.y > 0) {
+                U = position_cube.x;
+                V = -position_cube.z;
+            } else {
+                U = position_cube.x;
+                V = position_cube.z;
+            }
+        } else {
+            if (position_cube.z > 0) {
+                U = position_cube.x;
+                V = position_cube.y;    
+            } else {
+                U = -position_cube.x;
+                V = position_cube.y;
+            }
+        }
+
+        U = (U + 1.0) / 2.0;
+        V = (V + 1.0) / 2.0;
+
+        Kd = texture(SkyBoxTexture, vec2(U,V)).rgb;
+        color.rgb = Kd;
+    }
+    else if ( object_id == LABYRINTH_1 || object_id == LABYRINTH_2 || object_id == LABYRINTH_3)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+
+        Kd = texture(LabyrinthTexture, vec2(U,V)).rgb;
+        lambert_diffuse_term = Kd * I * lambert;
+        color.rgb = lambert_diffuse_term;
+    }
+    else if ( object_id == PACMAN) 
+    {
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+
         float radius = length(bbox_max - bbox_center);
 
         vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
-        //vec4 p_vector = position_model - bbox_center;
-
-        //float px = p_vector.x;
-        //float py = p_vector.y;
-        //float pz = p_vector.z;
-
-        //float theta = atan(px, pz);
-        //float rho = length(p_vector);
-        //float phi = asin(py/rho);
 
         float theta = atan(position_sphere.x, position_sphere.z);
         float phi = asin(position_sphere.y / radius);
@@ -152,17 +198,9 @@ void main()
         U *= 3.0f;
         V *= 3.0f;
 
-        Kd = texture(Test2, vec2(U,V)).rgb;
-        color.rgb = Kd;
-    }
-    else if ( object_id == LABYRINTH_1 || object_id == LABYRINTH_2 || object_id == LABYRINTH_3)
-    {
-        U = texcoords.x;
-        V = texcoords.y;
-
-        Kd = texture(LabTexture1, vec2(U,V)).rgb;
+        Kd = texture(PacmanTexture, vec2(U,V)).rgb;
         lambert_diffuse_term = Kd * I * lambert;
-        color.rgb = lambert_diffuse_term;
+        color.rgb = lambert_diffuse_term + ambient_term;
     }
     else // Objeto desconhecido = preto
     {

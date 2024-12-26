@@ -31,6 +31,9 @@
 
 #include "matrices.h"
 
+// Funções callback para comunicação com o sistema operacional e interação do
+// usuário. Veja mais comentários nas definições das mesmas, abaixo.
+
 // Definição da função que será chamada sempre que a janela do sistema
 // operacional for redimensionada, por consequência alterando o tamanho do
 // "framebuffer" (região de memória onde são armazenados os pixels da imagem).
@@ -124,11 +127,11 @@ void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
     {
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
-        //float dy = ypos - g_LastCursorPosY;
+        float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da câmera com os deslocamentos
         g_CameraTheta -= 0.01f * dx;
-        //g_CameraPhi += 0.01f * dy;
+        g_CameraPhi += 0.01f * dy;
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
         float phimax = 3.141592f / 2;
@@ -314,9 +317,63 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
         }
     }
 
+    // Se o usuário apertar a tecla A, movemos o pacman para esquerda
+    if (key == GLFW_KEY_A && !isFreeCamOn)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
+            movePacmanLeft = true;
+        }
+        else
+        {
+            movePacmanLeft = false;
+        }
+    }
+
+    // Se o usuário apertar a tecla W, movemos o pacman para frente
+    if (key == GLFW_KEY_W && !isFreeCamOn)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
+            movePacmanForward = true;
+        }
+        else
+        {
+            movePacmanForward = false;
+        }
+    }
+
+    // Se o usuário apertar a tecla D, movemos o pacman para direita
+    if (key == GLFW_KEY_D && !isFreeCamOn)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
+            movePacmanRight = true;
+        }
+        else
+        {
+            movePacmanRight = false;
+        }
+    }
+
+    // Se o usuário apertar a tecla S, movemos o pacman para trás
+    if (key == GLFW_KEY_S && !isFreeCamOn)
+    {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        {
+            movePacmanBackward = true;
+        }
+        else
+        {
+            movePacmanBackward = false;
+        }
+    }
+
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
         isFreeCamOn = !isFreeCamOn;
+        pacman_rotation = isFreeCamOn ? pacman_initial_rotation : pacman_rotation;
+        pacman_size = (pacman_size == pacman_freecam_size) ? pacman_lookat_size : pacman_freecam_size;
     }
 }
 
