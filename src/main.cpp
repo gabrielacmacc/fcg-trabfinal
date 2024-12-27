@@ -71,6 +71,8 @@ public:
     int objectType;
     std::string objectName;
     AABB minMaxCorner;
+    glm::vec4 collisionOffset;
+    bool isColliding;
 
     // Métodos:
 
@@ -79,6 +81,8 @@ public:
         : modelMatrix(modelMatrix), objectId(objectId), objectType(objectType), objectName(objectName)
     {
         this->minMaxCorner = setBoundingBox();
+        this->collisionOffset = getCollisionOffset();
+        this->isColliding = detectCollision();
     }
 
     void render()
@@ -86,6 +90,34 @@ public:
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glUniform1i(g_object_id_uniform, objectType);
         DrawVirtualObject(objectName.c_str());
+    }
+
+    bool detectCollision()
+    {
+        Sphere pacman = {pacman_position_c, 0.5};
+        glm::vec4 offset = checkSphereToAABBCollision(this->minMaxCorner, pacman);
+        isColliding = false;
+        if (offset.x < 0.0f || offset.y < 0.0f || offset.z < 0.0f)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    glm::vec4 getCollisionOffset()
+    {
+        Sphere pacman = {pacman_position_c, 0.5};
+        glm::vec4 offset = checkSphereToAABBCollision(this->minMaxCorner, pacman);
+        isColliding = false;
+        if (offset.x < 0.0f || offset.y < 0.0f || offset.z < 0.0f)
+        {
+            // debugX = offset.x;
+            // debugY = offset.y;
+            // debugZ = offset.z;
+            isColliding = true;
+            // pacman.center += glm::vec3(offset); // Ajusta posição do pac man
+        }
+        return offset;
     }
 
 private:
@@ -103,6 +135,7 @@ private:
         return {minCorner, maxCorner};
     }
 };
+void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -110,8 +143,7 @@ private:
 // (map).  Veja dentro da função BuildTrianglesAndAddToVirtualScene() como que são incluídos
 // objetos dentro da variável g_VirtualScene, e veja na função main() como
 // estes são acessados.
-std::map<std::string, SceneObject>
-    g_VirtualScene;
+std::map<std::string, SceneObject> g_VirtualScene;
 
 // Pilha que guardará as matrizes de modelagem.
 std::stack<glm::mat4> g_MatrixStack;
@@ -392,41 +424,42 @@ int main(int argc, char *argv[])
 
         Wall walls[] = {
             {Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(0.0f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(0.0f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            // {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
             {Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_3, "p3"},
         };
+        TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
 
         for (Wall &wall : walls)
         {
@@ -449,17 +482,6 @@ int main(int argc, char *argv[])
 
         camera_offset = checkAABBToPlaneCollision(camera_bbox, sky_bbox);
         pacman_offset = checkSphereToAABBCollision(sky_bbox, pacman_sphere);
-
-        for (Wall &wall : walls)
-        {
-            glm::vec4 offset = checkSphereToAABBCollision(wall.minMaxCorner, pacman_sphere);
-
-            if (glm::length(offset) > 0.0f) // Se houve colisão, ajusta a posição do pac-man
-            {
-                isColliding = true;
-                pacman_sphere.center += glm::vec3(offset);
-            }
-        }
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
@@ -730,6 +752,36 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *model)
     // "Desligamos" o VAO, evitando assim que operações posteriores venham a
     // alterar o mesmo. Isso evita bugs.
     glBindVertexArray(0);
+}
+
+void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size)
+{
+    if (!g_ShowInfoText)
+        return;
+
+    float pad = TextRendering_LineHeight(window);
+    char buffer[140];
+
+    float yPosition = 1.0f - pad; // Posição inicial
+
+    for (int i = 0; i < size; i++)
+    {
+        Wall &wall = walls[i];
+
+        // Printa as coordenadas max e min de AABB para debug
+        snprintf(buffer, 140,
+                 "Wall %d coordinates: Min(X: %.2f, Y: %.2f, Z: %.2f) Max(X: %.2f, Y: %.2f, Z: %.2f, Offx:%.2f,Offy:%.2f,Offz:%.2f, Coll: %s)\n",
+                 i,
+                 wall.minMaxCorner.min.x, wall.minMaxCorner.min.y, wall.minMaxCorner.min.z,
+                 wall.minMaxCorner.max.x, wall.minMaxCorner.max.y, wall.minMaxCorner.max.z,
+                 wall.collisionOffset.x,
+                 wall.collisionOffset.y,
+                 wall.collisionOffset.z,
+                 wall.isColliding ? "T" : "F");
+
+        TextRendering_PrintString(window, buffer, -1.0f + pad / 10, yPosition, 1.0f);
+        yPosition -= pad * 1.5f;
+    }
 }
 
 // Função para debugging: imprime no terminal todas informações de um modelo

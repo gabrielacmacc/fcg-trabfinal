@@ -78,7 +78,7 @@ bool moveBackward = false;
 bool moveRight = false;
 bool moveLeft = false;
 bool isFreeCamOn = false;
-bool isColliding = false;
+// bool isColliding = false;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
