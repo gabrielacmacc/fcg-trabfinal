@@ -14,7 +14,8 @@ bool checkAABBCollision(AABB a, AABB b)
     return false;
 }
 
-glm::vec4 checkAABBToPlaneCollision(AABB a, AABB b) {
+glm::vec4 checkAABBToPlaneCollision(AABB a, AABB b)
+{
     glm::vec4 offset = {0.0f, 0.0f, 0.0f, 0.0f};
 
     float xPenetrationMin = b.min.x - a.min.x;
@@ -24,28 +25,38 @@ glm::vec4 checkAABBToPlaneCollision(AABB a, AABB b) {
     float zPenetrationMin = b.min.z - a.min.z;
     float zPenetrationMax = b.max.z - a.max.z;
 
-    if (xPenetrationMin > 0.0f) {
-        offset.x = xPenetrationMin;   
-    } else if (xPenetrationMax < 0.0f) {
+    if (xPenetrationMin > 0.0f)
+    {
+        offset.x = xPenetrationMin;
+    }
+    else if (xPenetrationMax < 0.0f)
+    {
         offset.x = xPenetrationMax;
     }
 
-    if (yPenetrationMin > 0.0f) {
+    if (yPenetrationMin > 0.0f)
+    {
         offset.y = yPenetrationMin;
-    } else if (yPenetrationMax < 0.0f) {
+    }
+    else if (yPenetrationMax < 0.0f)
+    {
         offset.y = yPenetrationMax;
     }
 
-    if (zPenetrationMin > 0.0f) {
+    if (zPenetrationMin > 0.0f)
+    {
         offset.z = zPenetrationMin;
-    } else if (zPenetrationMax < 0.0f) {
+    }
+    else if (zPenetrationMax < 0.0f)
+    {
         offset.z = zPenetrationMax;
     }
 
     return offset;
 }
 
-glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b) {
+glm::vec4 checkSphereToAABBCollision(AABB a, Sphere b)
+{
     glm::vec4 offset = {0.0f, 0.0f, 0.0f, 0.0f};
 
     float xPenetrationMin = a.min.x - (b.center.x - b.radius);
@@ -55,21 +66,30 @@ glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b) {
     float zPenetrationMin = a.min.z - (b.center.z - b.radius);
     float zPenetrationMax = (b.center.z + b.radius) - a.max.z;
 
-    if (xPenetrationMin > 0.0f) {
+    if (xPenetrationMin > 0.0f)
+    {
         offset.x = xPenetrationMin;
-    } else if (xPenetrationMax > 0.0f) {
+    }
+    else if (xPenetrationMax > 0.0f)
+    {
         offset.x = -xPenetrationMax;
     }
 
-    if (yPenetrationMin > 0.0f) {
+    if (yPenetrationMin > 0.0f)
+    {
         offset.y = yPenetrationMin;
-    } else if (yPenetrationMax > 0.0f) {
+    }
+    else if (yPenetrationMax > 0.0f)
+    {
         offset.y = -yPenetrationMax;
     }
 
-    if (zPenetrationMin > 0.0f) {
+    if (zPenetrationMin > 0.0f)
+    {
         offset.z = zPenetrationMin;
-    } else if (zPenetrationMax > 0.0f) {
+    }
+    else if (zPenetrationMax > 0.0f)
+    {
         offset.z = -zPenetrationMax;
     }
 

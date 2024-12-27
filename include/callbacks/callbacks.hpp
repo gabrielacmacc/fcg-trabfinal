@@ -266,7 +266,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla A, movemos a câmera para esquerda
-    if (key == GLFW_KEY_A && isFreeCamOn)
+    if (key == GLFW_KEY_A && isFreeCamOn && !isColliding)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -279,7 +279,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla W, movemos a câmera para frente
-    if (key == GLFW_KEY_W && isFreeCamOn)
+    if (key == GLFW_KEY_W && isFreeCamOn && !isColliding)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -292,7 +292,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla D, movemos a câmera para direita
-    if (key == GLFW_KEY_D && isFreeCamOn)
+    if (key == GLFW_KEY_D && isFreeCamOn && !isColliding)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -305,7 +305,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla S, movemos a câmera para trás
-    if (key == GLFW_KEY_S && isFreeCamOn)
+    if (key == GLFW_KEY_S && isFreeCamOn && !isColliding)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {

@@ -59,25 +59,62 @@ void PrintObjModelInfo(ObjModel *);                  // Função para debugging
 void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
 void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
 
+// Declaração da classe paredes
+using namespace std;
+
+class Wall
+{
+public:
+    // Atributos:
+    glm::mat4 modelMatrix;
+    int objectId;
+    int objectType;
+    std::string objectName;
+    AABB minMaxCorner;
+
+    // Métodos:
+
+    // Construtor
+    Wall(glm::mat4 modelMatrix, int objectId, int objectType, std::string objectName)
+        : modelMatrix(modelMatrix), objectId(objectId), objectType(objectType), objectName(objectName)
+    {
+        this->minMaxCorner = setBoundingBox();
+    }
+
+    void render()
+    {
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniform1i(g_object_id_uniform, objectType);
+        DrawVirtualObject(objectName.c_str());
+    }
+
+private:
+    AABB setBoundingBox()
+    {
+        glm::vec3 minCorner = {10000.0f, 10000.0f, 10000.0f};
+        glm::vec3 maxCorner = {-10000.0f, -10000.0f, -10000.0f};
+        for (int i = 0; i < 8; i++)
+        {
+            glm::vec4 transformed = modelMatrix * baseCorners[i];
+            glm::vec3 transformedPos = glm::vec3(transformed);
+            minCorner = glm::min(minCorner, glm::vec3(transformedPos));
+            maxCorner = glm::max(maxCorner, glm::vec3(transformedPos));
+        }
+        return {minCorner, maxCorner};
+    }
+};
+
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
 // A cena virtual é uma lista de objetos nomeados, guardados em um dicionário
 // (map).  Veja dentro da função BuildTrianglesAndAddToVirtualScene() como que são incluídos
 // objetos dentro da variável g_VirtualScene, e veja na função main() como
 // estes são acessados.
-std::map<std::string, SceneObject> g_VirtualScene;
+std::map<std::string, SceneObject>
+    g_VirtualScene;
 
 // Pilha que guardará as matrizes de modelagem.
 std::stack<glm::mat4> g_MatrixStack;
-
-// Struct que guarda o id, o tipo e o nome dos objetos a serem instanciados (usada pro labirinto)
-struct ObjectTransform
-{
-    glm::mat4 modelMatrix;
-    int objectId;
-    int objectType;
-    std::string objectName;
-};
 
 int main(int argc, char *argv[])
 {
@@ -256,7 +293,7 @@ int main(int argc, char *argv[])
             camera_view_unit = camera_view_vector / norm(camera_view_vector);
 
             pacman_position_c = camera_position_c + glm::vec4(camera_view_unit * pacmanDistance);
-            pacman_position_c.y = (pacman_position_c.y - pacmanDistance) < -1.0f ? -1.0f: (pacman_position_c.y - pacmanDistance);
+            pacman_position_c.y = (pacman_position_c.y - pacmanDistance) < -1.0f ? -1.0f : (pacman_position_c.y - pacmanDistance);
             pacman_rotation = -atan2(camera_view_unit.z, camera_view_unit.x);
             camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
         }
@@ -266,10 +303,10 @@ int main(int argc, char *argv[])
             camera_position_c = glm::vec4(0.0f, fixedHeight, 0.0f, 1.0f);
             camera_up_vector = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
             camera_view_vector = camera_lookat_l - camera_position_c;
-            
+
             pacman_movement += pacman_offset;
             pacman_position_c = pacman_position_initial + pacman_movement;
-            pacman_offset = glm::vec4(0.0f,0.0f,0.0f,0.0f);
+            pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
         }
 
         camera_view_unit = camera_view_vector / norm(camera_view_vector);
@@ -328,14 +365,17 @@ int main(int argc, char *argv[])
 #define PLANE 4
 #define BACKGROUND 5
 #define PACMAN 6
-        
+
+        glm::vec3 minCorner = {10000.0f, 10000.0f, 10000.0f};
+        glm::vec3 maxCorner = {-10000.0f, -10000.0f, -10000.0f};
+
         glDepthFunc(GL_ALWAYS);
 
         glm::mat4 skyModel = Matrix_Scale(farplane / 4, farplane / 4, farplane / 4);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(skyModel));
         glUniform1i(g_object_id_uniform, BACKGROUND);
         DrawVirtualObject("Cube");
-        
+
         glDepthFunc(GL_LESS);
 
         model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane / 4, 1.0f, farplane / 4);
@@ -343,15 +383,14 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
 
-        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z)
-        * Matrix_Rotate_Y(pacman_rotation)
-        * Matrix_Scale(pacman_size.x, pacman_size.y, pacman_size.z);
+        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z) * Matrix_Rotate_Y(pacman_rotation) * Matrix_Scale(pacman_size.x, pacman_size.y, pacman_size.z);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
 
         int objectIdCounter = 0;
-        std::vector<ObjectTransform> objectTransforms = {
+
+        Wall walls[] = {
             {Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
             {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2"},
             {Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
@@ -388,16 +427,13 @@ int main(int argc, char *argv[])
             {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
             {Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_3, "p3"},
         };
-        
-        // Desenha todos os objetos que formam o labirinto
-        for (const auto &obj : objectTransforms)
+
+        for (Wall &wall : walls)
         {
-            glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(obj.modelMatrix));
-            glUniform1i(g_object_id_uniform, obj.objectType);
-            DrawVirtualObject(obj.objectName.c_str());
+            wall.render();
         }
 
-        //Testes de colisão
+        // Testes de colisão
         glm::vec3 camera_position_vec3 = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
 
         glm::vec3 boxMin = camera_position_vec3 - camera_bbox_aux;
@@ -412,7 +448,18 @@ int main(int argc, char *argv[])
         Sphere pacman_sphere = {pacman_position_c, 0.5};
 
         camera_offset = checkAABBToPlaneCollision(camera_bbox, sky_bbox);
-        pacman_offset = checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
+        pacman_offset = checkSphereToAABBCollision(sky_bbox, pacman_sphere);
+
+        for (Wall &wall : walls)
+        {
+            glm::vec4 offset = checkSphereToAABBCollision(wall.minMaxCorner, pacman_sphere);
+
+            if (glm::length(offset) > 0.0f) // Se houve colisão, ajusta a posição do pac-man
+            {
+                isColliding = true;
+                pacman_sphere.center += glm::vec3(offset);
+            }
+        }
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
@@ -447,7 +494,8 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime) {
+void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime)
+{
     if (moveBackward)
         camera_movement -= camera_view_unit * CAMERA_SPEED * ellapsedTime;
 
@@ -461,17 +509,18 @@ void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, fl
         camera_movement += camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
 }
 
-void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime) {
+void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime)
+{
     if (movePacmanBackward)
     {
         pacman_movement -= camera_up_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_rotation = -3.14159f/2;
+        pacman_rotation = -3.14159f / 2;
     }
 
     if (movePacmanForward)
     {
         pacman_movement += camera_up_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_rotation = 3.14159f/2;
+        pacman_rotation = 3.14159f / 2;
     }
 
     if (movePacmanRight)
