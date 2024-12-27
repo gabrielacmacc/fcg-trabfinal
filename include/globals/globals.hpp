@@ -54,8 +54,8 @@ float g_AngleZ = 0.0f;
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-float g_CameraTheta = 0.0f;    // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;      // Ângulo em relação ao eixo Y
+float g_CameraTheta = 0.0f;     // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi = 0.0f;       // Ângulo em relação ao eixo Y
 float g_CameraDistance = 15.0f; // Distância da câmera para a origem
 
 // Variáveis que controlam a posição e movimentação da câmera
@@ -92,7 +92,7 @@ float camera_depth = 0.5f;
 
 glm::vec3 camera_bbox_aux = glm::vec3(camera_width, camera_height, camera_depth);
 
-//Variáveis para controle de movimento do pacman
+// Variáveis para controle de movimento do pacman
 float pacmanDistance = 0.5f;
 
 glm::vec3 pacman_freecam_size = glm::vec3(0.1f, 0.1f, 0.1f);
@@ -102,6 +102,17 @@ glm::vec3 pacman_size = pacman_lookat_size;
 glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
+// Base de um cubo unitário centrado na origem usado como base para as bounding boxes das paredes do labirinto:
+glm::vec4 baseCorners[8] = {
+    glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
+    glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
+    glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
+    glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+    glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
+    glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
+    glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
+    glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)};
+
 const float PACMAN_SPEED = 3.0f;
 
 bool movePacmanForward = false;
@@ -109,7 +120,7 @@ bool movePacmanBackward = false;
 bool movePacmanRight = false;
 bool movePacmanLeft = false;
 
-float pacman_initial_rotation = 3.14159f/2;
+float pacman_initial_rotation = 3.14159f / 2;
 float pacman_rotation = pacman_initial_rotation;
 
 float g_PacmanTheta = 0.0f;
