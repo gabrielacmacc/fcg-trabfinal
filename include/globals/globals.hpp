@@ -58,20 +58,9 @@ float g_CameraTheta = 0.0f;     // Ângulo no plano ZX em relação ao eixo Z
 float g_CameraPhi = 0.0f;       // Ângulo em relação ao eixo Y
 float g_CameraDistance = 15.0f; // Distância da câmera para a origem
 
-// Variáveis que controlam a posição e movimentação da câmera
-// glm::vec4 camera_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-// glm::vec4 camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
 const float CAMERA_SPEED = 3.0f;
 
 float previousTime = (float)glfwGetTime();
-
-float r_initial = g_CameraDistance;
-float x_initial = r_initial * cos(g_CameraPhi) * sin(g_CameraTheta);
-float y_initial = r_initial * sin(g_CameraPhi);
-float z_initial = r_initial * cos(g_CameraPhi) * cos(g_CameraTheta);
-
-glm::vec4 camera_position_initial = glm::vec4(x_initial, y_initial, z_initial, 1.0f);
 
 bool moveForward = false;
 bool moveBackward = false;
@@ -86,15 +75,8 @@ bool g_UsePerspectiveProjection = true;
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = false;
 
-// Variáveis para a bounding box da câmera
-float camera_width = 0.5f;
-float camera_height = 0.5f;
-float camera_depth = 0.5f;
-
-glm::vec3 camera_bbox_aux = glm::vec3(camera_width, camera_height, camera_depth);
-
 // Variáveis para controle de movimento do pacman
-float pacmanDistance = 0.5f;
+const float PACMAN_DISTANCE = 0.5f;
 
 glm::vec3 pacman_freecam_size = glm::vec3(0.1f, 0.1f, 0.1f);
 glm::vec3 pacman_lookat_size = glm::vec3(0.3f, 0.3f, 0.3f);

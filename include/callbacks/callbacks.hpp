@@ -265,58 +265,6 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
         fflush(stdout);
     }
 
-    // Se o usuário apertar a tecla A, movemos a câmera para esquerda
-    if (key == GLFW_KEY_A && isFreeCamOn)
-    {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT)
-        {
-            moveLeft = true;
-        }
-        else
-        {
-            moveLeft = false;
-        }
-    }
-
-    // Se o usuário apertar a tecla W, movemos a câmera para frente
-    if (key == GLFW_KEY_W && isFreeCamOn)
-    {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT)
-        {
-            moveForward = true;
-        }
-        else
-        {
-            moveForward = false;
-        }
-    }
-
-    // Se o usuário apertar a tecla D, movemos a câmera para direita
-    if (key == GLFW_KEY_D && isFreeCamOn)
-    {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT)
-        {
-            moveRight = true;
-        }
-        else
-        {
-            moveRight = false;
-        }
-    }
-
-    // Se o usuário apertar a tecla S, movemos a câmera para trás
-    if (key == GLFW_KEY_S && isFreeCamOn)
-    {
-        if (action == GLFW_PRESS || action == GLFW_REPEAT)
-        {
-            moveBackward = true;
-        }
-        else
-        {
-            moveBackward = false;
-        }
-    }
-
     // Se o usuário apertar a tecla A, movemos o pacman para esquerda
     if (key == GLFW_KEY_A)
     {
@@ -371,14 +319,6 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
-        // if (isFreeCamOn)
-        // {
-        //     pacman_position_c = camera_position_c;
-        // }
-        // else
-        // {
-        //     camera_position_initial = pacman_position_c;
-        // }
         isFreeCamOn = !isFreeCamOn;
         pacman_rotation = isFreeCamOn ? pacman_initial_rotation : pacman_rotation;
         pacman_size = (pacman_size == pacman_freecam_size) ? pacman_lookat_size : pacman_freecam_size;
