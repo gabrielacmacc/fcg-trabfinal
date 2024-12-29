@@ -55,7 +55,7 @@ glm::vec4 checkAABBToPlaneCollision(AABB a, AABB b)
     return offset;
 }
 
-glm::vec4 checkSphereToAABBCollision(AABB a, Sphere b)
+glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b)
 {
     glm::vec4 offset = {0.0f, 0.0f, 0.0f, 0.0f};
 

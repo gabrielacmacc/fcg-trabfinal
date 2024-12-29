@@ -95,7 +95,7 @@ public:
     bool detectCollision()
     {
         Sphere pacman = {pacman_position_c, 0.5};
-        glm::vec4 offset = checkSphereToAABBCollision(this->minMaxCorner, pacman);
+        glm::vec4 offset = checkSphereToPlaneCollision(this->minMaxCorner, pacman);
         isColliding = false;
         if (offset.x < 0.0f || offset.y < 0.0f || offset.z < 0.0f)
         {
@@ -107,7 +107,7 @@ public:
     glm::vec4 getCollisionOffset()
     {
         Sphere pacman = {pacman_position_c, 0.5};
-        glm::vec4 offset = checkSphereToAABBCollision(this->minMaxCorner, pacman);
+        glm::vec4 offset = checkSphereToPlaneCollision(this->minMaxCorner, pacman);
         isColliding = false;
         if (offset.x < 0.0f || offset.y < 0.0f || offset.z < 0.0f)
         {
@@ -315,6 +315,9 @@ int main(int argc, char *argv[])
         glm::vec4 camera_view_unit;                                     // Vetor "view" unitário
         glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); // Vetor "up" fixado para apontar para o "céu" (eixo Y global)
         glm::vec4 camera_distance;
+        pacman_movement += pacman_offset;
+        pacman_position_c = pacman_position_initial + pacman_movement;
+        pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
         if (isFreeCamOn)
         {
@@ -323,7 +326,7 @@ int main(int argc, char *argv[])
 
             camera_view_unit = camera_view_vector / norm(camera_view_vector);
 
-            pacman_position_c = pacman_position_initial + pacman_movement;
+            // pacman_position_c = pacman_position_initial + pacman_movement;
             camera_distance = pacmanDistance * camera_view_unit;
             camera_distance.y = camera_view_unit.y - 0.3f;
             camera_position_c = pacman_position_c - camera_distance;
@@ -338,16 +341,12 @@ int main(int argc, char *argv[])
             camera_position_c = glm::vec4(0.0f, fixedHeight, 0.0f, 1.0f);
             camera_up_vector = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
             camera_view_vector = camera_lookat_l - camera_position_c;
-
-            pacman_movement += pacman_offset;
-            pacman_position_c = pacman_position_initial + pacman_movement;
-            pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
         }
 
         printf("Pacman (%f, %f, %f) - ", pacman_position_c.x, pacman_position_c.y, pacman_position_c.z);
-        printf("Camera (%f, %f, %f) - ", camera_position_c.x, camera_position_c.y, camera_position_c.z);
-        printf("View Unit (%f, %f, %f) - ", camera_view_unit.x, camera_view_unit.y, camera_view_unit.z);
-        printf("Camera distance (%f, %f, %f) - ", camera_distance.x, camera_distance.y, camera_distance.z);
+        // printf("Camera (%f, %f, %f) - ", camera_position_c.x, camera_position_c.y, camera_position_c.z);
+        // printf("View Unit (%f, %f, %f) - ", camera_view_unit.x, camera_view_unit.y, camera_view_unit.z);
+        // printf("Camera distance (%f, %f, %f) - ", camera_distance.x, camera_distance.y, camera_distance.z);
         printf("\n");
 
         camera_view_unit = camera_view_vector / norm(camera_view_vector);
@@ -494,7 +493,8 @@ int main(int argc, char *argv[])
         Sphere pacman_sphere = {pacman_position_c, 0.5};
 
         // camera_offset = checkAABBToPlaneCollision(camera_bbox, sky_bbox);
-        pacman_offset = checkSphereToAABBCollision(sky_bbox, pacman_sphere);
+        pacman_offset = checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
+        printf("Pacman Offset (%f, %f, %f) ", pacman_offset.x, pacman_offset.y, pacman_offset.z);
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
