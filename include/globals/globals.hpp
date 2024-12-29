@@ -59,8 +59,8 @@ float g_CameraPhi = 0.0f;       // Ângulo em relação ao eixo Y
 float g_CameraDistance = 15.0f; // Distância da câmera para a origem
 
 // Variáveis que controlam a posição e movimentação da câmera
-glm::vec4 camera_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-glm::vec4 camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+// glm::vec4 camera_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+// glm::vec4 camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 const float CAMERA_SPEED = 3.0f;
 

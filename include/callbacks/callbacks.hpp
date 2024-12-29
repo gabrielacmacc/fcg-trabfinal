@@ -123,7 +123,7 @@ void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
     // parâmetros que definem a posição da câmera dentro da cena virtual.
     // Assim, temos que o usuário consegue controlar a câmera.
 
-    if (!g_LeftMouseButtonPressed && isFreeCamOn) // câmera controlada pelo cursor na câmera livre
+    if (isFreeCamOn)
     {
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
@@ -318,7 +318,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla A, movemos o pacman para esquerda
-    if (key == GLFW_KEY_A && !isFreeCamOn)
+    if (key == GLFW_KEY_A)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -331,7 +331,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla W, movemos o pacman para frente
-    if (key == GLFW_KEY_W && !isFreeCamOn)
+    if (key == GLFW_KEY_W)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -344,7 +344,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla D, movemos o pacman para direita
-    if (key == GLFW_KEY_D && !isFreeCamOn)
+    if (key == GLFW_KEY_D)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -357,7 +357,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla S, movemos o pacman para trás
-    if (key == GLFW_KEY_S && !isFreeCamOn)
+    if (key == GLFW_KEY_S)
     {
         if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
@@ -371,6 +371,14 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
+        // if (isFreeCamOn)
+        // {
+        //     pacman_position_c = camera_position_c;
+        // }
+        // else
+        // {
+        //     camera_position_initial = pacman_position_c;
+        // }
         isFreeCamOn = !isFreeCamOn;
         pacman_rotation = isFreeCamOn ? pacman_initial_rotation : pacman_rotation;
         pacman_size = (pacman_size == pacman_freecam_size) ? pacman_lookat_size : pacman_freecam_size;

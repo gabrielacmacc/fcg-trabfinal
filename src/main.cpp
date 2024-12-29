@@ -56,7 +56,7 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *); // Constrói representaçã
 void DrawVirtualObject(const char *object_name);     // Desenha um objeto armazenado em g_VirtualScene
 void PrintObjModelInfo(ObjModel *);                  // Função para debugging
 
-void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
+// void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
 void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
 
 // Declaração da classe paredes
@@ -136,6 +136,7 @@ private:
     }
 };
 void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
+void TextRendering_Debug(GLFWwindow *window, glm::vec4 vec, string name, float pad);
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -302,7 +303,7 @@ int main(int argc, char *argv[])
         float g_CameraThetaCos = cos(g_CameraTheta);
 
         float r = g_CameraDistance;
-        float y = r * g_CameraPhiSin;
+        float y = g_CameraPhiSin >= 0 ? r * g_CameraPhiSin : 0; // Limita ângulo da free camera
         float z = r * g_CameraPhiCos * g_CameraThetaCos;
         float x = r * g_CameraPhiCos * g_CameraThetaSin;
 
@@ -313,21 +314,23 @@ int main(int argc, char *argv[])
         glm::vec4 camera_view_vector;                                   // Vetor "view", sentido para onde a câmera está virada
         glm::vec4 camera_view_unit;                                     // Vetor "view" unitário
         glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); // Vetor "up" fixado para apontar para o "céu" (eixo Y global)
+        glm::vec4 camera_distance;
 
         if (isFreeCamOn)
         {
-            camera_movement.y = -0.5f;
-            camera_movement += camera_offset;
-            camera_position_c = camera_position_initial + camera_movement;
             camera_view_vector = glm::vec4(-x, -y, -z, 0.0f);
-            camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+            // camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
             camera_view_unit = camera_view_vector / norm(camera_view_vector);
 
-            pacman_position_c = camera_position_c + glm::vec4(camera_view_unit * pacmanDistance);
-            pacman_position_c.y = (pacman_position_c.y - pacmanDistance) < -1.0f ? -1.0f : (pacman_position_c.y - pacmanDistance);
+            pacman_position_c = pacman_position_initial + pacman_movement;
+            camera_distance = pacmanDistance * camera_view_unit;
+            camera_distance.y = camera_view_unit.y - 0.3f;
+            camera_position_c = pacman_position_c - camera_distance;
+            // pacman_position_c = camera_position_c + glm::vec4(camera_view_unit * pacmanDistance);
+            // pacman_position_c.y = (pacman_position_c.y - pacmanDistance) < -1.0f ? -1.0f : (pacman_position_c.y - pacmanDistance);
             pacman_rotation = -atan2(camera_view_unit.z, camera_view_unit.x);
-            camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+            // camera_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
         }
         else
         {
@@ -341,13 +344,23 @@ int main(int argc, char *argv[])
             pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
         }
 
+        printf("Pacman (%f, %f, %f) - ", pacman_position_c.x, pacman_position_c.y, pacman_position_c.z);
+        printf("Camera (%f, %f, %f) - ", camera_position_c.x, camera_position_c.y, camera_position_c.z);
+        printf("View Unit (%f, %f, %f) - ", camera_view_unit.x, camera_view_unit.y, camera_view_unit.z);
+        printf("Camera distance (%f, %f, %f) - ", camera_distance.x, camera_distance.y, camera_distance.z);
+        printf("\n");
+
         camera_view_unit = camera_view_vector / norm(camera_view_vector);
         glm::vec4 camera_side_view = crossproduct(camera_up_vector, camera_view_unit);
         glm::vec4 camera_side_view_unit = camera_side_view / norm(camera_side_view);
         glm::vec4 camera_up_unit = camera_up_vector / norm(camera_up_vector);
 
-        MooveCamera(camera_view_unit, camera_side_view_unit, ellapsedTime);
-        MoovePacman(camera_up_unit, camera_side_view_unit, ellapsedTime);
+        glm::vec4 camera_v_view_unit = camera_view_unit;
+        camera_v_view_unit.y = 0.0f;
+        glm::vec4 vertical_move_unit = isFreeCamOn ? camera_v_view_unit : camera_up_unit;
+
+        // MooveCamera(camera_view_unit, camera_side_view_unit, ellapsedTime);
+        MoovePacman(vertical_move_unit, camera_side_view_unit, ellapsedTime);
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -480,7 +493,7 @@ int main(int argc, char *argv[])
         AABB sky_bbox = {skyboxMin, skyboxMax};
         Sphere pacman_sphere = {pacman_position_c, 0.5};
 
-        camera_offset = checkAABBToPlaneCollision(camera_bbox, sky_bbox);
+        // camera_offset = checkAABBToPlaneCollision(camera_bbox, sky_bbox);
         pacman_offset = checkSphereToAABBCollision(sky_bbox, pacman_sphere);
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
@@ -516,20 +529,20 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime)
-{
-    if (moveBackward)
-        camera_movement -= camera_view_unit * CAMERA_SPEED * ellapsedTime;
+// void MooveCamera(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime)
+// {
+//     if (moveBackward)
+//         camera_movement -= camera_view_unit * CAMERA_SPEED * ellapsedTime;
 
-    if (moveForward)
-        camera_movement += camera_view_unit * CAMERA_SPEED * ellapsedTime;
+//     if (moveForward)
+//         camera_movement += camera_view_unit * CAMERA_SPEED * ellapsedTime;
 
-    if (moveRight)
-        camera_movement -= camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
+//     if (moveRight)
+//         camera_movement -= camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
 
-    if (moveLeft)
-        camera_movement += camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
-}
+//     if (moveLeft)
+//         camera_movement += camera_side_view_unit * CAMERA_SPEED * ellapsedTime;
+// }
 
 void MoovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime)
 {
@@ -782,6 +795,20 @@ void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size)
         TextRendering_PrintString(window, buffer, -1.0f + pad / 10, yPosition, 1.0f);
         yPosition -= pad * 1.5f;
     }
+}
+
+void TextRendering_Debug(GLFWwindow *window, glm::vec4 vec, string name, float yPosition)
+{
+    if (!g_ShowInfoText)
+        return;
+
+    char buffer[140];
+
+    snprintf(buffer, 140,
+             "%s (%f, %f, %f)\n",
+             name, vec.x, vec.y, vec.z);
+
+    TextRendering_PrintString(window, buffer, -1.0f + TextRendering_LineHeight(window) / 10, yPosition, 1.0f);
 }
 
 // Função para debugging: imprime no terminal todas informações de um modelo
