@@ -55,6 +55,9 @@ float g_CameraDistance = 15.0f; // Distância da câmera para a origem
 
 const float CAMERA_SPEED = 3.0f;
 
+const float MAX_BOUNDARY = 9.0f;
+const float MIN_BOUNDARY = -9.0f;
+
 float previousTime = (float)glfwGetTime();
 
 bool moveForward = false;
