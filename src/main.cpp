@@ -457,10 +457,6 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
 
-        // Imprimimos na tela os ângulos de Euler que controlam a rotação do
-        // terceiro cubo.
-        TextRendering_ShowEulerAngles(window);
-
         // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
         TextRendering_ShowProjection(window);
 

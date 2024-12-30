@@ -34,34 +34,34 @@
 
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp
 
-const GLchar* const textvertexshader_source = ""
-"#version 330\n"
-"layout (location = 0) in vec4 position;\n"
-"out vec2 texCoords;\n"
-"void main()\n"
-"{\n"
-    "gl_Position = vec4(position.xy, 0, 1);\n"
-    "texCoords = position.zw;\n"
-"}\n"
-"\0";
+const GLchar *const textvertexshader_source = ""
+                                              "#version 330\n"
+                                              "layout (location = 0) in vec4 position;\n"
+                                              "out vec2 texCoords;\n"
+                                              "void main()\n"
+                                              "{\n"
+                                              "gl_Position = vec4(position.xy, 0, 1);\n"
+                                              "texCoords = position.zw;\n"
+                                              "}\n"
+                                              "\0";
 
-const GLchar* const textfragmentshader_source = ""
-"#version 330\n"
-"uniform sampler2D tex;\n"
-"in vec2 texCoords;\n"
-"out vec4 fragColor;\n"
-"void main()\n"
-"{\n"
-    "fragColor = vec4(0, 0, 0, texture(tex, texCoords).r);\n"
-"}\n"
-"\0";
+const GLchar *const textfragmentshader_source = ""
+                                                "#version 330\n"
+                                                "uniform sampler2D tex;\n"
+                                                "in vec2 texCoords;\n"
+                                                "out vec4 fragColor;\n"
+                                                "void main()\n"
+                                                "{\n"
+                                                "fragColor = vec4(0, 0, 0, texture(tex, texCoords).r);\n"
+                                                "}\n"
+                                                "\0";
 
 GLuint textVAO;
 GLuint textVBO;
 GLuint textprogram_id;
 GLuint texttexture_id;
 
-void TextRendering_LoadShader(const GLchar* const shader_string, GLuint shader_id)
+void TextRendering_LoadShader(const GLchar *const shader_string, GLuint shader_id)
 {
     // Define o código do shader, contido na string "shader_string"
     glShaderSource(shader_id, 1, &shader_string, NULL);
@@ -78,15 +78,15 @@ void TextRendering_LoadShader(const GLchar* const shader_string, GLuint shader_i
 
     // Alocamos memória para guardar o log de compilação.
     // A chamada "new" em C++ é equivalente ao "malloc()" do C.
-    GLchar* log = new GLchar[log_length];
+    GLchar *log = new GLchar[log_length];
     glGetShaderInfoLog(shader_id, log_length, &log_length, log);
 
     // Imprime no terminal qualquer erro ou "warning" de compilação
-    if ( log_length != 0 )
+    if (log_length != 0)
     {
-        std::string  output;
+        std::string output;
 
-        if ( !compiled_ok )
+        if (!compiled_ok)
         {
             output += "ERROR: OpenGL compilation failed.\n";
             output += "== Start of compilation log\n";
@@ -105,7 +105,7 @@ void TextRendering_LoadShader(const GLchar* const shader_string, GLuint shader_i
     }
 
     // A chamada "delete" em C++ é equivalente ao "free()" do C
-    delete [] log;
+    delete[] log;
 }
 
 void TextRendering_Init()
@@ -165,7 +165,7 @@ void TextRendering_Init()
 
 float textscale = 1.5f;
 
-void TextRendering_PrintString(GLFWwindow* window, const std::string &str, float x, float y, float scale = 1.0f)
+void TextRendering_PrintString(GLFWwindow *window, const std::string &str, float x, float y, float scale = 1.0f)
 {
     scale *= textscale;
     int width, height;
@@ -185,28 +185,31 @@ void TextRendering_PrintString(GLFWwindow* window, const std::string &str, float
                 break;
             }
         }
-        if (!glyph) {
+        if (!glyph)
+        {
             continue;
         }
         x += glyph->kerning[0].kerning;
-        float x0 = (float) (x + glyph->offset_x * sx);
-        float y0 = (float) (y + glyph->offset_y * sy);
-        float x1 = (float) (x0 + glyph->width * sx);
-        float y1 = (float) (y0 - glyph->height * sy);
+        float x0 = (float)(x + glyph->offset_x * sx);
+        float y0 = (float)(y + glyph->offset_y * sy);
+        float x1 = (float)(x0 + glyph->width * sx);
+        float y1 = (float)(y0 - glyph->height * sy);
 
-        float s0 = glyph->s0 - 0.5f/dejavufont.tex_width;
-        float t0 = glyph->t0 - 0.5f/dejavufont.tex_height;
-        float s1 = glyph->s1 - 0.5f/dejavufont.tex_width;
-        float t1 = glyph->t1 - 0.5f/dejavufont.tex_height;
+        float s0 = glyph->s0 - 0.5f / dejavufont.tex_width;
+        float t0 = glyph->t0 - 0.5f / dejavufont.tex_height;
+        float s1 = glyph->s1 - 0.5f / dejavufont.tex_width;
+        float t1 = glyph->t1 - 0.5f / dejavufont.tex_height;
 
-        struct {float x, y, s, t;} data[6] = {
-            { x0, y0, s0, t0 },
-            { x0, y1, s0, t1 },
-            { x1, y1, s1, t1 },
-            { x0, y0, s0, t0 },
-            { x1, y1, s1, t1 },
-            { x1, y0, s1, t0 }
-        };
+        struct
+        {
+            float x, y, s, t;
+        } data[6] = {
+            {x0, y0, s0, t0},
+            {x0, y1, s0, t1},
+            {x1, y1, s1, t1},
+            {x0, y0, s0, t0},
+            {x1, y1, s1, t1},
+            {x1, y0, s1, t0}};
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -232,21 +235,21 @@ void TextRendering_PrintString(GLFWwindow* window, const std::string &str, float
     }
 }
 
-float TextRendering_LineHeight(GLFWwindow* window)
+float TextRendering_LineHeight(GLFWwindow *window)
 {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     return dejavufont.height / height * textscale;
 }
 
-float TextRendering_CharWidth(GLFWwindow* window)
+float TextRendering_CharWidth(GLFWwindow *window)
 {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     return dejavufont.glyphs[32].advance_x / width * textscale;
 }
 
-void TextRendering_PrintMatrix(GLFWwindow* window, glm::mat4 M, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrix(GLFWwindow *window, glm::mat4 M, float x, float y, float scale = 1.0f)
 {
     char buffer[40];
     float lineheight = TextRendering_LineHeight(window) * scale;
@@ -256,12 +259,12 @@ void TextRendering_PrintMatrix(GLFWwindow* window, glm::mat4 M, float x, float y
     snprintf(buffer, 40, "[%+0.2f %+0.2f %+0.2f %+0.2f]", M[0][1], M[1][1], M[2][1], M[3][1]);
     TextRendering_PrintString(window, buffer, x, y - lineheight, scale);
     snprintf(buffer, 40, "[%+0.2f %+0.2f %+0.2f %+0.2f]", M[0][2], M[1][2], M[2][2], M[3][2]);
-    TextRendering_PrintString(window, buffer, x, y - 2*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 2 * lineheight, scale);
     snprintf(buffer, 40, "[%+0.2f %+0.2f %+0.2f %+0.2f]", M[0][3], M[1][3], M[2][3], M[3][3]);
-    TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 3 * lineheight, scale);
 }
 
-void TextRendering_PrintVector(GLFWwindow* window, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintVector(GLFWwindow *window, glm::vec4 v, float x, float y, float scale = 1.0f)
 {
     char buffer[10];
     float lineheight = TextRendering_LineHeight(window) * scale;
@@ -271,74 +274,59 @@ void TextRendering_PrintVector(GLFWwindow* window, glm::vec4 v, float x, float y
     snprintf(buffer, 10, "[%+0.2f]", v.y);
     TextRendering_PrintString(window, buffer, x, y - lineheight, scale);
     snprintf(buffer, 10, "[%+0.2f]", v.z);
-    TextRendering_PrintString(window, buffer, x, y - 2*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 2 * lineheight, scale);
     snprintf(buffer, 10, "[%+0.2f]", v.w);
-    TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 3 * lineheight, scale);
 }
 
-void TextRendering_PrintMatrixVectorProduct(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrixVectorProduct(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
 {
     char buffer[70];
     float lineheight = TextRendering_LineHeight(window) * scale;
 
-    auto r = M*v;
+    auto r = M * v;
     snprintf(buffer, 70, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]\n", M[0][0], M[1][0], M[2][0], M[3][0], v[0], r[0]);
     TextRendering_PrintString(window, buffer, x, y, scale);
     snprintf(buffer, 70, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]\n", M[0][1], M[1][1], M[2][1], M[3][1], v[1], r[1]);
     TextRendering_PrintString(window, buffer, x, y - lineheight, scale);
     snprintf(buffer, 70, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f] --> [%+0.2f]\n", M[0][2], M[1][2], M[2][2], M[3][2], v[2], r[2]);
-    TextRendering_PrintString(window, buffer, x, y - 2*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 2 * lineheight, scale);
     snprintf(buffer, 70, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]\n", M[0][3], M[1][3], M[2][3], M[3][3], v[3], r[3]);
-    TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 3 * lineheight, scale);
 }
 
-void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
 {
     char buffer[70];
     float lineheight = TextRendering_LineHeight(window) * scale;
 
-    auto r = M*v;
+    auto r = M * v;
     snprintf(buffer, 70, "[%5.1f %5.1f %5.1f %5.1f][%5.2f]     [%+6.1f]\n", M[0][0], M[1][0], M[2][0], M[3][0], v[0], r[0]);
     TextRendering_PrintString(window, buffer, x, y, scale);
     snprintf(buffer, 70, "[%5.1f %5.1f %5.1f %5.1f][%5.2f]     [%+6.1f]\n", M[0][1], M[1][1], M[2][1], M[3][1], v[1], r[1]);
     TextRendering_PrintString(window, buffer, x, y - lineheight, scale);
     snprintf(buffer, 70, "[%5.1f %5.1f %5.1f %5.1f][%5.2f] --> [%+6.1f]\n", M[0][2], M[1][2], M[2][2], M[3][2], v[2], r[2]);
-    TextRendering_PrintString(window, buffer, x, y - 2*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 2 * lineheight, scale);
     snprintf(buffer, 70, "[%5.1f %5.1f %5.1f %5.1f][%5.2f]     [%+6.1f]\n", M[0][3], M[1][3], M[2][3], M[3][3], v[3], r[3]);
-    TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
+    TextRendering_PrintString(window, buffer, x, y - 3 * lineheight, scale);
 }
 
-void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow *window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
 {
-    auto r = M*v;
+    auto r = M * v;
     auto w = r[3];
 
     char buffer[90];
     float lineheight = TextRendering_LineHeight(window) * scale;
 
-    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]        [%+0.2f]\n", M[0][0], M[1][0], M[2][0], M[3][0], v[0], r[0], r[0]/w);
+    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]        [%+0.2f]\n", M[0][0], M[1][0], M[2][0], M[3][0], v[0], r[0], r[0] / w);
     TextRendering_PrintString(window, buffer, x, y, scale);
-    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f] div. w [%+0.2f]\n", M[0][1], M[1][1], M[2][1], M[3][1], v[1], r[1], r[1]/w);
+    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f] div. w [%+0.2f]\n", M[0][1], M[1][1], M[2][1], M[3][1], v[1], r[1], r[1] / w);
     TextRendering_PrintString(window, buffer, x, y - lineheight, scale);
-    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f] --> [%+0.2f] -----> [%+0.2f]\n", M[0][2], M[1][2], M[2][2], M[3][2], v[2], r[2], r[2]/w);
-    TextRendering_PrintString(window, buffer, x, y - 2*lineheight, scale);
-    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]        [%+0.2f]\n", M[0][3], M[1][3], M[2][3], M[3][3], v[3], r[3], r[3]/w);
-    TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
-}
-
-// Escrevemos na tela os ângulos de Euler definidos nas variáveis globais
-// g_AngleX, g_AngleY, e g_AngleZ.
-void TextRendering_ShowEulerAngles(GLFWwindow *window)
-{
-    if (!g_ShowInfoText)
-        return;
-
-    float pad = TextRendering_LineHeight(window);
-
-    char buffer[80];
-    snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
-
-    TextRendering_PrintString(window, buffer, -1.0f + pad / 10, -1.0f + 2 * pad / 10, 1.0f);
+    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f] --> [%+0.2f] -----> [%+0.2f]\n", M[0][2], M[1][2], M[2][2], M[3][2], v[2], r[2], r[2] / w);
+    TextRendering_PrintString(window, buffer, x, y - 2 * lineheight, scale);
+    snprintf(buffer, 90, "[%+0.2f %+0.2f %+0.2f %+0.2f][%+0.2f]     [%+0.2f]        [%+0.2f]\n", M[0][3], M[1][3], M[2][3], M[3][3], v[3], r[3], r[3] / w);
+    TextRendering_PrintString(window, buffer, x, y - 3 * lineheight, scale);
 }
 
 // Escrevemos na tela qual matriz de projeção está sendo utilizada.
