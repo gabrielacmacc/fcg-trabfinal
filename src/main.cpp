@@ -107,15 +107,28 @@ private:
     }
 };
 
-// class Ball
-// {
-// public:
-//     // Atributos:
-//     int objectId;
-//     int objectType;
-//     std::string objectName;
-//     // AABB ball_bbox;
-// };
+class Ball
+{
+public:
+    // Atributos:
+    glm::mat4 modelMatrix;
+    int objectId;
+    int objectType;
+    std::string objectName;
+    // AABB ball_bbox;
+
+    // Contrutor
+    Ball(glm::mat4 modelMatrix, int objectId, int objectType, std::string objectName)
+        : modelMatrix(modelMatrix), objectId(objectId), objectType(objectType), objectName(objectName) {}
+    // Métodos:
+    void render()
+    {
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniform1i(g_object_id_uniform, objectType);
+        DrawVirtualObject(objectName.c_str());
+        // printf("%d [(min: %f, max:%f), (min: %f , max: %f), (min: %f , max: %f)] ", objectId, minMaxCorner.min.x, minMaxCorner.max.x, minMaxCorner.min.y, minMaxCorner.max.y, minMaxCorner.min.z, minMaxCorner.max.z);
+    }
+};
 
 void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
 
@@ -373,12 +386,26 @@ int main(int argc, char *argv[])
             {Matrix_Translate(-7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(-2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            // {Matrix_Translate(2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            // {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             // {Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene},
         };
         printf("\n");
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
+
+        Ball balls[] = {
+            {Matrix_Translate(-1.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 5.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 6.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 6.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 7.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 7.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 8.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 8.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 9.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+            {Matrix_Translate(-1.25f, -0.8f, 9.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
+
+        };
 
         Sphere pacman_sphere = {pacman_position_c, pacman_size + 0.05f};
         std::vector<glm::vec4> all_collision_directions;
@@ -390,6 +417,7 @@ int main(int argc, char *argv[])
         DrawVirtualObject("Cube");
 
         glDepthFunc(GL_LESS);
+
         for (Wall &wall : walls)
         {
 
@@ -407,12 +435,18 @@ int main(int argc, char *argv[])
             printf("(%f, %f, %f) ", cd.x, cd.y, cd.z);
         };
 
+        for (Ball &ball : balls)
+        {
+
+            ball.render();
+        }
+
         // Testes de colisão com as paredes limítrofes: colisão esfera-plano
 
-        glm::vec3 skyboxMin = glm::vec3(farplane / 4, farplane / 2, farplane / 4);
-        glm::vec3 skyboxMax = glm::vec3(-farplane / 4, -farplane / 2, -farplane / 4);
+        // glm::vec3 skyboxMin = glm::vec3(farplane / 4, farplane / 2, farplane / 4);
+        // glm::vec3 skyboxMax = glm::vec3(-farplane / 4, -farplane / 2, -farplane / 4);
 
-        AABB sky_bbox = {skyboxMin, skyboxMax};
+        // AABB sky_bbox = {skyboxMin, skyboxMax};
 
         // bool c += checkSphereToAABBCollisionDirection(sky_bbox, pacman_sphere);
         // printf("Pacman Offset (%f, %f, %f) ", pacman_offset.x, pacman_offset.y, pacman_offset.z);

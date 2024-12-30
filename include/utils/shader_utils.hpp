@@ -1,17 +1,17 @@
 #pragma once
 
 // "headers" padrões de C
-//#include <cmath>
-//#include <cstdio>
-//#include <cstdlib>
+// #include <cmath>
+// #include <cstdio>
+// #include <cstdlib>
 
 // Headers específicos de C++
-//#include <map>
-//#include <stack>
-//#include <string>
-//#include <vector>
-//#include <limits>
-//#include <fstream>
+// #include <map>
+// #include <stack>
+// #include <string>
+// #include <vector>
+// #include <limits>
+// #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
@@ -209,12 +209,12 @@ void LoadShadersFromFiles()
     // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
     // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
     // (GPU)! Veja arquivo "shader_vertex.glsl" e "shader_fragment.glsl".
-    g_model_uniform      = glGetUniformLocation(g_GpuProgramID, "model"); // Variável da matriz "model"
-    g_view_uniform       = glGetUniformLocation(g_GpuProgramID, "view"); // Variável da matriz "view" em shader_vertex.glsl
+    g_model_uniform = glGetUniformLocation(g_GpuProgramID, "model");           // Variável da matriz "model"
+    g_view_uniform = glGetUniformLocation(g_GpuProgramID, "view");             // Variável da matriz "view" em shader_vertex.glsl
     g_projection_uniform = glGetUniformLocation(g_GpuProgramID, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
-    g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
-    g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
-    g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");
+    g_object_id_uniform = glGetUniformLocation(g_GpuProgramID, "object_id");   // Variável "object_id" em shader_fragment.glsl
+    g_bbox_min_uniform = glGetUniformLocation(g_GpuProgramID, "bbox_min");
+    g_bbox_max_uniform = glGetUniformLocation(g_GpuProgramID, "bbox_max");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
@@ -222,5 +222,6 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "FloorTexture"), 1);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabyrinthTexture"), 2);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "PacmanTexture"), 3);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "LittleBallTexture"), 4);
     glUseProgram(0);
 }

@@ -73,9 +73,11 @@ void LoadTextureImage(const char *filename)
     g_NumLoadedTextures += 1;
 }
 
-void LoadTexturesFromFiles() {
+void LoadTexturesFromFiles()
+{
     LoadTextureImage("../../resources/textures/skybox/walltexture.jpg");
     LoadTextureImage("../../resources/textures/skybox/floortexture.jpg");
     LoadTextureImage("../../resources/textures/labyrinth/blue.jpg");
     LoadTextureImage("../../resources/textures/pacman/yellow.png");
+    LoadTextureImage("../../resources/textures/food/littleballtexture.jpg");
 }

@@ -38,6 +38,7 @@ uniform sampler2D SkyBoxTexture;
 uniform sampler2D FloorTexture;
 uniform sampler2D LabyrinthTexture;
 uniform sampler2D PacmanTexture;
+uniform sampler2D LittleBallTexture;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -113,12 +114,30 @@ void main()
 
     if ( object_id == SPHERE )
     {
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+
+        float radius = length(bbox_max - bbox_center);
+
+        vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
+
+        float theta = atan(position_sphere.x, position_sphere.z);
+        float phi = asin(position_sphere.y / radius);
+
+        U = (theta + M_PI) / (2 * M_PI);
+        V = (phi + M_PI_2) / M_PI;
+
+        U *= 3.0f;
+        V *= 3.0f;
         Kd = vec3(0.8, 0.4, 0.08);
         Ks = vec3(0.0, 0.0, 0.0);
         Ka = vec3(0.4, 0.2, 0.04);
         q = 1.0;
+
         lambert_diffuse_term = Kd * I * lambert;
-        color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
+        // color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
+        Kd = texture(LittleBallTexture, vec2(U,V)).rgb;
+        color.rgb = Kd;
+        
     }
     else if ( object_id == PLANE )
     {

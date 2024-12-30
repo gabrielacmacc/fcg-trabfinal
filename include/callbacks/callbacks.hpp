@@ -239,7 +239,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     // Se o usuário apertar a tecla A, movemos o pacman para esquerda
     if (key == GLFW_KEY_A)
     {
-        if ((action == GLFW_PRESS || action == GLFW_REPEAT) && (!isFreeCamOn && pacman_position_c.x >= MIN_BOUNDARY))
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
             movePacmanLeft = true;
         }
@@ -252,7 +252,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     // Se o usuário apertar a tecla W, movemos o pacman para frente
     if (key == GLFW_KEY_W)
     {
-        if ((action == GLFW_PRESS || action == GLFW_REPEAT) && (!isFreeCamOn && pacman_position_c.z >= MIN_BOUNDARY))
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
             movePacmanForward = true;
         }
@@ -265,7 +265,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     // Se o usuário apertar a tecla D, movemos o pacman para direita
     if (key == GLFW_KEY_D)
     {
-        if ((action == GLFW_PRESS || action == GLFW_REPEAT) && (!isFreeCamOn && pacman_position_c.x <= MAX_BOUNDARY))
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
             movePacmanRight = true;
         }
@@ -278,7 +278,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     // Se o usuário apertar a tecla S, movemos o pacman para trás
     if (key == GLFW_KEY_S)
     {
-        if ((action == GLFW_PRESS || action == GLFW_REPEAT) && (!isFreeCamOn && pacman_position_c.z <= MAX_BOUNDARY))
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
             movePacmanBackward = true;
         }
