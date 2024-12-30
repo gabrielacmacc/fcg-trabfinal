@@ -70,18 +70,14 @@ public:
     int objectType;
     std::string objectName;
     AABB minMaxCorner;
-    glm::vec4 collisionOffset;
-    bool isColliding;
 
     // Métodos:
 
     // Construtor
-    Wall(glm::mat4 modelMatrix, int objectId, int objectType, std::string objectName)
+    Wall(glm::mat4 modelMatrix, int objectId, int objectType, std::string objectName, std::map<std::string, SceneObject> &g_VirtualScene)
         : modelMatrix(modelMatrix), objectId(objectId), objectType(objectType), objectName(objectName)
     {
-        this->minMaxCorner = setBoundingBox();
-        this->collisionOffset = getCollisionOffset();
-        this->isColliding = detectCollision();
+        this->minMaxCorner = setBoundingBox(g_VirtualScene);
     }
 
     void render()
@@ -89,49 +85,17 @@ public:
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glUniform1i(g_object_id_uniform, objectType);
         DrawVirtualObject(objectName.c_str());
-    }
-
-    bool detectCollision()
-    {
-        Sphere pacman = {pacman_position_c, 0.5};
-        glm::vec4 offset = checkSphereToPlaneCollision(this->minMaxCorner, pacman);
-        isColliding = false;
-        if (offset.x < 0.0f || offset.y < 0.0f || offset.z < 0.0f)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    glm::vec4 getCollisionOffset()
-    {
-        Sphere pacman = {pacman_position_c, 0.5};
-        glm::vec4 offset = checkSphereToPlaneCollision(this->minMaxCorner, pacman);
-        isColliding = false;
-        if (offset.x < 0.0f || offset.y < 0.0f || offset.z < 0.0f)
-        {
-            // debugX = offset.x;
-            // debugY = offset.y;
-            // debugZ = offset.z;
-            isColliding = true;
-            // pacman.center += glm::vec3(offset); // Ajusta posição do pac man
-        }
-        return offset;
+        // printf("%d [(min: %f, max:%f), (min: %f , max: %f), (min: %f , max: %f)] ", objectId, minMaxCorner.min.x, minMaxCorner.max.x, minMaxCorner.min.y, minMaxCorner.max.y, minMaxCorner.min.z, minMaxCorner.max.z);
     }
 
 private:
-    AABB setBoundingBox()
+    AABB setBoundingBox(std::map<std::string, SceneObject> &g_VirtualScene)
     {
-        glm::vec3 minCorner = {10000.0f, 10000.0f, 10000.0f};
-        glm::vec3 maxCorner = {-10000.0f, -10000.0f, -10000.0f};
-        for (int i = 0; i < 8; i++)
-        {
-            glm::vec4 transformed = modelMatrix * baseCorners[i];
-            glm::vec3 transformedPos = glm::vec3(transformed);
-            minCorner = glm::min(minCorner, glm::vec3(transformedPos));
-            maxCorner = glm::max(maxCorner, glm::vec3(transformedPos));
-        }
-        return {minCorner, maxCorner};
+        glm::vec3 bbox_min = g_VirtualScene[objectName].bbox_min;
+        glm::vec3 bbox_max = g_VirtualScene[objectName].bbox_max;
+        glm::vec4 minCorner = glm::vec4(bbox_min.x, bbox_min.y, bbox_min.z, 1.0f);
+        glm::vec4 maxCorner = glm::vec4(bbox_max.x, bbox_max.y, bbox_max.z, 1.0f);
+        return {modelMatrix * minCorner, modelMatrix * maxCorner};
     }
 };
 void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
@@ -335,7 +299,7 @@ int main(int argc, char *argv[])
             camera_view_vector = camera_lookat_l - camera_position_c;
         }
 
-        // printf("Pacman (%f, %f, %f) - ", pacman_position_c.x, pacman_position_c.y, pacman_position_c.z);
+        printf("Pacman (%f, %f, %f) - ", pacman_position_c.x, pacman_position_c.y, pacman_position_c.z);
         // printf("Camera (%f, %f, %f) - ", camera_position_c.x, camera_position_c.y, camera_position_c.z);
         // printf("View Unit (%f, %f, %f) - ", camera_view_unit.x, camera_view_unit.y, camera_view_unit.z);
         // printf("Camera distance (%f, %f, %f) - ", camera_distance.x, camera_distance.y, camera_distance.z);
@@ -418,7 +382,7 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
 
-        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z) * Matrix_Rotate_Y(pacman_rotation) * Matrix_Scale(pacman_size.x, pacman_size.y, pacman_size.z);
+        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z) * Matrix_Rotate_Y(pacman_rotation) * Matrix_Scale(pacman_size, pacman_size, pacman_size);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
@@ -426,9 +390,9 @@ int main(int argc, char *argv[])
         int objectIdCounter = 0;
 
         Wall walls[] = {
-            {Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
-            // {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2"},
-            // {Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
+            {Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            // {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            // {Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             // {Matrix_Translate(3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
             // {Matrix_Translate(-3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2"},
             // {Matrix_Translate(7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
@@ -460,14 +424,26 @@ int main(int argc, char *argv[])
             // {Matrix_Translate(-2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
             // {Matrix_Translate(2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
             // {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
-            {Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_3, "p3"},
+            // {Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_3, "p3"},
         };
+        // printf("\n");
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
 
+        Sphere pacman_sphere = {pacman_position_c, pacman_size + 0.05f};
+        std::vector<int> collidedWalls;
         for (Wall &wall : walls)
         {
             wall.render();
+            if (sphereToAABBCollided(wall.minMaxCorner, pacman_sphere))
+            {
+                collidedWalls.push_back(wall.objectId);
+            }
         }
+        printf("collided walls: ");
+        for (auto &id : collidedWalls)
+        {
+            printf("%d, ", id);
+        };
 
         // Testes de colisão
 
@@ -475,9 +451,8 @@ int main(int argc, char *argv[])
         glm::vec3 skyboxMax = glm::vec3(-farplane / 4, -farplane / 2, -farplane / 4);
 
         AABB sky_bbox = {skyboxMin, skyboxMax};
-        Sphere pacman_sphere = {pacman_position_c, 0.5};
 
-        pacman_offset = checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
+        pacman_offset += checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
         // printf("Pacman Offset (%f, %f, %f) ", pacman_offset.x, pacman_offset.y, pacman_offset.z);
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
@@ -736,35 +711,35 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *model)
     glBindVertexArray(0);
 }
 
-void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size)
-{
-    if (!g_ShowInfoText)
-        return;
+// void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size)
+// {
+//     if (!g_ShowInfoText)
+//         return;
 
-    float pad = TextRendering_LineHeight(window);
-    char buffer[140];
+//     float pad = TextRendering_LineHeight(window);
+//     char buffer[140];
 
-    float yPosition = 1.0f - pad; // Posição inicial
+//     float yPosition = 1.0f - pad; // Posição inicial
 
-    for (int i = 0; i < size; i++)
-    {
-        Wall &wall = walls[i];
+//     for (int i = 0; i < size; i++)
+//     {
+//         Wall &wall = walls[i];
 
-        // Printa as coordenadas max e min de AABB para debug
-        snprintf(buffer, 140,
-                 "Wall %d coordinates: Min(X: %.2f, Y: %.2f, Z: %.2f) Max(X: %.2f, Y: %.2f, Z: %.2f, Offx:%.2f,Offy:%.2f,Offz:%.2f, Coll: %s)\n",
-                 i,
-                 wall.minMaxCorner.min.x, wall.minMaxCorner.min.y, wall.minMaxCorner.min.z,
-                 wall.minMaxCorner.max.x, wall.minMaxCorner.max.y, wall.minMaxCorner.max.z,
-                 wall.collisionOffset.x,
-                 wall.collisionOffset.y,
-                 wall.collisionOffset.z,
-                 wall.isColliding ? "T" : "F");
+//         // Printa as coordenadas max e min de AABB para debug
+//         // snprintf(buffer, 140,
+//         //          "Wall %d coordinates: Min(X: %.2f, Y: %.2f, Z: %.2f) Max(X: %.2f, Y: %.2f, Z: %.2f, Offx:%.2f,Offy:%.2f,Offz:%.2f, Coll: %s)\n",
+//         //          i,
+//         //          wall.minMaxCorner.min.x, wall.minMaxCorner.min.y, wall.minMaxCorner.min.z,
+//         //          wall.minMaxCorner.max.x, wall.minMaxCorner.max.y, wall.minMaxCorner.max.z,
+//         //         //  wall.collisionOffset.x,
+//         //         //  wall.collisionOffset.y,
+//         //         //  wall.collisionOffset.z,
+//         //         //  wall.isColliding ? "T" : "F");
 
-        TextRendering_PrintString(window, buffer, -1.0f + pad / 10, yPosition, 1.0f);
-        yPosition -= pad * 1.5f;
-    }
-}
+//         TextRendering_PrintString(window, buffer, -1.0f + pad / 10, yPosition, 1.0f);
+//         yPosition -= pad * 1.5f;
+//     }
+// }
 
 // Função para debugging: imprime no terminal todas informações de um modelo
 // geométrico carregado de um arquivo ".obj".

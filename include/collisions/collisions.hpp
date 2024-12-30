@@ -96,6 +96,27 @@ glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b)
     return offset;
 }
 
+glm::vec3 AABBPointClosestToSphereCenter(AABB a, Sphere b)
+{
+    float x = std::max(a.min.x, std::min(b.center.x, a.max.x));
+    float y = std::max(a.min.y, std::min(b.center.y, a.max.y));
+    float z = std::max(a.min.z, std::min(b.center.z, a.max.z));
+    return glm::vec3(x, y, z);
+}
+
+bool sphereToAABBCollided(AABB a, Sphere b)
+{
+    glm::vec3 closestPoint = AABBPointClosestToSphereCenter(a, b);
+    float dist = glm::distance(closestPoint, b.center);
+    // printf("dist: %f, radius: %f", dist, b.radius);
+    if (dist <= b.radius)
+    {
+
+        return true;
+    }
+    return false;
+}
+
 glm::vec4 checkSphereToSphereCollision(Sphere a, Sphere b)
 {
     glm::vec4 offset = {0.0f, 0.0f, 0.0f, 0.0f};

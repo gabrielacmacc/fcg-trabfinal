@@ -78,23 +78,12 @@ bool g_ShowInfoText = false;
 // Variáveis para controle de movimento do pacman
 const float PACMAN_DISTANCE = 0.5f;
 
-glm::vec3 pacman_freecam_size = glm::vec3(0.1f, 0.1f, 0.1f);
-glm::vec3 pacman_lookat_size = glm::vec3(0.3f, 0.3f, 0.3f);
-glm::vec3 pacman_size = pacman_lookat_size;
+float pacman_freecam_size = 0.1f;
+float pacman_lookat_size = 0.3f;
+float pacman_size = pacman_lookat_size;
 
 glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-// Base de um cubo unitário centrado na origem usado como base para as bounding boxes das paredes do labirinto:
-glm::vec4 baseCorners[8] = {
-    glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
-    glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
-    glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-    glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-    glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
-    glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-    glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-    glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)};
 
 const float PACMAN_SPEED = 3.0f;
 
