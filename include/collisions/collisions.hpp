@@ -104,17 +104,20 @@ glm::vec3 AABBPointClosestToSphereCenter(AABB a, Sphere b)
     return glm::vec3(x, y, z);
 }
 
-bool sphereToAABBCollided(AABB a, Sphere b)
+glm::vec4 checkSphereToAABBCollisionDirection(AABB a, Sphere b)
 {
     glm::vec3 closestPoint = AABBPointClosestToSphereCenter(a, b);
     float dist = glm::distance(closestPoint, b.center);
     // printf("dist: %f, radius: %f", dist, b.radius);
     if (dist <= b.radius)
     {
+        glm::vec4 collision_direction = glm::vec4(closestPoint.x, closestPoint.y, closestPoint.z, 1.0f) -
+                                        glm::vec4(b.center.x, b.center.y, b.center.z, 1.0f);
 
-        return true;
+        collision_direction = collision_direction / norm(collision_direction);
+        return glm::vec4(round(collision_direction.x), round(collision_direction.y), round(collision_direction.z), 0.0f); // Vetor unitário da direção da colisão
     }
-    return false;
+    return glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 glm::vec4 checkSphereToSphereCollision(Sphere a, Sphere b)

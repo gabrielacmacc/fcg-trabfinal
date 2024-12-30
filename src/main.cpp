@@ -46,6 +46,14 @@
 #include "utils/shader_utils.hpp"
 #include "utils/texture_utils.hpp"
 
+#define SPHERE 0
+#define LABYRINTH_1 1
+#define LABYRINTH_2 2
+#define LABYRINTH_3 3
+#define PLANE 4
+#define BACKGROUND 5
+#define PACMAN 6
+
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);
 void PopMatrix(glm::mat4 &M);
@@ -56,7 +64,7 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *); // Constrói representaçã
 void DrawVirtualObject(const char *object_name);     // Desenha um objeto armazenado em g_VirtualScene
 void PrintObjModelInfo(ObjModel *);                  // Função para debugging
 
-void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime);
+void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions);
 
 // Declaração da classe paredes
 using namespace std;
@@ -277,8 +285,8 @@ int main(int argc, char *argv[])
         glm::vec4 camera_view_unit;                                     // Vetor "view" unitário
         glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); // Vetor "up" fixado para apontar para o "céu" (eixo Y global)
         glm::vec4 camera_distance;
-        pacman_movement += pacman_offset;
-        pacman_position_c = pacman_position_initial + pacman_movement;
+        // pacman_movement += pacman_offset;
+        // pacman_position_c += pacman_movement;
         pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
         if (isFreeCamOn)
@@ -314,78 +322,10 @@ int main(int argc, char *argv[])
         camera_v_view_unit.y = 0.0f;
         glm::vec4 vertical_move_unit = isFreeCamOn ? camera_v_view_unit : camera_up_unit;
 
-        MovePacman(vertical_move_unit, camera_side_view_unit, ellapsedTime);
-
-        // Computamos a matriz "View" utilizando os parâmetros da câmera para
-        // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
-
-        // Agora computamos a matriz de Projeção.
-        glm::mat4 projection;
-
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f; // Posição do "near plane"
         float farplane = -40.0f; // Posição do "far plane"
-
-        if (g_UsePerspectiveProjection)
-        {
-            // Projeção Perspectiva.
-            // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
-            float field_of_view = 3.141592 / 3.0f;
-            projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
-        }
-        else
-        {
-            // Projeção Ortográfica.
-            // Para definição dos valores l, r, b, t ("left", "right", "bottom", "top"),
-            // PARA PROJEÇÃO ORTOGRÁFICA veja slides 219-224 do documento Aula_09_Projecoes.pdf.
-            // Para simular um "zoom" ortográfico, computamos o valor de "t"
-            // utilizando a variável g_CameraDistance.
-            float t = 1.5f * g_CameraDistance / 2.5f;
-            float b = -t;
-            float r = t * g_ScreenRatio;
-            float l = -r;
-            projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
-        }
-
-        glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
-
-        // Enviamos as matrizes "view" e "projection" para a placa de vídeo
-        // (GPU). Veja o arquivo "shader_vertex.glsl", onde estas são
-        // efetivamente aplicadas em todos os pontos.
-        glUniformMatrix4fv(g_view_uniform, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(g_projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
-
-#define SPHERE 0
-#define LABYRINTH_1 1
-#define LABYRINTH_2 2
-#define LABYRINTH_3 3
-#define PLANE 4
-#define BACKGROUND 5
-#define PACMAN 6
-
-        glm::vec3 minCorner = {10000.0f, 10000.0f, 10000.0f};
-        glm::vec3 maxCorner = {-10000.0f, -10000.0f, -10000.0f};
-
-        glDepthFunc(GL_ALWAYS);
-
-        glm::mat4 skyModel = Matrix_Scale(farplane / 4, farplane / 4, farplane / 4);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(skyModel));
-        glUniform1i(g_object_id_uniform, BACKGROUND);
-        DrawVirtualObject("Cube");
-
-        glDepthFunc(GL_LESS);
-
-        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane / 4, 1.0f, farplane / 4);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, PLANE);
-        DrawVirtualObject("the_plane");
-
-        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z) * Matrix_Rotate_Y(pacman_rotation) * Matrix_Scale(pacman_size, pacman_size, pacman_size);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, PACMAN);
-        DrawVirtualObject("pacman");
 
         int objectIdCounter = 0;
 
@@ -426,23 +366,34 @@ int main(int argc, char *argv[])
             // {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2"},
             // {Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_3, "p3"},
         };
-        // printf("\n");
+        printf("\n");
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
 
         Sphere pacman_sphere = {pacman_position_c, pacman_size + 0.05f};
-        std::vector<int> collidedWalls;
+        std::vector<glm::vec4> all_collision_directions;
+        glDepthFunc(GL_ALWAYS);
+
+        glm::mat4 skyModel = Matrix_Scale(farplane / 4, farplane / 4, farplane / 4);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(skyModel));
+        glUniform1i(g_object_id_uniform, BACKGROUND);
+        DrawVirtualObject("Cube");
+
+        glDepthFunc(GL_LESS);
         for (Wall &wall : walls)
         {
+
             wall.render();
-            if (sphereToAABBCollided(wall.minMaxCorner, pacman_sphere))
+            // Teste de colisão com paredes do labirinto
+            glm::vec4 collision_direction = checkSphereToAABBCollisionDirection(wall.minMaxCorner, pacman_sphere);
+            if (norm(collision_direction) > 0)
             {
-                collidedWalls.push_back(wall.objectId);
+                all_collision_directions.push_back(collision_direction);
             }
         }
-        printf("collided walls: ");
-        for (auto &id : collidedWalls)
+        printf("collision directions: ");
+        for (auto &cd : all_collision_directions)
         {
-            printf("%d, ", id);
+            printf("(%f, %f, %f) ", cd.x, cd.y, cd.z);
         };
 
         // Testes de colisão
@@ -452,8 +403,59 @@ int main(int argc, char *argv[])
 
         AABB sky_bbox = {skyboxMin, skyboxMax};
 
-        pacman_offset += checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
+        // bool c += checkSphereToAABBCollisionDirection(sky_bbox, pacman_sphere);
         // printf("Pacman Offset (%f, %f, %f) ", pacman_offset.x, pacman_offset.y, pacman_offset.z);
+
+        MovePacman(vertical_move_unit, camera_side_view_unit, ellapsedTime, all_collision_directions);
+
+        // Computamos a matriz "View" utilizando os parâmetros da câmera para
+        // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+        glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
+
+        // Agora computamos a matriz de Projeção.
+        glm::mat4 projection;
+
+        if (g_UsePerspectiveProjection)
+        {
+            // Projeção Perspectiva.
+            // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
+            float field_of_view = 3.141592 / 3.0f;
+            projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
+        }
+        else
+        {
+            // Projeção Ortográfica.
+            // Para definição dos valores l, r, b, t ("left", "right", "bottom", "top"),
+            // PARA PROJEÇÃO ORTOGRÁFICA veja slides 219-224 do documento Aula_09_Projecoes.pdf.
+            // Para simular um "zoom" ortográfico, computamos o valor de "t"
+            // utilizando a variável g_CameraDistance.
+            float t = 1.5f * g_CameraDistance / 2.5f;
+            float b = -t;
+            float r = t * g_ScreenRatio;
+            float l = -r;
+            projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
+        }
+
+        glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
+
+        // Enviamos as matrizes "view" e "projection" para a placa de vídeo
+        // (GPU). Veja o arquivo "shader_vertex.glsl", onde estas são
+        // efetivamente aplicadas em todos os pontos.
+        glUniformMatrix4fv(g_view_uniform, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(g_projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
+
+        glm::vec3 minCorner = {10000.0f, 10000.0f, 10000.0f};
+        glm::vec3 maxCorner = {-10000.0f, -10000.0f, -10000.0f};
+
+        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane / 4, 1.0f, farplane / 4);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, PLANE);
+        DrawVirtualObject("the_plane");
+
+        model = Matrix_Translate(pacman_position_c.x, pacman_position_c.y, pacman_position_c.z) * Matrix_Rotate_Y(pacman_rotation) * Matrix_Scale(pacman_size, pacman_size, pacman_size);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, PACMAN);
+        DrawVirtualObject("pacman");
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
@@ -488,29 +490,33 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime)
+void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions)
 {
     if (movePacmanBackward)
     {
-        pacman_movement -= camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_position_c -= pacman_movement;
         pacman_rotation = -3.14159f / 2;
     }
 
     if (movePacmanForward)
     {
-        pacman_movement += camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_position_c += pacman_movement;
         pacman_rotation = 3.14159f / 2;
     }
 
     if (movePacmanRight)
     {
-        pacman_movement -= camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_position_c -= pacman_movement;
         pacman_rotation = 0.0f;
     }
 
     if (movePacmanLeft)
     {
-        pacman_movement += camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_position_c += pacman_movement;
         pacman_rotation = 3.14159f;
     }
 }
