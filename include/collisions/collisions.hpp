@@ -120,8 +120,14 @@ glm::vec4 checkSphereToAABBCollisionDirection(AABB a, Sphere b)
     return glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-glm::vec4 checkSphereToSphereCollision(Sphere a, Sphere b)
+// Se a distância entre os centros das esferas for menor do que a soma dos seus raios,
+// é porque houve colisão entre elas
+bool checkSphereToSphereCollision(Sphere a, Sphere b)
 {
-    glm::vec4 offset = {0.0f, 0.0f, 0.0f, 0.0f};
-    return offset;
+    float dist = glm::distance(a.center, b.center);
+    if (dist < a.radius + b.radius)
+    {
+        return true;
+    }
+    return false;
 }

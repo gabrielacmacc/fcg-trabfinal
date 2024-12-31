@@ -112,14 +112,18 @@ class Ball
 public:
     // Atributos:
     glm::mat4 modelMatrix;
-    int objectId;
     int objectType;
     std::string objectName;
-    // AABB ball_bbox;
+    Sphere b_sphere;
+    // bool shouldRender;
 
     // Contrutor
-    Ball(glm::mat4 modelMatrix, int objectId, int objectType, std::string objectName)
-        : modelMatrix(modelMatrix), objectId(objectId), objectType(objectType), objectName(objectName) {}
+    Ball(glm::vec3 center, float radius, int objectType, std::string objectName)
+        : modelMatrix(modelMatrix), objectType(objectType), objectName(objectName)
+    {
+        this->modelMatrix = Matrix_Translate(center.x, center.y, center.z) * Matrix_Scale(radius, radius, radius);
+        this->b_sphere = Sphere{center, radius};
+    }
     // Métodos:
     void render()
     {
@@ -131,6 +135,98 @@ public:
 };
 
 void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
+
+std::vector<Ball> balls = {
+    {glm::vec3(3.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
+
+    {glm::vec3(-2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+
+    {glm::vec3(-3.35f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-3.35f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
+
+    {glm::vec3(-3.35f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(-0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+    {glm::vec3(3.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+
+    // {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-3.35f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-3.35f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-3.35f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-3.35f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-3.35f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-3.35f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-3.35f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
+
+    // {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(3.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(3.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+
+    // {glm::vec3(-1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 9.0f), 0.1f, SPHERE, "the_sphere"},
+    // {glm::vec3(-1.25f, -0.8f, 9.5f), 0.1f, SPHERE, "the_sphere"},
+
+};
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -393,99 +489,6 @@ int main(int argc, char *argv[])
         printf("\n");
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
 
-        Ball balls[] = {
-            {Matrix_Translate(3.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, -1.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, -1.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, -0.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 0.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 0.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 1.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 1.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 2.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 3.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-
-            {Matrix_Translate(-2.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-2.25f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-1.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-1.25f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-0.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-0.25f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(0.25f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(0.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(1.25f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(1.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(2.25f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(2.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.25f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-
-            {Matrix_Translate(-3.35f, -0.8f, -2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, -1.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, -1.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, -0.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, 0.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, 0.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, 1.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, 1.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, 2.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, 2.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-3.35f, -0.8f, 3.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-
-            {Matrix_Translate(-3.35f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-2.75f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-2.25f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-1.75f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-1.25f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-0.75f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(-0.25f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(0.25f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(0.75f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(1.25f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(1.75f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(2.25f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(2.75f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.25f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            {Matrix_Translate(3.75f, -0.8f, 3.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-
-            // {Matrix_Translate(-3.35f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-3.35f, -0.8f, 5.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-3.35f, -0.8f, 6.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-3.35f, -0.8f, 6.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-3.35f, -0.8f, 7.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-3.35f, -0.8f, 7.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-3.35f, -0.8f, 8.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-3.35f, -0.8f, 8.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-
-            // {Matrix_Translate(-3.35f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-2.75f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-2.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.75f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-0.75f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-0.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(0.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(0.75f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(1.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(1.75f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(2.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(2.75f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(3.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(3.75f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-
-            // {Matrix_Translate(-1.25f, -0.8f, 5.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 5.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 6.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 6.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 7.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 7.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 8.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 8.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 9.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-            // {Matrix_Translate(-1.25f, -0.8f, 9.5f) * Matrix_Scale(0.1f, 0.1f, 0.1f), objectIdCounter++, SPHERE, "the_sphere"},
-
-        };
-
         Sphere pacman_sphere = {pacman_position_c, pacman_size + 0.05f};
         std::vector<glm::vec4> all_collision_directions;
         glDepthFunc(GL_ALWAYS);
@@ -514,10 +517,27 @@ int main(int argc, char *argv[])
             printf("(%f, %f, %f) ", cd.x, cd.y, cd.z);
         };
 
+        std::vector<int> remove_indexes = {};
+
+        int index = 0;
         for (Ball &ball : balls)
         {
+            bool ate = checkSphereToSphereCollision(pacman_sphere, ball.b_sphere);
+            if (ate)
+            {
+                remove_indexes.push_back(index);
+            }
+            else
+            {
+                ball.render();
+            }
 
-            ball.render();
+            index++;
+        }
+
+        for (int idx : remove_indexes)
+        {
+            balls.erase(balls.begin() + idx);
         }
 
         // Testes de colisão com as paredes limítrofes: colisão esfera-plano
@@ -614,8 +634,8 @@ void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float
 {
     if (movePacmanBackward)
     {
-        pacman_movement = camera_up_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_position_c -= pacman_movement;
+        pacman_movement = -camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_position_c += pacman_movement;
         pacman_rotation = -3.14159f / 2;
     }
 
@@ -628,8 +648,8 @@ void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float
 
     if (movePacmanRight)
     {
-        pacman_movement = camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_position_c -= pacman_movement;
+        pacman_movement = -camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_position_c += pacman_movement;
         pacman_rotation = 0.0f;
     }
 
@@ -639,7 +659,7 @@ void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float
         pacman_position_c += pacman_movement;
         pacman_rotation = 3.14159f;
     }
-    // printf("Pacman movement: (%f, %f, %f)", pacman_movement.x, pacman_movement.y, pacman_movement.z); // fica entre -0.04 e 0.04 (?)
+    printf("Pacman movement: (%f, %f, %f)", pacman_movement.x, pacman_movement.y, pacman_movement.z); // fica entre -0.04 e -0.03 (?)
 }
 
 // Função que desenha um objeto armazenado em g_VirtualScene. Veja definição
