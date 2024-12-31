@@ -630,11 +630,38 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+glm::vec4 cancelCollisionMovement(glm::vec4 movement, std::vector<glm::vec4> collision_directions)
+{
+    for (auto &cd : collision_directions)
+    {
+        float result = dotproduct(cd, movement);
+        printf("dot product: %f", result);
+        if (result > 0)
+        {
+            if (cd.x != 0)
+            {
+                movement.x = 0;
+            }
+            else if (cd.y != 0)
+            {
+                movement.y = 0;
+            }
+            else if (cd.z != 0)
+            {
+                movement.z = 0;
+            }
+        }
+    }
+    return movement;
+}
+
 void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions)
 {
     if (movePacmanBackward)
     {
         pacman_movement = -camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
+
         pacman_position_c += pacman_movement;
         pacman_rotation = -3.14159f / 2;
     }
@@ -642,6 +669,7 @@ void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float
     if (movePacmanForward)
     {
         pacman_movement = camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
         pacman_position_c += pacman_movement;
         pacman_rotation = 3.14159f / 2;
     }
@@ -649,6 +677,7 @@ void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float
     if (movePacmanRight)
     {
         pacman_movement = -camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
         pacman_position_c += pacman_movement;
         pacman_rotation = 0.0f;
     }
@@ -656,6 +685,7 @@ void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float
     if (movePacmanLeft)
     {
         pacman_movement = camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
         pacman_position_c += pacman_movement;
         pacman_rotation = 3.14159f;
     }
