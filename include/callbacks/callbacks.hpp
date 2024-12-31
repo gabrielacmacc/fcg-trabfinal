@@ -214,7 +214,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla O, utilizamos projeção ortográfica.
-    if (key == GLFW_KEY_O && action == GLFW_PRESS)
+    if (key == GLFW_KEY_O && action == GLFW_PRESS && !isFreeCamOn)
     {
         g_UsePerspectiveProjection = false;
     }
