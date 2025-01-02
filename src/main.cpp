@@ -117,7 +117,7 @@ public:
     Sphere b_sphere;
     // bool shouldRender;
 
-    // Contrutor
+    // Construtor
     Ball(glm::vec3 center, float radius, int objectType, std::string objectName)
         : modelMatrix(modelMatrix), objectType(objectType), objectName(objectName)
     {
@@ -136,97 +136,97 @@ public:
 
 void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
 
-std::vector<Ball> balls = {
-    {glm::vec3(3.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
+std::vector<Ball> instanciateLittleBalls();
 
-    {glm::vec3(-2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// std::vector<Ball> balls = {
+// {glm::vec3(3.75f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
 
-    {glm::vec3(-3.35f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-3.35f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
 
-    {glm::vec3(-3.35f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(-0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-    {glm::vec3(3.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
 
-    // {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-3.35f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-3.35f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-3.35f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-3.35f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-3.35f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-3.35f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-3.35f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
 
-    // {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(3.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(3.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
 
-    // {glm::vec3(-1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 9.0f), 0.1f, SPHERE, "the_sphere"},
-    // {glm::vec3(-1.25f, -0.8f, 9.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(3.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
 
-};
+// {glm::vec3(-1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 9.0f), 0.1f, SPHERE, "the_sphere"},
+// {glm::vec3(-1.25f, -0.8f, 9.5f), 0.1f, SPHERE, "the_sphere"},
+// };
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -356,6 +356,9 @@ int main(int argc, char *argv[])
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
+
+    // chama a função que inicializa as bolinhas:
+    std::vector<Ball> balls = instanciateLittleBalls();
 
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -629,6 +632,30 @@ int main(int argc, char *argv[])
     // Fim do programa
     return 0;
 }
+
+std::vector<Ball> instanciateLittleBalls()
+{
+    std::vector<Ball> balls;
+    float z = 9.0f;
+    float x = 8.5f;
+    for (int i = 0; i < 34; i++)
+    {
+        z -= 0.5f;
+        Ball right = {glm::vec3(8.5f, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(right);
+
+        Ball left = {glm::vec3(-8.5, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(left);
+
+        x -= 0.5f;
+        Ball up = {glm::vec3(x, -0.8f, 8.5), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(up);
+        Ball newBall = {glm::vec3(x, -0.8f, -8.5), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(newBall);
+    }
+
+    return balls;
+};
 
 glm::vec4 cancelCollisionMovement(glm::vec4 movement, std::vector<glm::vec4> collision_directions)
 {
