@@ -139,58 +139,6 @@ void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size)
 std::vector<Ball> instanciateLittleBalls();
 
 // std::vector<Ball> balls = {
-// {glm::vec3(3.75f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
-
-// {glm::vec3(-2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(0.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(0.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(1.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(1.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(2.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(2.75f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.25f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-
-// {glm::vec3(-3.35f, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, -1.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, -1.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, -0.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 0.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 0.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 1.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 1.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 2.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 3.0f), 0.1f, SPHERE, "the_sphere"},
-
-// {glm::vec3(-3.35f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(0.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(0.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(1.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(1.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(2.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(2.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.25f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"},
 
 // {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
 // {glm::vec3(-3.35f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
@@ -636,9 +584,11 @@ int main(int argc, char *argv[])
 std::vector<Ball> instanciateLittleBalls()
 {
     std::vector<Ball> balls;
-    float z = 9.0f;
+    float z = 8.5f;
     float x = 8.5f;
-    for (int i = 0; i < 34; i++)
+
+    // Quadrado de fora:
+    for (int i = 0; i < 33; i++)
     {
         z -= 0.5f;
         Ball right = {glm::vec3(8.5f, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
@@ -650,8 +600,32 @@ std::vector<Ball> instanciateLittleBalls()
         x -= 0.5f;
         Ball up = {glm::vec3(x, -0.8f, 8.5), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(up);
-        Ball newBall = {glm::vec3(x, -0.8f, -8.5), 0.1f, SPHERE, "the_sphere"};
-        balls.push_back(newBall);
+
+        Ball down = {glm::vec3(x, -0.8f, -8.5), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(down);
+    }
+
+    // Quadrado de dentro:
+    z = -1.5f;
+    for (int i = 0; i < 10; i++)
+    {
+        Ball inner_left = {glm::vec3(3.75f, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(inner_left);
+
+        Ball inner_right = {glm::vec3(-3.35f, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(inner_right);
+        z += 0.5f; // de -1.5 a 3.0
+    }
+    x = -2.75f;
+    for (int i = 0; i < 13; i++)
+    {
+        Ball inner_up = {glm::vec3(x, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(inner_up);
+
+        Ball inner_down = {glm::vec3(x, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"};
+        balls.push_back(inner_down);
+
+        x += 0.5f;
     }
 
     return balls;
