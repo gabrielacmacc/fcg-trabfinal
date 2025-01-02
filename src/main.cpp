@@ -69,6 +69,42 @@ void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float
 // Declaração da classe paredes
 using namespace std;
 
+class Ghost
+{
+public:
+    // Atributos:
+    glm::mat4 modelMatrix;
+    int objectId;
+    int objectType;
+    std::string objectName;
+    AABB ghost_bbox;
+
+    // Métodos:
+
+    // Construtor
+    Ghost(glm::mat4 modelMatrix, int objectId, int objectType, std::string objectName, std::map<std::string, SceneObject> &g_VirtualScene)
+        : modelMatrix(modelMatrix), objectId(objectId), objectType(objectType), objectName(objectName)
+    {
+        this->ghost_bbox = setBoundingBox(g_VirtualScene);
+    }
+
+    void render()
+    {
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniform1i(g_object_id_uniform, objectType);
+        DrawVirtualObject(objectName.c_str());
+    }
+
+private:
+    AABB setBoundingBox(std::map<std::string, SceneObject> &g_VirtualScene)
+    {
+        glm::vec3 bbox_min = g_VirtualScene[objectName].bbox_min;
+        glm::vec3 bbox_max = g_VirtualScene[objectName].bbox_max;
+        glm::vec4 minCorner = glm::vec4(bbox_min.x, bbox_min.y, bbox_min.z, 1.0f);
+        glm::vec4 maxCorner = glm::vec4(bbox_max.x, bbox_max.y, bbox_max.z, 1.0f);
+        return {modelMatrix * minCorner, modelMatrix * maxCorner};
+    }
+};
 class Wall
 {
 public:
@@ -280,6 +316,10 @@ int main(int argc, char *argv[])
     ComputeNormals(&piecetwo);
     BuildTrianglesAndAddToVirtualScene(&piecetwo);
 
+    ObjModel piecetworotated("../../resources/models/labyrinth/p2-rotated.obj");
+    ComputeNormals(&piecetworotated);
+    BuildTrianglesAndAddToVirtualScene(&piecetworotated);
+
     ObjModel piecethree("../../resources/models/labyrinth/p3.obj");
     ComputeNormals(&piecethree);
     BuildTrianglesAndAddToVirtualScene(&piecethree);
@@ -287,6 +327,10 @@ int main(int argc, char *argv[])
     ObjModel pacmodel("../../resources/models/pacman/pacman.obj");
     ComputeNormals(&pacmodel);
     BuildTrianglesAndAddToVirtualScene(&pacmodel);
+
+    ObjModel ghostmodel("../../resources/models/ghost/ghost.obj");
+    ComputeNormals(&ghostmodel);
+    BuildTrianglesAndAddToVirtualScene(&ghostmodel);
 
     if (argc > 1)
     {
@@ -402,31 +446,31 @@ int main(int argc, char *argv[])
 
         Wall walls[] = {
             {Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
             {Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-3.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-7.0f, -1.0f, -3.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(3.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-3.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(7.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-7.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
             {Matrix_Translate(5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(-5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-8.0f, -1.0f, -6.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-3.0f, -1.0f, -7.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(8.0f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-8.0f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(3.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-3.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
             {Matrix_Translate(8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(-8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(0.0f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-3.0f, -1.0f, 4.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(3.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-3.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
             {Matrix_Translate(4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(-4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(-4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-5.7f, -1.0f, 7.0f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-7.5f, -1.0f, 0.5f) * Matrix_Rotate_Y(3.14159 / 2) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(5.7f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-5.7f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(7.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-7.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
             {Matrix_Translate(7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(-7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
             {Matrix_Translate(7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
@@ -476,6 +520,7 @@ int main(int argc, char *argv[])
             bool ate = checkSphereToSphereCollision(pacman_sphere, ball.b_sphere);
             if (ate)
             {
+                // Aplicar transformação geométrica ao comer a bolinha
                 remove_indexes.push_back(index);
             }
             else
