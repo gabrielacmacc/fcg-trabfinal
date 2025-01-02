@@ -446,40 +446,61 @@ int main(int argc, char *argv[])
 
         Wall walls[] = {
             {Matrix_Translate(0.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(0.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(3.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(-3.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(7.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(-7.0f, -1.0f, -3.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-5.5f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(8.0f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(-8.0f, -1.0f, -6.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(3.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(-3.0f, -1.0f, -7.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-8.0f, -1.0f, -8.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(0.0f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(3.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(-3.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-4.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-4.5f, -1.0f, 5.5f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(5.7f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(-5.7f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(7.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(-7.5f, -1.0f, 0.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
-            {Matrix_Translate(7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-7.5f, -1.0f, 2.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-7.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            {Matrix_Translate(-2.5f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            // {Matrix_Translate(2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            // {Matrix_Translate(-2.5f, -1.0f, 9.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
-            // {Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.4f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene},
+            {Matrix_Translate(0.0f, -1.0f, -5.5f) * Matrix_Scale(0.6f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(0.0f, -1.0f, -7.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(3.5f, -1.0f, -2.9f) * Matrix_Scale(0.6f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(3.0f, -1.0f, -4.3f) * Matrix_Scale(0.4f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(5.7f, -1.0f, -6.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(3.3f, -1.0f, -6.3f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(4.5f, -1.0f, -5.0f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(2.2f, -1.0f, -7.0f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(7.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(6.5f, -1.0f, -6.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(6.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(4.5f, -1.0f, -2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+
+            {Matrix_Translate(-3.5f, -1.0f, -2.9f) * Matrix_Scale(0.6f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-3.0f, -1.0f, -4.3f) * Matrix_Scale(0.4f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-5.7f, -1.0f, -6.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-3.3f, -1.0f, -6.3f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-4.5f, -1.0f, -5.0f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-2.2f, -1.0f, -7.0f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-7.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-6.5f, -1.0f, -6.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-6.0f, -1.0f, -4.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-4.5f, -1.0f, -2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+
+            {Matrix_Translate(0.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(0.0f, -1.0f, 5.5f) * Matrix_Scale(0.6f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(0.0f, -1.0f, 7.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(3.5f, -1.0f, 2.9f) * Matrix_Scale(0.6f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(3.0f, -1.0f, 4.3f) * Matrix_Scale(0.4f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(5.7f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(3.3f, -1.0f, 6.3f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(4.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(2.2f, -1.0f, 7.0f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(7.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(6.5f, -1.0f, 6.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(6.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(4.5f, -1.0f, 2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+
+            {Matrix_Translate(-3.5f, -1.0f, 2.9f) * Matrix_Scale(0.6f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-3.0f, -1.0f, 4.3f) * Matrix_Scale(0.4f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-5.7f, -1.0f, 6.5f) * Matrix_Scale(0.2f, 0.5f, 0.4f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-3.3f, -1.0f, 6.3f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-4.5f, -1.0f, 5.0f) * Matrix_Scale(0.2f, 0.5f, 0.25f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-2.2f, -1.0f, 7.0f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-7.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-6.5f, -1.0f, 6.8f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-6.0f, -1.0f, 4.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(-4.5f, -1.0f, 2.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+
+            // Lados direito e esquerdo
+            {Matrix_Translate(-6.4f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(6.4f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.6f), objectIdCounter++, LABYRINTH_2, "p2", g_VirtualScene},
+            {Matrix_Translate(-7.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+            {Matrix_Translate(7.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
+
         };
         printf("\n");
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
@@ -652,7 +673,7 @@ std::vector<Ball> instanciateLittleBalls()
 
     // Quadrado de dentro:
     z = -1.5f;
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 8; i++)
     {
         Ball inner_left = {glm::vec3(3.75f, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(inner_left);
@@ -667,7 +688,7 @@ std::vector<Ball> instanciateLittleBalls()
         Ball inner_up = {glm::vec3(x, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(inner_up);
 
-        Ball inner_down = {glm::vec3(x, -0.8f, 3.5f), 0.1f, SPHERE, "the_sphere"};
+        Ball inner_down = {glm::vec3(x, -0.8f, 2.2f), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(inner_down);
 
         x += 0.5f;
