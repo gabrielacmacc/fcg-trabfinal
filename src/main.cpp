@@ -53,6 +53,7 @@
 #define PLANE 4
 #define BACKGROUND 5
 #define PACMAN 6
+#define CHERRY 7
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);
@@ -308,10 +309,6 @@ int main(int argc, char *argv[])
     ComputeNormals(&cubemodel);
     BuildTrianglesAndAddToVirtualScene(&cubemodel);
 
-    ObjModel pieceone("../../resources/models/labyrinth/p1.obj");
-    ComputeNormals(&pieceone);
-    BuildTrianglesAndAddToVirtualScene(&pieceone);
-
     ObjModel piecetwo("../../resources/models/labyrinth/p2.obj");
     ComputeNormals(&piecetwo);
     BuildTrianglesAndAddToVirtualScene(&piecetwo);
@@ -335,6 +332,10 @@ int main(int argc, char *argv[])
     ObjModel ghostmodel("../../resources/models/ghost/ghost.obj");
     ComputeNormals(&ghostmodel);
     BuildTrianglesAndAddToVirtualScene(&ghostmodel);
+
+    ObjModel cherrymodel("../../resources/models/food/cherry.obj");
+    ComputeNormals(&cherrymodel);
+    BuildTrianglesAndAddToVirtualScene(&cherrymodel);
 
     if (argc > 1)
     {
