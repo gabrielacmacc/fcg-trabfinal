@@ -20,6 +20,14 @@ out vec4 position_model;
 out vec4 normal;
 out vec2 texcoords;
 
+#define SPHERE 0
+
+uniform int object_id;
+
+uniform sampler2D LittleBallTexture;
+
+out vec4 colorGouraud;
+
 void main()
 {
     // A variável gl_Position define a posição final de cada vértice
@@ -63,5 +71,43 @@ void main()
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;
+
+    if ( object_id == SPHERE ) 
+    {
+        vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
+        
+        vec4 camera_position = inverse(view) * origin;
+
+        vec4 p = position_world;
+
+        vec4 n = normalize(normal);
+        
+        vec4 v = normalize(camera_position - p);
+
+        vec4 l = normalize(origin - position_world); //normalize(vec4(0.5,1.0,0.0,0.0));
+
+        vec4 h = normalize(l + v);
+
+        float q = 50.0;
+
+        float U = texcoords.x;
+        float V = texcoords.y;
+
+        vec3 Ka = vec3(0.05, 0.05, 0.05);
+        vec3 Ks = vec3(0.8, 0.8, 0.8);
+        vec3 Ia = vec3(0.5, 0.5, 0.5);
+        vec3 I  = vec3(1.5, 1.5, 1.5);
+        
+        vec3 Kd = texture(LittleBallTexture, vec2(U, V)).rgb;
+
+        float lambert = max(0, dot(n, l));
+
+        vec3 lambert_diffuse_term = Kd * I * lambert;
+        vec3 ambient_term = Ka * Ia;
+        vec3 blinn_phong_specular_term = Ks * I * pow(dot(n, h), q);
+
+        colorGouraud.rgb = lambert_diffuse_term + ambient_term + blinn_phong_specular_term;
+        colorGouraud.a = 1.0;
+    }
 }
 

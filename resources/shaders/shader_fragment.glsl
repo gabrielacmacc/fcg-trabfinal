@@ -13,6 +13,8 @@ in vec4 position_model;
 // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
 in vec2 texcoords;
 
+in vec4 colorGouraud;
+
 // Matrizes computadas no código C++ e enviadas para a GPU
 uniform mat4 model;
 uniform mat4 view;
@@ -45,6 +47,8 @@ uniform sampler2D PacmanTexture;
 uniform sampler2D LittleBallTexture;
 uniform sampler2D CherryTexture;
 uniform sampler2D NumbersTexture;
+
+uniform bool isFreeCamOn;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -90,13 +94,13 @@ void main()
     float q = 1.0; // Expoente especular para o modelo de iluminação de Phong
 
     // Refletância difusa
-    vec3 Kd = vec3(0.5,0.5,0.5);
+    vec3 Kd = vec3(0.5, 0.5, 0.5);
 
     // Refletância especular
-    vec3 Ks = vec3(0.5,0.5,0.5);
+    vec3 Ks = vec3(0.5, 0.5, 0.5);
 
     // Refletância ambiente
-    vec3 Ka = vec3(0.05,0.05,0.05);
+    vec3 Ka = vec3(0.05, 0.05, 0.05);
 
     // Espectro da fonte de iluminação
     vec3 I = vec3(1.0, 1.0, 1.0); // espectro da fonte de luz
@@ -107,43 +111,19 @@ void main()
     // Termo difuso utilizando a lei dos cossenos de Lambert
     vec3 lambert_diffuse_term; // termo difuso de Lambert
 
+    // Termo especular
+    vec3 phong_specular_term; // termo especular de Phong
+    vec3 blinn_phong_specular_term; // termo especular de Blinn-Phong
+
     // Equação de Iluminação
     float lambert = max(0, dot(n, l));
 
     // Termo ambiente
     vec3 ambient_term = Ka * Ia; // termo ambiente
 
-    // Termo especular utilizando o modelo de iluminação de Phong
-    vec3 phong_specular_term  = Ks * I * max(0, pow(dot(r, v), q)); // termo especular de Phong 
-
-    vec3 blinn_phong_specular_term  = Ks * I * (pow(dot(n, h), q)); // termo especular de Blinn-Phong
-
     if ( object_id == SPHERE )
     {
-        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
-
-        float radius = length(bbox_max - bbox_center);
-
-        vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
-
-        float theta = atan(position_sphere.x, position_sphere.z);
-        float phi = asin(position_sphere.y / radius);
-
-        U = (theta + M_PI) / (2 * M_PI);
-        V = (phi + M_PI_2) / M_PI;
-
-        U *= 3.0f;
-        V *= 3.0f;
-        Kd = vec3(0.8, 0.4, 0.08);
-        Ks = vec3(0.0, 0.0, 0.0);
-        Ka = vec3(0.4, 0.2, 0.04);
-        q = 1.0;
-
-        lambert_diffuse_term = Kd * I * lambert;
-        // color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
-        Kd = texture(LittleBallTexture, vec2(U,V)).rgb;
-        color.rgb = Kd;
-        
+        color = colorGouraud;     
     }
     else if ( object_id == PLANE )
     {
@@ -197,14 +177,14 @@ void main()
         Kd = texture(SkyBoxTexture, vec2(U,V)).rgb;
         color.rgb = Kd;
     }
-    else if ( object_id == LABYRINTH_1 || object_id == LABYRINTH_2 || object_id == LABYRINTH_3)
+    else if ( object_id == LABYRINTH_2 || object_id == LABYRINTH_3 )
     {
         U = texcoords.x;
         V = texcoords.y;
 
         Kd = texture(LabyrinthTexture, vec2(U,V)).rgb;
         lambert_diffuse_term = Kd * I * lambert;
-        color.rgb = lambert_diffuse_term;
+        color.rgb = lambert_diffuse_term + ambient_term;
     }
     else if ( object_id == PACMAN) 
     {
@@ -244,9 +224,12 @@ void main()
         U *= 3.0f;
         V *= 3.0f;
 
+        q = 5.0;
+        phong_specular_term  = Ks * I * max(0, pow(dot(r, v), q));
+
         Kd = texture(CherryTexture, vec2(U,V)).rgb;
         lambert_diffuse_term = Kd * I * lambert;
-        color.rgb = lambert_diffuse_term + ambient_term;
+        color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
     }
     else if ( object_id == COUNT_1 || object_id == COUNT_2 || object_id == COUNT_3)
     {
@@ -262,17 +245,22 @@ void main()
         U = (theta + M_PI) / (2 * M_PI);
         V = (phi + M_PI_2) / M_PI;
 
-        U *= 3.0f;
-        V *= 3.0f;
-        Kd = vec3(0.8, 0.4, 0.08);
-        Ks = vec3(0.0, 0.0, 0.0);
-        Ka = vec3(0.4, 0.2, 0.04);
-        q = 1.0;
+        U *= 1.0f;
+        V *= 1.0f;
 
-        lambert_diffuse_term = Kd * I * lambert;
-        // color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
         Kd = texture(NumbersTexture, vec2(U,V)).rgb;
-        color.rgb = Kd;
+        lambert_diffuse_term = Kd * I * lambert;
+
+        if (isFreeCamOn) 
+        {
+            q = 15.0;
+            blinn_phong_specular_term = Ks * I * (pow(dot(n, h), q));
+            color.rgb = lambert_diffuse_term + ambient_term + blinn_phong_specular_term;
+        }
+        else
+        {
+            color.rgb = lambert_diffuse_term + ambient_term;
+        }
     }
     else // Objeto desconhecido = preto
     {
