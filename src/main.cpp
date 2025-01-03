@@ -64,7 +64,7 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *); // Constrói representaçã
 void DrawVirtualObject(const char *object_name);     // Desenha um objeto armazenado em g_VirtualScene
 void PrintObjModelInfo(ObjModel *);                  // Função para debugging
 
-void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions);
+void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions);
 
 // Declaração da classe paredes
 using namespace std;
@@ -730,7 +730,7 @@ glm::vec4 cancelCollisionMovement(glm::vec4 movement, std::vector<glm::vec4> col
     return movement;
 }
 
-void MovePacman(glm::vec4 camera_up_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions)
+void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions)
 {
     if (movePacmanBackward)
     {
