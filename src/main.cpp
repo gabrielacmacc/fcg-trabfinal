@@ -22,6 +22,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
+#include <iomanip>
 
 // Headers das bibliotecas OpenGL
 #include <external/glad/glad.h>  // Criação de contexto OpenGL 3.3
@@ -54,6 +55,9 @@
 #define BACKGROUND 5
 #define PACMAN 6
 #define CHERRY 7
+#define COUNT_1 8
+#define COUNT_2 9
+#define COUNT_3 10
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);
@@ -174,6 +178,8 @@ public:
 void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
 
 std::vector<Ball> instanciateLittleBalls();
+
+void renderCount(int current_count, char* count_first_digit, char* count_second_digit, char* count_third_digit);
 
 // std::vector<Ball> balls = {
 
@@ -337,6 +343,46 @@ int main(int argc, char *argv[])
     ComputeNormals(&cherrymodel);
     BuildTrianglesAndAddToVirtualScene(&cherrymodel);
 
+    ObjModel zeromodel("../../resources/models/numbers/000.obj");
+    ComputeNormals(&zeromodel);
+    BuildTrianglesAndAddToVirtualScene(&zeromodel);
+
+    ObjModel onemodel("../../resources/models/numbers/001.obj");
+    ComputeNormals(&onemodel);
+    BuildTrianglesAndAddToVirtualScene(&onemodel);
+
+    ObjModel twomodel("../../resources/models/numbers/002.obj");
+    ComputeNormals(&twomodel);
+    BuildTrianglesAndAddToVirtualScene(&twomodel);
+
+    ObjModel threemodel("../../resources/models/numbers/003.obj");
+    ComputeNormals(&threemodel);
+    BuildTrianglesAndAddToVirtualScene(&threemodel);
+
+    ObjModel forthmodel("../../resources/models/numbers/004.obj");
+    ComputeNormals(&forthmodel);
+    BuildTrianglesAndAddToVirtualScene(&forthmodel);
+
+    ObjModel fivemodel("../../resources/models/numbers/005.obj");
+    ComputeNormals(&fivemodel);
+    BuildTrianglesAndAddToVirtualScene(&fivemodel);
+
+    ObjModel sixmodel("../../resources/models/numbers/006.obj");
+    ComputeNormals(&sixmodel);
+    BuildTrianglesAndAddToVirtualScene(&sixmodel);
+
+    ObjModel sevenmodel("../../resources/models/numbers/007.obj");
+    ComputeNormals(&sevenmodel);
+    BuildTrianglesAndAddToVirtualScene(&sevenmodel);
+
+    ObjModel eightmodel("../../resources/models/numbers/008.obj");
+    ComputeNormals(&eightmodel);
+    BuildTrianglesAndAddToVirtualScene(&eightmodel);
+
+    ObjModel ninemodel("../../resources/models/numbers/009.obj");
+    ComputeNormals(&ninemodel);
+    BuildTrianglesAndAddToVirtualScene(&ninemodel);
+
     if (argc > 1)
     {
         ObjModel model(argv[1]);
@@ -356,6 +402,13 @@ int main(int argc, char *argv[])
 
     // chama a função que inicializa as bolinhas:
     std::vector<Ball> balls = instanciateLittleBalls();
+
+    int initial_ball_count = balls.size();
+    int eaten_ball_count = 0;
+
+    char count_first_digit[4] = {0};
+    char count_second_digit[4] = {0};
+    char count_third_digit[4] = {0};
 
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -576,7 +629,10 @@ int main(int argc, char *argv[])
         for (int idx : remove_indexes)
         {
             balls.erase(balls.begin() + idx);
+            eaten_ball_count += 1;
         }
+
+        renderCount(eaten_ball_count, count_first_digit, count_second_digit, count_third_digit);
 
         // Testes de colisão com as paredes limítrofes: colisão esfera-plano
         glm::vec4 collision_direction_sky = checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
@@ -620,9 +676,6 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(g_view_uniform, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(g_projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
-        glm::vec3 minCorner = {10000.0f, 10000.0f, 10000.0f};
-        glm::vec3 maxCorner = {-10000.0f, -10000.0f, -10000.0f};
-
         model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(farplane / 4, 1.0f, farplane / 4);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
@@ -632,6 +685,38 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
+
+        model = Matrix_Translate(1.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4): 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, COUNT_1);
+        DrawVirtualObject(count_first_digit);
+
+        model = Matrix_Translate(0.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4): 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, COUNT_2);
+        DrawVirtualObject(count_second_digit);
+
+        model = Matrix_Translate(-1.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4) : 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, COUNT_3);
+        DrawVirtualObject(count_third_digit);
+
+        if (isFreeCamOn) {
+            model = Matrix_Translate(-1.0f, 2.0f, -farplane / 4) * Matrix_Rotate_Y(3.14159f);
+            glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, COUNT_1);
+            DrawVirtualObject(count_first_digit);
+
+            model = Matrix_Translate(0.0f, 2.0f, -farplane / 4) * Matrix_Rotate_Y(3.14159f);
+            glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, COUNT_2);
+            DrawVirtualObject(count_second_digit);
+
+            model = Matrix_Translate(1.0f, 2.0f, -farplane / 4) * Matrix_Rotate_Y(3.14159f);
+            glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, COUNT_3);
+            DrawVirtualObject(count_third_digit);
+        }
 
         // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
         TextRendering_ShowProjection(window);
@@ -740,6 +825,17 @@ glm::vec4 cancelCollisionMovement(glm::vec4 movement, std::vector<glm::vec4> col
         }
     }
     return movement;
+}
+
+void renderCount(int current_count, char* count_first_digit, char* count_second_digit, char* count_third_digit) 
+{
+    std::ostringstream oss;
+    oss << std::setfill('0') << std::setw(3) << current_count;
+    std::string numStr = oss.str();
+
+    snprintf(count_first_digit, 4, "N_%c", numStr[2]);
+    snprintf(count_second_digit, 4, "N_%c", numStr[1]);
+    snprintf(count_third_digit, 4, "N_%c", numStr[0]);
 }
 
 void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions)
