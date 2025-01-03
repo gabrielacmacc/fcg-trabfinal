@@ -517,8 +517,7 @@ int main(int argc, char *argv[])
             {Matrix_Translate(2.1f, -1.0f, -0.2f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_3, "p33", g_VirtualScene},
             {Matrix_Translate(-2.1f, -1.0f, -0.2f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_3, "p33", g_VirtualScene},
             {Matrix_Translate(1.5f, -1.0f, -1.1f) * Matrix_Scale(0.125f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene},
-            {Matrix_Translate(-1.5f, -1.0f, -1.1f) * Matrix_Scale(0.125f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene}
-        };
+            {Matrix_Translate(-1.5f, -1.0f, -1.1f) * Matrix_Scale(0.125f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene}};
         printf("\n");
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
 
@@ -747,7 +746,7 @@ void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, flo
 {
     if (movePacmanBackward)
     {
-        pacman_movement = -camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = -camera_view_unit * PACMAN_SPEED * ellapsedTime;
         pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
 
         pacman_position_c += pacman_movement;
@@ -756,7 +755,7 @@ void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, flo
 
     if (movePacmanForward)
     {
-        pacman_movement = camera_up_unit * PACMAN_SPEED * ellapsedTime;
+        pacman_movement = camera_view_unit * PACMAN_SPEED * ellapsedTime;
         pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
         pacman_position_c += pacman_movement;
         pacman_rotation = 3.14159f / 2;
