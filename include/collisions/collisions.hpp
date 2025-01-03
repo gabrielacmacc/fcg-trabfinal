@@ -57,7 +57,7 @@ glm::vec4 checkAABBToPlaneCollision(AABB a, AABB b)
 
 glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b)
 {
-    glm::vec4 offset = {0.0f, 0.0f, 0.0f, 0.0f};
+    glm::vec3 offset = {0.0f, 0.0f, 0.0f};
 
     float xPenetrationMin = a.min.x - (b.center.x - b.radius);
     float xPenetrationMax = (b.center.x + b.radius) - a.max.x;
@@ -68,32 +68,38 @@ glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b)
 
     if (xPenetrationMin > 0.0f)
     {
-        offset.x = xPenetrationMin;
+        offset.x = -xPenetrationMin;
     }
     else if (xPenetrationMax > 0.0f)
     {
-        offset.x = -xPenetrationMax;
+        offset.x = xPenetrationMax;
     }
 
     if (yPenetrationMin > 0.0f)
     {
-        offset.y = yPenetrationMin;
+        offset.y = -yPenetrationMin;
     }
     else if (yPenetrationMax > 0.0f)
     {
-        offset.y = -yPenetrationMax;
+        offset.y = yPenetrationMax;
     }
 
     if (zPenetrationMin > 0.0f)
     {
-        offset.z = zPenetrationMin;
+        offset.z = -zPenetrationMin;
     }
     else if (zPenetrationMax > 0.0f)
     {
-        offset.z = -zPenetrationMax;
+        offset.z = zPenetrationMax;
     }
 
-    return offset;
+    if (glm::length(offset) > 0.0f)
+    {
+        glm::vec3 normalizedDirection = glm::normalize(offset);
+        return glm::vec4(round(normalizedDirection.x), round(normalizedDirection.y), round(normalizedDirection.z), 0.0f);
+    }
+
+    return glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 glm::vec3 AABBPointClosestToSphereCenter(AABB a, Sphere b)
