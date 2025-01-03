@@ -679,6 +679,11 @@ int main(int argc, char *argv[])
                 {
                     cherry.modelMatrix = Matrix_Translate(cherry.center.x, cherry.center.y, cherry.center.z) * Matrix_Rotate_X(3.14159f) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.001f, 0.001f, 0.001f);
                 }
+                else
+                {
+                    cherry.modelMatrix = Matrix_Translate(cherry.center.x, cherry.center.y, cherry.center.z)  * Matrix_Rotate_X(3.14159f / 2) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.002f, 0.002f, 0.002f);
+
+                }
                 cherry.render();
             }
             cherry_index++;
