@@ -324,6 +324,10 @@ int main(int argc, char *argv[])
     ComputeNormals(&piecethree);
     BuildTrianglesAndAddToVirtualScene(&piecethree);
 
+    ObjModel piecethreerotated("../../resources/models/labyrinth/p3-rotated.obj");
+    ComputeNormals(&piecethreerotated);
+    BuildTrianglesAndAddToVirtualScene(&piecethreerotated);
+
     ObjModel pacmodel("../../resources/models/pacman/pacman.obj");
     ComputeNormals(&pacmodel);
     BuildTrianglesAndAddToVirtualScene(&pacmodel);
@@ -501,6 +505,11 @@ int main(int argc, char *argv[])
             {Matrix_Translate(-7.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
             {Matrix_Translate(7.0f, -1.0f, 0.0f) * Matrix_Scale(0.2f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_2, "p22", g_VirtualScene},
 
+            {Matrix_Translate(0.0f, -1.0f, 1.0f) * Matrix_Scale(0.4f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene},
+            {Matrix_Translate(2.1f, -1.0f, -0.2f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_3, "p33", g_VirtualScene},
+            {Matrix_Translate(-2.1f, -1.0f, -0.2f) * Matrix_Scale(0.3f, 0.5f, 0.2f), objectIdCounter++, LABYRINTH_3, "p33", g_VirtualScene},
+            {Matrix_Translate(1.5f, -1.0f, -1.1f) * Matrix_Scale(0.125f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene},
+            {Matrix_Translate(-1.5f, -1.0f, -1.1f) * Matrix_Scale(0.125f, 0.5f, 0.3f), objectIdCounter++, LABYRINTH_3, "p3", g_VirtualScene}
         };
         printf("\n");
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
