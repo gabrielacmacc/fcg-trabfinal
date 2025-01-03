@@ -26,6 +26,10 @@ uniform mat4 projection;
 #define PLANE  4
 #define BACKGROUND 5
 #define PACMAN 6
+#define CHERRY 7
+#define COUNT_1 8
+#define COUNT_2 9
+#define COUNT_3 10
 
 uniform int object_id;
 
@@ -39,6 +43,8 @@ uniform sampler2D FloorTexture;
 uniform sampler2D LabyrinthTexture;
 uniform sampler2D PacmanTexture;
 uniform sampler2D LittleBallTexture;
+uniform sampler2D CherryTexture;
+uniform sampler2D NumbersTexture;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -220,6 +226,53 @@ void main()
         Kd = texture(PacmanTexture, vec2(U,V)).rgb;
         lambert_diffuse_term = Kd * I * lambert;
         color.rgb = lambert_diffuse_term + ambient_term;
+    }
+    else if ( object_id == CHERRY)
+    {
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+
+        float radius = length(bbox_max - bbox_center);
+
+        vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
+
+        float theta = atan(position_sphere.x, position_sphere.z);
+        float phi = asin(position_sphere.y / radius);
+
+        U = (theta + M_PI) / (2 * M_PI);
+        V = (phi + M_PI_2) / M_PI;
+
+        U *= 3.0f;
+        V *= 3.0f;
+
+        Kd = texture(CherryTexture, vec2(U,V)).rgb;
+        lambert_diffuse_term = Kd * I * lambert;
+        color.rgb = lambert_diffuse_term + ambient_term;
+    }
+    else if ( object_id == COUNT_1 || object_id == COUNT_2 || object_id == COUNT_3)
+    {
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+
+        float radius = length(bbox_max - bbox_center);
+
+        vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
+
+        float theta = atan(position_sphere.x, position_sphere.z);
+        float phi = asin(position_sphere.y / radius);
+
+        U = (theta + M_PI) / (2 * M_PI);
+        V = (phi + M_PI_2) / M_PI;
+
+        U *= 3.0f;
+        V *= 3.0f;
+        Kd = vec3(0.8, 0.4, 0.08);
+        Ks = vec3(0.0, 0.0, 0.0);
+        Ka = vec3(0.4, 0.2, 0.04);
+        q = 1.0;
+
+        lambert_diffuse_term = Kd * I * lambert;
+        // color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
+        Kd = texture(NumbersTexture, vec2(U,V)).rgb;
+        color.rgb = Kd;
     }
     else // Objeto desconhecido = preto
     {

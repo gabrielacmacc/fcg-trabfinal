@@ -80,4 +80,6 @@ void LoadTexturesFromFiles()
     LoadTextureImage("../../resources/textures/labyrinth/blue.jpg");
     LoadTextureImage("../../resources/textures/pacman/yellow.png");
     LoadTextureImage("../../resources/textures/food/littleballtexture.jpg");
+    LoadTextureImage("../../resources/textures/food/cherrytexture.jpg");
+    LoadTextureImage("../../resources/textures/numbers/yellow.png");
 }

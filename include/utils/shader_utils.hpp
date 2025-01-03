@@ -223,5 +223,7 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabyrinthTexture"), 2);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "PacmanTexture"), 3);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "LittleBallTexture"), 4);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "CherryTexture"), 5);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "NumbersTexture"), 6);
     glUseProgram(0);
 }
