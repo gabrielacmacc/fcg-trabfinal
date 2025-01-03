@@ -523,6 +523,11 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, BACKGROUND);
         DrawVirtualObject("Cube");
 
+        glm::vec3 skyboxMin = glm::vec3(farplane / 4, farplane / 2, farplane / 4);
+        glm::vec3 skyboxMax = glm::vec3(-farplane / 4, -farplane / 2, -farplane / 4);
+
+        AABB sky_bbox = {skyboxMin, skyboxMax};
+
         glDepthFunc(GL_LESS);
 
         for (Wall &wall : walls)
@@ -567,14 +572,8 @@ int main(int argc, char *argv[])
         }
 
         // Testes de colisão com as paredes limítrofes: colisão esfera-plano
-
-        // glm::vec3 skyboxMin = glm::vec3(farplane / 4, farplane / 2, farplane / 4);
-        // glm::vec3 skyboxMax = glm::vec3(-farplane / 4, -farplane / 2, -farplane / 4);
-
-        // AABB sky_bbox = {skyboxMin, skyboxMax};
-
-        // bool c += checkSphereToAABBCollisionDirection(sky_bbox, pacman_sphere);
-        // printf("Pacman Offset (%f, %f, %f) ", pacman_offset.x, pacman_offset.y, pacman_offset.z);
+        glm::vec4 collision_direction_sky = checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
+        all_collision_directions.push_back(collision_direction_sky);
 
         MovePacman(vertical_move_unit, camera_side_view_unit, ellapsedTime, all_collision_directions);
 
