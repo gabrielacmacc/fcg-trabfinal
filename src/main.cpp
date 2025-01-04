@@ -794,8 +794,8 @@ std::vector<Ball> instanciateLittleBalls()
     std::vector<Ball> balls;
 
     // Quadrado de fora:
-    float z = 8.5f;
-    for (int i = 0; i < 35; i++)
+    float z = 8.0f;
+    for (int i = 0; i < 33; i++)
     {
         Ball right = {glm::vec3(8.5f, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(right);
@@ -805,8 +805,8 @@ std::vector<Ball> instanciateLittleBalls()
 
         z -= 0.5f;
     }
-    float x = 8.5f;
-    for (int i = 0; i < 34; i++)
+    float x = 8.0f;
+    for (int i = 0; i < 33; i++)
     {
         Ball up = {glm::vec3(x, -0.8f, 8.5), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(up);
@@ -816,6 +816,16 @@ std::vector<Ball> instanciateLittleBalls()
 
         x -= 0.5f;
     }
+
+    // Adiciona as bolinhas dos cantos manualmente para não sobrescrever:
+    Ball outerCornerBall = {glm::vec3(8.5, -0.8f, 8.5), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(outerCornerBall);
+    outerCornerBall = {glm::vec3(-8.5, -0.8f, 8.5), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(outerCornerBall);
+    outerCornerBall = {glm::vec3(8.5f, -0.8f, -8.5), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(outerCornerBall);
+    outerCornerBall = {glm::vec3(-8.5, -0.8f, -8.5), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(outerCornerBall);
 
     // Quadrado de dentro:
     z = -1.5f;
@@ -829,8 +839,8 @@ std::vector<Ball> instanciateLittleBalls()
 
         z += 0.5f; // de -1.5 a 3.0
     }
-    x = -3.35f;
-    for (int i = 0; i < 14; i++)
+    x = -2.85f;
+    for (int i = 0; i < 12; i++)
     {
         Ball inner_up = {glm::vec3(x, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(inner_up);
@@ -840,6 +850,15 @@ std::vector<Ball> instanciateLittleBalls()
 
         x += 0.5f;
     }
+    // Adiciona as bolinhas dos cantos manualmente para não sobrescrever:
+    Ball innerCornerBall = {glm::vec3(-3.35, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(innerCornerBall);
+    innerCornerBall = {glm::vec3(-3.35, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(innerCornerBall);
+    innerCornerBall = {glm::vec3(3.2, -0.8f, -2.0f), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(innerCornerBall);
+    innerCornerBall = {glm::vec3(3.2, -0.8f, 2.0f), 0.1f, SPHERE, "the_sphere"};
+    balls.push_back(innerCornerBall);
 
     return balls;
 };
