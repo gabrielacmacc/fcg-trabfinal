@@ -93,14 +93,13 @@ bool movePacmanLeft = false;
 float pacman_initial_rotation = 3.14159f / 2;
 float pacman_rotation = pacman_initial_rotation;
 
-float g_PacmanTheta = 0.0f;
-float g_PacmanPhi = 0.0f;
-float g_PacmanDistance = -1.0f;
+float t = 0.0f;
 
-float r_initial_pacman = g_PacmanDistance;
-float x_initial_pacman = r_initial_pacman * cos(g_PacmanPhi) * sin(g_PacmanTheta);
-float y_initial_pacman = r_initial_pacman;
-float z_initial_pacman = r_initial_pacman * cos(g_PacmanPhi) * cos(g_PacmanTheta);
+glm::vec4 initial_position_bezier = glm::vec4(1.0f, 10.0f, 3.0f, 1.0f);
+glm::vec4 intermediate_position_bezier_1 = glm::vec4(6.0f, 7.0f, 6.0f, 1.0f);
+glm::vec4 intermediate_position_bezier_2 = glm::vec4(-6.0f, 3.0f, 2.0f, 1.0f);
+glm::vec4 final_position_bezier = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
 
-glm::vec4 pacman_position_initial = glm::vec4(x_initial_pacman, y_initial_pacman, z_initial_pacman, 1.0f);
+glm::vec4 curr_bezier_position = initial_position_bezier;
+glm::vec4 pacman_position_initial = final_position_bezier;
 glm::vec4 pacman_position_c = pacman_position_initial;

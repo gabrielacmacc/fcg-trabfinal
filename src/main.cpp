@@ -68,7 +68,7 @@ void PopMatrix(glm::mat4 &M);
 void BuildTrianglesAndAddToVirtualScene(ObjModel *); // Constrói representação de um ObjModel como malha de triângulos para renderização
 void DrawVirtualObject(const char *object_name);     // Desenha um objeto armazenado em g_VirtualScene
 void PrintObjModelInfo(ObjModel *);                  // Função para debugging
-
+glm::vec4 calculateBezierPosition(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4, float t);
 void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions);
 
 // Declaração da classe paredes
@@ -210,45 +210,7 @@ void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size)
 std::vector<Ball> instanciateLittleBalls();
 std::vector<Cherry> instanciateCherries();
 
-void renderCount(int current_count, char* count_first_digit, char* count_second_digit, char* count_third_digit);
-
-// std::vector<Ball> balls = {
-
-// {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-3.35f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
-
-// {glm::vec3(-3.35f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(0.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(0.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(1.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(2.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(2.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(3.75f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-
-// {glm::vec3(-1.25f, -0.8f, 5.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 5.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 6.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 6.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 7.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 7.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 8.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 8.5f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 9.0f), 0.1f, SPHERE, "the_sphere"},
-// {glm::vec3(-1.25f, -0.8f, 9.5f), 0.1f, SPHERE, "the_sphere"},
-// };
+void renderCount(int current_count, char *count_first_digit, char *count_second_digit, char *count_third_digit);
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -471,6 +433,13 @@ int main(int argc, char *argv[])
         // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
         // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
         // e ScrollCallback().
+        if (t <= 1)
+        {
+            t += 0.008;
+            curr_bezier_position = calculateBezierPosition(initial_position_bezier, intermediate_position_bezier_1, intermediate_position_bezier_2, final_position_bezier, t);
+            pacman_position_c = curr_bezier_position;
+        }
+        // printf("curr_bezier_position: %f %f %f ", curr_bezier_position.x, curr_bezier_position.y, curr_bezier_position.z);
 
         float g_CameraPhiSin = sin(g_CameraPhi);
         float g_CameraPhiCos = cos(g_CameraPhi);
@@ -484,7 +453,8 @@ int main(int argc, char *argv[])
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);         // Ponto "c", centro da câmera
+        glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f); // Ponto "c", centro da câmera
+        // printf("camera_position_c: %f, %f, %f", camera_position_c.x, camera_position_c.y, camera_position_c.z);
         glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);  // Ponto "l", para onde a câmera (look-at) estará sempre olhando
         glm::vec4 camera_view_vector;                                   // Vetor "view", sentido para onde a câmera está virada
         glm::vec4 camera_view_unit;                                     // Vetor "view" unitário
@@ -632,11 +602,11 @@ int main(int argc, char *argv[])
                 all_collision_directions.push_back(collision_direction);
             }
         }
-        printf("collision directions: ");
-        for (auto &cd : all_collision_directions)
-        {
-            printf("(%f, %f, %f) ", cd.x, cd.y, cd.z);
-        };
+        // printf("collision directions: ");
+        // for (auto &cd : all_collision_directions)
+        // {
+        //     printf("(%f, %f, %f) ", cd.x, cd.y, cd.z);
+        // };
 
         std::vector<int> remove_indexes = {};
 
@@ -673,7 +643,7 @@ int main(int argc, char *argv[])
             {
                 remove_cherry_indexes.push_back(cherry_index);
             }
-            else 
+            else
             {
                 if (isFreeCamOn)
                 {
@@ -681,8 +651,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    cherry.modelMatrix = Matrix_Translate(cherry.center.x, cherry.center.y, cherry.center.z)  * Matrix_Rotate_X(3.14159f / 2) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.002f, 0.002f, 0.002f);
-
+                    cherry.modelMatrix = Matrix_Translate(cherry.center.x, cherry.center.y, cherry.center.z) * Matrix_Rotate_X(3.14159f / 2) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.002f, 0.002f, 0.002f);
                 }
                 cherry.render();
             }
@@ -748,12 +717,12 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
 
-        model = Matrix_Translate(1.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4): 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
+        model = Matrix_Translate(1.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4) : 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, COUNT_1);
         DrawVirtualObject(count_first_digit);
 
-        model = Matrix_Translate(0.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4): 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
+        model = Matrix_Translate(0.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4) : 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, COUNT_2);
         DrawVirtualObject(count_second_digit);
@@ -763,7 +732,8 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, COUNT_3);
         DrawVirtualObject(count_third_digit);
 
-        if (isFreeCamOn) {
+        if (isFreeCamOn)
+        {
             model = Matrix_Translate(-1.0f, 2.0f, -farplane / 4) * Matrix_Rotate_Y(3.14159f);
             glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(g_object_id_uniform, COUNT_1);
@@ -807,6 +777,16 @@ int main(int argc, char *argv[])
 
     // Fim do programa
     return 0;
+}
+
+glm::vec4 calculateBezierPosition(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4, float t)
+{
+    float b03 = pow((1 - t), 3);
+    float b13 = 3 * t * pow((1 - t), 2);
+    float b23 = 3 * pow(t, 2) * (1 - t);
+    float b33 = pow(t, 3);
+
+    return b03 * p1 + b13 * p2 + b23 * p3 + b33 * p4;
 }
 
 std::vector<Ball> instanciateLittleBalls()
@@ -871,9 +851,9 @@ std::vector<Cherry> instanciateCherries()
 
     float x = -4.5f;
     float z = -7.0f;
-    for (int i = 0; i < 4; i ++)
+    for (int i = 0; i < 4; i++)
     {
-        Cherry cherry = {Matrix_Translate(x, -0.5f, z)  * Matrix_Rotate_X(3.14159f / 2) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.002f, 0.002f, 0.002f), objectIdCounter++, CHERRY, "Cherry", glm::vec3(x, -0.5f, z), 0.5f};
+        Cherry cherry = {Matrix_Translate(x, -0.5f, z) * Matrix_Rotate_X(3.14159f / 2) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.002f, 0.002f, 0.002f), objectIdCounter++, CHERRY, "Cherry", glm::vec3(x, -0.5f, z), 0.5f};
         cherries.push_back(cherry);
 
         if (i % 2 == 0)
@@ -910,7 +890,7 @@ glm::vec4 cancelCollisionMovement(glm::vec4 movement, std::vector<glm::vec4> col
     return movement;
 }
 
-void renderCount(int current_count, char* count_first_digit, char* count_second_digit, char* count_third_digit) 
+void renderCount(int current_count, char *count_first_digit, char *count_second_digit, char *count_third_digit)
 {
     std::ostringstream oss;
     oss << std::setfill('0') << std::setw(3) << current_count;
@@ -955,7 +935,7 @@ void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, flo
         pacman_position_c += pacman_movement;
         pacman_rotation = 3.14159f;
     }
-    printf("Pacman movement: (%f, %f, %f)", pacman_movement.x, pacman_movement.y, pacman_movement.z); // fica entre -0.04 e -0.03 (?)
+    // printf("Pacman movement: (%f, %f, %f)", pacman_movement.x, pacman_movement.y, pacman_movement.z);
 }
 
 // Função que desenha um objeto armazenado em g_VirtualScene. Veja definição
