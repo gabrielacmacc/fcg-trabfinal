@@ -81,5 +81,6 @@ void LoadTexturesFromFiles()
     LoadTextureImage("../../resources/textures/pacman/yellow.png");
     LoadTextureImage("../../resources/textures/food/littleballtexture.jpg");
     LoadTextureImage("../../resources/textures/food/cherrytexture.jpg");
-    LoadTextureImage("../../resources/textures/numbers/yellow.png");
+    LoadTextureImage("../../resources/textures/numbers/old-grunge-concrete.jpg");
+    LoadTextureImage("../../resources/textures/ghost/abstract-surface-textures-white-concrete-stone-wall.jpg");
 }

@@ -32,6 +32,7 @@ uniform mat4 projection;
 #define COUNT_1 8
 #define COUNT_2 9
 #define COUNT_3 10
+#define GHOST 11
 
 uniform int object_id;
 
@@ -47,6 +48,7 @@ uniform sampler2D PacmanTexture;
 uniform sampler2D LittleBallTexture;
 uniform sampler2D CherryTexture;
 uniform sampler2D NumbersTexture;
+uniform sampler2D GhostTexture;
 
 uniform bool isFreeCamOn;
 
@@ -261,6 +263,12 @@ void main()
         {
             color.rgb = lambert_diffuse_term + ambient_term;
         }
+    }
+    else if (object_id == GHOST){
+
+        Kd = texture(GhostTexture, vec2(U,V)).rgb;
+        lambert_diffuse_term = Kd * I * lambert;
+        color.rgb = lambert_diffuse_term + ambient_term;
     }
     else // Objeto desconhecido = preto
     {

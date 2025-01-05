@@ -288,7 +288,9 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
         }
     }
 
-    if (key == GLFW_KEY_F && action == GLFW_PRESS && t >= 1) // Não permite trocar pra freecam enquanto estiver começando
+    // Não permite trocar pra freecam enquanto o pacman estiver indo para a posição inicial com a curva de Bezier,
+    // nem se a projeção atual for a ortográfica
+    if (key == GLFW_KEY_F && action == GLFW_PRESS && t >= 1 && g_UsePerspectiveProjection)
     {
         isFreeCamOn = !isFreeCamOn;
         pacman_rotation = isFreeCamOn ? pacman_initial_rotation : pacman_rotation;

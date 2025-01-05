@@ -80,6 +80,10 @@ float pacman_freecam_size = 0.1f;
 float pacman_lookat_size = 0.3f;
 float pacman_size = pacman_lookat_size;
 
+float ghost_freecam_size = 0.2f;
+float ghost_lookat_size = 0.4f;
+float ghost_size = ghost_lookat_size;
+
 glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
