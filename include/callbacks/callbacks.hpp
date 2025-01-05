@@ -288,7 +288,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
         }
     }
 
-    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+    if (key == GLFW_KEY_F && action == GLFW_PRESS && t >= 1) // Não permite trocar pra freecam enquanto estiver começando
     {
         isFreeCamOn = !isFreeCamOn;
         pacman_rotation = isFreeCamOn ? pacman_initial_rotation : pacman_rotation;
