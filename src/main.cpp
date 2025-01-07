@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 
         // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
 
-        Sphere pacman_sphere = {pacman_position_c, pacman_size + 0.05f};
+        Sphere pacman_sphere = {pacman_position_c, pacman_size + 0.1f};
         std::vector<glm::vec4> all_collision_directions;
         glDepthFunc(GL_ALWAYS);
 
