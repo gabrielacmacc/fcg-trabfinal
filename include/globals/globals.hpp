@@ -25,6 +25,19 @@
 #include <external/glm/vec4.hpp>
 #include <external/glm/gtc/type_ptr.hpp>
 
+#define SPHERE 0
+#define LABYRINTH_1 1
+#define LABYRINTH_2 2
+#define LABYRINTH_3 3
+#define PLANE 4
+#define BACKGROUND 5
+#define PACMAN 6
+#define CHERRY 7
+#define COUNT_1 8
+#define COUNT_2 9
+#define COUNT_3 10
+#define GHOST 11
+
 GLuint g_NumLoadedTextures = 0;
 
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
@@ -52,8 +65,6 @@ bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mous
 float g_CameraTheta = 0.0f;     // Ângulo no plano ZX em relação ao eixo Z
 float g_CameraPhi = 0.0f;       // Ângulo em relação ao eixo Y
 float g_CameraDistance = 15.0f; // Distância da câmera para a origem
-
-const float CAMERA_SPEED = 3.0f;
 
 const float MAX_BOUNDARY = 9.0f;
 const float MIN_BOUNDARY = -9.0f;
@@ -85,9 +96,10 @@ float ghost_lookat_size = 0.4f;
 float ghost_size = ghost_lookat_size;
 
 glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-glm::vec4 pacman_offset = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+glm::vec4 ghost_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-const float PACMAN_SPEED = 3.0f;
+const float PACMAN_SPEED = 2.0f;
+const float GHOST_SPEED = 3.0f;
 
 bool movePacmanForward = false;
 bool movePacmanBackward = false;
