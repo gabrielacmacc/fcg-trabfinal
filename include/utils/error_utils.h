@@ -1,5 +1,5 @@
-#ifndef _UTILS_H
-#define _UTILS_H
+#ifndef _ERROR_UTILS_H
+#define _ERROR_UTILS_H
 
 #include <external/glad/glad.h>
 #include <external/GLFW/glfw3.h>
@@ -29,4 +29,4 @@ static GLenum glCheckError_(const char *file, int line)
 }
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
-#endif // _UTILS_H
+#endif // _ERROR_UTILS_H

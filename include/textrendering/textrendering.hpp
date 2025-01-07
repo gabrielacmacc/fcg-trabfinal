@@ -29,7 +29,7 @@
 #include <external/glm/gtc/type_ptr.hpp>
 
 #include "globals/globals.hpp"
-#include "utils/utils.h"
+#include "utils/error_utils.h"
 #include "external/dejavufont.h"
 
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp

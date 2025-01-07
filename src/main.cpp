@@ -48,7 +48,7 @@
 #include "collisions/collisions.hpp"
 #include "globals/globals.hpp"
 #include "textrendering/textrendering.hpp"
-#include "utils/utils.h"
+#include "utils/error_utils.h"
 #include "utils/shader_utils.hpp"
 #include "utils/texture_utils.hpp"
 
