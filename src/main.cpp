@@ -43,6 +43,7 @@
 #include "objects/ghost.hpp"
 #include "objects/numbers.hpp"
 #include "objects/objects.hpp"
+#include "objects/pacman.hpp"
 #include "objects/wall.hpp"
 #include "callbacks/callbacks.hpp"
 #include "collisions/collisions.hpp"
@@ -204,7 +205,7 @@ int main(int argc, char *argv[])
         glUseProgram(g_GpuProgramID);
 
         float currentTime = (float)glfwGetTime();
-        float ellapsedTime = currentTime - previousTime;
+        float elapsedTime = currentTime - previousTime;
         previousTime = currentTime;
 
         // Computamos a posição da câmera utilizando coordenadas esféricas.  As
@@ -287,13 +288,19 @@ int main(int argc, char *argv[])
         checkLittleBallsCollision(balls, pacman_sphere, eaten_ball_count);
         checkCherriesCollision(cherries, pacman_sphere);
 
+        if (shouldBoostSpeed)
+        {
+            pacmanPreviousTime = previousTime;
+            BoostPacmanSpeed(pacmanPreviousTime);
+        }
+
         renderCount(eaten_ball_count, count_first_digit, count_second_digit, count_third_digit);
 
         // Testes de colisão com as paredes limítrofes: colisão esfera-plano
         glm::vec4 collision_direction_sky = checkSphereToPlaneCollision(sky_bbox, pacman_sphere);
         all_collision_directions.push_back(collision_direction_sky);
 
-        MovePacman(vertical_move_unit, camera_side_view_unit, ellapsedTime, all_collision_directions);
+        MovePacman(vertical_move_unit, camera_side_view_unit, elapsedTime, all_collision_directions);
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -406,52 +413,6 @@ int main(int argc, char *argv[])
 
     // Fim do programa
     return 0;
-}
-
-glm::vec4 calculateBezierPosition(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4, float t)
-{
-    float b03 = pow((1 - t), 3);
-    float b13 = 3 * t * pow((1 - t), 2);
-    float b23 = 3 * pow(t, 2) * (1 - t);
-    float b33 = pow(t, 3);
-
-    return b03 * p1 + b13 * p2 + b23 * p3 + b33 * p4;
-}
-
-void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float ellapsedTime, std::vector<glm::vec4> collision_directions)
-    {
-    if (movePacmanBackward)
-    {
-        pacman_movement = -camera_view_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
-        pacman_position_c += pacman_movement;
-        pacman_rotation = -3.14159f / 2;
-    }
-
-    if (movePacmanForward)
-    {
-        pacman_movement = camera_view_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
-        pacman_position_c += pacman_movement;
-        pacman_rotation = 3.14159f / 2;
-    }
-
-    if (movePacmanRight)
-    {
-        pacman_movement = -camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
-        pacman_position_c += pacman_movement;
-        pacman_rotation = 0.0f;
-    }
-
-    if (movePacmanLeft)
-    {
-        pacman_movement = camera_side_view_unit * PACMAN_SPEED * ellapsedTime;
-        pacman_movement = cancelCollisionMovement(pacman_movement, collision_directions);
-        pacman_position_c += pacman_movement;
-        pacman_rotation = 3.14159f;
-    }
-    // printf("Pacman movement: (%f, %f, %f)", pacman_movement.x, pacman_movement.y, pacman_movement.z);
 }
 
 // Função que pega a matriz M e guarda a mesma no topo da pilha

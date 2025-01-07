@@ -70,6 +70,7 @@ const float MAX_BOUNDARY = 9.0f;
 const float MIN_BOUNDARY = -9.0f;
 
 float previousTime = (float)glfwGetTime();
+float pacmanPreviousTime = (float)glfwGetTime();
 
 bool moveForward = false;
 bool moveBackward = false;
@@ -95,10 +96,11 @@ float ghost_freecam_size = 0.2f;
 float ghost_lookat_size = 0.4f;
 float ghost_size = ghost_lookat_size;
 
-glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-glm::vec4 ghost_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+const float PACMAN_ORIGINAL_SPEED = 2.5f;
+const float PACMAN_BOOST = 4.0f;
+float PACMAN_SPEED = PACMAN_ORIGINAL_SPEED;
+bool shouldBoostSpeed = false;
 
-const float PACMAN_SPEED = 2.0f;
 const float GHOST_SPEED = 3.0f;
 
 bool movePacmanForward = false;
@@ -118,4 +120,5 @@ glm::vec4 final_position_bezier = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
 
 glm::vec4 curr_bezier_position = initial_position_bezier;
 glm::vec4 pacman_position_initial = final_position_bezier;
+glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 pacman_position_c = pacman_position_initial;
