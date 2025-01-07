@@ -6,6 +6,31 @@
 #include <external/GLFW/glfw3.h>
 #include <external/glm/gtc/type_ptr.hpp>
 
+#include "globals/globals.hpp"
+
+// Definimos uma estrutura que armazenará dados necessários para renderizar
+// cada objeto da cena virtual.
+struct SceneObject
+{
+    std::string name;              // Nome do objeto
+    size_t first_index;            // Índice do primeiro vértice dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
+    size_t num_indices;            // Número de índices do objeto dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
+    GLenum rendering_mode;         // Modo de rasterização (GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.)
+    GLuint vertex_array_object_id; // ID do VAO onde estão armazenados os atributos do modelo
+    glm::vec3 bbox_min;            // Axis-Aligned Bounding Box do objeto
+    glm::vec3 bbox_max;
+};
+
+struct AABB {
+    glm::vec3 min;
+    glm::vec3 max;
+};
+
+struct Sphere {
+    glm::vec3 center;
+    float radius;
+};
+
 // Estrutura que representa um modelo geométrico carregado a partir de um
 // arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
 struct ObjModel
@@ -129,25 +154,268 @@ void ComputeNormals(ObjModel *model)
     }
 }
 
-// Definimos uma estrutura que armazenará dados necessários para renderizar
-// cada objeto da cena virtual.
-struct SceneObject
+// A cena virtual é uma lista de objetos nomeados, guardados em um dicionário
+// (map).  Veja dentro da função BuildTrianglesAndAddToVirtualScene() como que são incluídos
+// objetos dentro da variável g_VirtualScene, e veja na função main() como
+// estes são acessados.
+std::map<std::string, SceneObject> g_VirtualScene;
+
+// Função que desenha um objeto armazenado em g_VirtualScene. Veja definição
+// dos objetos na função BuildTrianglesAndAddToVirtualScene().
+void DrawVirtualObject(const char *object_name)
 {
-    std::string name;              // Nome do objeto
-    size_t first_index;            // Índice do primeiro vértice dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
-    size_t num_indices;            // Número de índices do objeto dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
-    GLenum rendering_mode;         // Modo de rasterização (GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.)
-    GLuint vertex_array_object_id; // ID do VAO onde estão armazenados os atributos do modelo
-    glm::vec3 bbox_min;            // Axis-Aligned Bounding Box do objeto
-    glm::vec3 bbox_max;
-};
+    // "Ligamos" o VAO. Informamos que queremos utilizar os atributos de
+    // vértices apontados pelo VAO criado pela função BuildTrianglesAndAddToVirtualScene(). Veja
+    // comentários detalhados dentro da definição de BuildTrianglesAndAddToVirtualScene().
+    glBindVertexArray(g_VirtualScene[object_name].vertex_array_object_id);
 
-struct AABB {
-    glm::vec3 min;
-    glm::vec3 max;
-};
+    // Setamos as variáveis "bbox_min" e "bbox_max" do fragment shader
+    // com os parâmetros da axis-aligned bounding box (AABB) do modelo.
+    glm::vec3 bbox_min = g_VirtualScene[object_name].bbox_min;
+    glm::vec3 bbox_max = g_VirtualScene[object_name].bbox_max;
+    glUniform4f(g_bbox_min_uniform, bbox_min.x, bbox_min.y, bbox_min.z, 1.0f);
+    glUniform4f(g_bbox_max_uniform, bbox_max.x, bbox_max.y, bbox_max.z, 1.0f);
 
-struct Sphere {
-    glm::vec3 center;
-    float radius;
-};
+    // Pedimos para a GPU rasterizar os vértices dos eixos XYZ
+    // apontados pelo VAO como linhas. Veja a definição de
+    // g_VirtualScene[""] dentro da função BuildTrianglesAndAddToVirtualScene(), e veja
+    // a documentação da função glDrawElements() em
+    // http://docs.gl/gl3/glDrawElements.
+    glDrawElements(
+        g_VirtualScene[object_name].rendering_mode,
+        g_VirtualScene[object_name].num_indices,
+        GL_UNSIGNED_INT,
+        (void *)(g_VirtualScene[object_name].first_index * sizeof(GLuint)));
+
+    // "Desligamos" o VAO, evitando assim que operações posteriores venham a
+    // alterar o mesmo. Isso evita bugs.
+    glBindVertexArray(0);
+}
+
+
+// Constrói triângulos para futura renderização a partir de um ObjModel.
+void BuildTrianglesAndAddToVirtualScene(ObjModel *model)
+{
+    GLuint vertex_array_object_id;
+    glGenVertexArrays(1, &vertex_array_object_id);
+    glBindVertexArray(vertex_array_object_id);
+
+    std::vector<GLuint> indices;
+    std::vector<float> model_coefficients;
+    std::vector<float> normal_coefficients;
+    std::vector<float> texture_coefficients;
+
+    for (size_t shape = 0; shape < model->shapes.size(); ++shape)
+    {
+        size_t first_index = indices.size();
+        size_t num_triangles = model->shapes[shape].mesh.num_face_vertices.size();
+
+        const float minval = std::numeric_limits<float>::min();
+        const float maxval = std::numeric_limits<float>::max();
+
+        glm::vec3 bbox_min = glm::vec3(maxval, maxval, maxval);
+        glm::vec3 bbox_max = glm::vec3(minval, minval, minval);
+
+        for (size_t triangle = 0; triangle < num_triangles; ++triangle)
+        {
+            assert(model->shapes[shape].mesh.num_face_vertices[triangle] == 3);
+
+            for (size_t vertex = 0; vertex < 3; ++vertex)
+            {
+                tinyobj::index_t idx = model->shapes[shape].mesh.indices[3 * triangle + vertex];
+
+                indices.push_back(first_index + 3 * triangle + vertex);
+
+                const float vx = model->attrib.vertices[3 * idx.vertex_index + 0];
+                const float vy = model->attrib.vertices[3 * idx.vertex_index + 1];
+                const float vz = model->attrib.vertices[3 * idx.vertex_index + 2];
+                // printf("tri %d vert %d = (%.2f, %.2f, %.2f)\n", (int)triangle, (int)vertex, vx, vy, vz);
+                model_coefficients.push_back(vx);   // X
+                model_coefficients.push_back(vy);   // Y
+                model_coefficients.push_back(vz);   // Z
+                model_coefficients.push_back(1.0f); // W
+
+                bbox_min.x = std::min(bbox_min.x, vx);
+                bbox_min.y = std::min(bbox_min.y, vy);
+                bbox_min.z = std::min(bbox_min.z, vz);
+                bbox_max.x = std::max(bbox_max.x, vx);
+                bbox_max.y = std::max(bbox_max.y, vy);
+                bbox_max.z = std::max(bbox_max.z, vz);
+
+                // Inspecionando o código da tinyobjloader, o aluno Bernardo
+                // Sulzbach (2017/1) apontou que a maneira correta de testar se
+                // existem normais e coordenadas de textura no ObjModel é
+                // comparando se o índice retornado é -1. Fazemos isso abaixo.
+
+                if (idx.normal_index != -1)
+                {
+                    const float nx = model->attrib.normals[3 * idx.normal_index + 0];
+                    const float ny = model->attrib.normals[3 * idx.normal_index + 1];
+                    const float nz = model->attrib.normals[3 * idx.normal_index + 2];
+                    normal_coefficients.push_back(nx);   // X
+                    normal_coefficients.push_back(ny);   // Y
+                    normal_coefficients.push_back(nz);   // Z
+                    normal_coefficients.push_back(0.0f); // W
+                }
+
+                if (idx.texcoord_index != -1)
+                {
+                    const float u = model->attrib.texcoords[2 * idx.texcoord_index + 0];
+                    const float v = model->attrib.texcoords[2 * idx.texcoord_index + 1];
+                    texture_coefficients.push_back(u);
+                    texture_coefficients.push_back(v);
+                }
+            }
+        }
+
+        size_t last_index = indices.size() - 1;
+
+        SceneObject theobject;
+        theobject.name = model->shapes[shape].name;
+        theobject.first_index = first_index;                  // Primeiro índice
+        theobject.num_indices = last_index - first_index + 1; // Número de indices
+        theobject.rendering_mode = GL_TRIANGLES;              // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+        theobject.vertex_array_object_id = vertex_array_object_id;
+
+        theobject.bbox_min = bbox_min;
+        theobject.bbox_max = bbox_max;
+
+        g_VirtualScene[model->shapes[shape].name] = theobject;
+    }
+
+    GLuint VBO_model_coefficients_id;
+    glGenBuffers(1, &VBO_model_coefficients_id);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_model_coefficients_id);
+    glBufferData(GL_ARRAY_BUFFER, model_coefficients.size() * sizeof(float), NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, model_coefficients.size() * sizeof(float), model_coefficients.data());
+    GLuint location = 0;            // "(location = 0)" em "shader_vertex.glsl"
+    GLint number_of_dimensions = 4; // vec4 em "shader_vertex.glsl"
+    glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(location);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    if (!normal_coefficients.empty())
+    {
+        GLuint VBO_normal_coefficients_id;
+        glGenBuffers(1, &VBO_normal_coefficients_id);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_normal_coefficients_id);
+        glBufferData(GL_ARRAY_BUFFER, normal_coefficients.size() * sizeof(float), NULL, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, normal_coefficients.size() * sizeof(float), normal_coefficients.data());
+        location = 1;             // "(location = 1)" em "shader_vertex.glsl"
+        number_of_dimensions = 4; // vec4 em "shader_vertex.glsl"
+        glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(location);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    if (!texture_coefficients.empty())
+    {
+        GLuint VBO_texture_coefficients_id;
+        glGenBuffers(1, &VBO_texture_coefficients_id);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_texture_coefficients_id);
+        glBufferData(GL_ARRAY_BUFFER, texture_coefficients.size() * sizeof(float), NULL, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, texture_coefficients.size() * sizeof(float), texture_coefficients.data());
+        location = 2;             // "(location = 1)" em "shader_vertex.glsl"
+        number_of_dimensions = 2; // vec2 em "shader_vertex.glsl"
+        glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(location);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    GLuint indices_id;
+    glGenBuffers(1, &indices_id);
+
+    // "Ligamos" o buffer. Note que o tipo agora é GL_ELEMENT_ARRAY_BUFFER.
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(GLuint), indices.data());
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // XXX Errado!
+    //
+
+    // "Desligamos" o VAO, evitando assim que operações posteriores venham a
+    // alterar o mesmo. Isso evita bugs.
+    glBindVertexArray(0);
+}
+
+void LoadObjects () {
+    // Construímos a representação de objetos geométricos através de malhas de triângulos
+    ObjModel spheremodel("../../resources/models/food/sphere.obj");
+    ComputeNormals(&spheremodel);
+    BuildTrianglesAndAddToVirtualScene(&spheremodel);
+
+    ObjModel planemodel("../../resources/models/skybox/plane.obj");
+    ComputeNormals(&planemodel);
+    BuildTrianglesAndAddToVirtualScene(&planemodel);
+
+    ObjModel cubemodel("../../resources/models/skybox/cube.obj");
+    ComputeNormals(&cubemodel);
+    BuildTrianglesAndAddToVirtualScene(&cubemodel);
+
+    ObjModel piecetwo("../../resources/models/labyrinth/p2.obj");
+    ComputeNormals(&piecetwo);
+    BuildTrianglesAndAddToVirtualScene(&piecetwo);
+
+    ObjModel piecetworotated("../../resources/models/labyrinth/p2-rotated.obj");
+    ComputeNormals(&piecetworotated);
+    BuildTrianglesAndAddToVirtualScene(&piecetworotated);
+
+    ObjModel piecethree("../../resources/models/labyrinth/p3.obj");
+    ComputeNormals(&piecethree);
+    BuildTrianglesAndAddToVirtualScene(&piecethree);
+
+    ObjModel piecethreerotated("../../resources/models/labyrinth/p3-rotated.obj");
+    ComputeNormals(&piecethreerotated);
+    BuildTrianglesAndAddToVirtualScene(&piecethreerotated);
+
+    ObjModel pacmodel("../../resources/models/pacman/pacman.obj");
+    ComputeNormals(&pacmodel);
+    BuildTrianglesAndAddToVirtualScene(&pacmodel);
+
+    ObjModel ghostmodel("../../resources/models/ghost/ghost.obj");
+    ComputeNormals(&ghostmodel);
+    BuildTrianglesAndAddToVirtualScene(&ghostmodel);
+
+    ObjModel cherrymodel("../../resources/models/food/cherry.obj");
+    ComputeNormals(&cherrymodel);
+    BuildTrianglesAndAddToVirtualScene(&cherrymodel);
+
+    ObjModel zeromodel("../../resources/models/numbers/000.obj");
+    ComputeNormals(&zeromodel);
+    BuildTrianglesAndAddToVirtualScene(&zeromodel);
+
+    ObjModel onemodel("../../resources/models/numbers/001.obj");
+    ComputeNormals(&onemodel);
+    BuildTrianglesAndAddToVirtualScene(&onemodel);
+
+    ObjModel twomodel("../../resources/models/numbers/002.obj");
+    ComputeNormals(&twomodel);
+    BuildTrianglesAndAddToVirtualScene(&twomodel);
+
+    ObjModel threemodel("../../resources/models/numbers/003.obj");
+    ComputeNormals(&threemodel);
+    BuildTrianglesAndAddToVirtualScene(&threemodel);
+
+    ObjModel forthmodel("../../resources/models/numbers/004.obj");
+    ComputeNormals(&forthmodel);
+    BuildTrianglesAndAddToVirtualScene(&forthmodel);
+
+    ObjModel fivemodel("../../resources/models/numbers/005.obj");
+    ComputeNormals(&fivemodel);
+    BuildTrianglesAndAddToVirtualScene(&fivemodel);
+
+    ObjModel sixmodel("../../resources/models/numbers/006.obj");
+    ComputeNormals(&sixmodel);
+    BuildTrianglesAndAddToVirtualScene(&sixmodel);
+
+    ObjModel sevenmodel("../../resources/models/numbers/007.obj");
+    ComputeNormals(&sevenmodel);
+    BuildTrianglesAndAddToVirtualScene(&sevenmodel);
+
+    ObjModel eightmodel("../../resources/models/numbers/008.obj");
+    ComputeNormals(&eightmodel);
+    BuildTrianglesAndAddToVirtualScene(&eightmodel);
+
+    ObjModel ninemodel("../../resources/models/numbers/009.obj");
+    ComputeNormals(&ninemodel);
+    BuildTrianglesAndAddToVirtualScene(&ninemodel);
+}

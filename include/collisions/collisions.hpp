@@ -137,3 +137,28 @@ bool checkSphereToSphereCollision(Sphere a, Sphere b)
     }
     return false;
 }
+
+glm::vec4 cancelCollisionMovement(glm::vec4 movement, std::vector<glm::vec4> collision_directions)
+{
+    for (auto &cd : collision_directions)
+    {
+        float result = dotproduct(cd, movement);
+        //printf("dot product: %f", result);
+        if (result > 0)
+        {
+            if (cd.x != 0)
+            {
+                movement.x = 0;
+            }
+            else if (cd.y != 0)
+            {
+                movement.y = 0;
+            }
+            else if (cd.z != 0)
+            {
+                movement.z = 0;
+            }
+        }
+    }
+    return movement;
+}
