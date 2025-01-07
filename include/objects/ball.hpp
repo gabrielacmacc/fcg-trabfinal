@@ -7,7 +7,6 @@
 #include <external/glm/vec4.hpp>
 #include <external/glm/gtc/type_ptr.hpp>
 
-#include "objects/graphics.hpp"
 #include "objects/objects.hpp"
 #include "globals/globals.hpp"
 #include "collisions/collisions.hpp"
@@ -114,7 +113,7 @@ std::vector<Ball> instanciateLittleBalls()
     return balls;
 };
 
-void checkLittleBallsCollision(std::vector<Ball>& balls, Sphere pacman_sphere, int& eaten_ball_count)
+void checkLittleBallsCollision(std::vector<Ball> &balls, Sphere pacman_sphere, int &eaten_ball_count)
 {
     std::vector<int> remove_indexes = {};
 

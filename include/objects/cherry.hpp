@@ -7,7 +7,6 @@
 #include <external/glm/vec4.hpp>
 #include <external/glm/gtc/type_ptr.hpp>
 
-#include "objects/graphics.hpp"
 #include "objects/objects.hpp"
 #include "globals/globals.hpp"
 #include "collisions/collisions.hpp"
@@ -63,7 +62,8 @@ std::vector<Cherry> instanciateCherries()
     return cherries;
 }
 
-void checkCherriesCollision(std::vector<Cherry>& cherries, Sphere pacman_sphere) {
+void checkCherriesCollision(std::vector<Cherry> &cherries, Sphere pacman_sphere)
+{
     std::vector<int> remove_cherry_indexes = {};
 
     int cherry_index = 0;

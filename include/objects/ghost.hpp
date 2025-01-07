@@ -7,12 +7,12 @@
 #include <external/glm/vec4.hpp>
 #include <external/glm/gtc/type_ptr.hpp>
 
-#include "objects/graphics.hpp"
 #include "objects/objects.hpp"
 #include "globals/globals.hpp"
 #include "matrices.h"
 
-enum class GhostDirection {
+enum class GhostDirection
+{
     FORWARD = 0,
     BACKWARD = 1,
     RIGHT = 2,
@@ -57,37 +57,47 @@ private:
     }
 };
 
-void MoveGhost(float elapsedTime) {
+void MoveGhost(float elapsedTime)
+{
     static GhostDirection currentDirection = GhostDirection::NONE;
 
-    if (ghost_position_c.x == ghost_position_initial.x && ghost_position_c.z != ghost_position_initial.z) {
+    if (ghost_position_c.x == ghost_position_initial.x && ghost_position_c.z != ghost_position_initial.z)
+    {
         currentDirection = GhostDirection::BACKWARD;
-    } else if (ghost_position_c.x == ghost_position_final.x && ghost_position_c.z != ghost_position_final.z) {
+    }
+    else if (ghost_position_c.x == ghost_position_final.x && ghost_position_c.z != ghost_position_final.z)
+    {
         currentDirection = GhostDirection::FORWARD;
-    } else if (ghost_position_c.x == ghost_position_initial.x && ghost_position_c.z == ghost_position_initial.z) {
+    }
+    else if (ghost_position_c.x == ghost_position_initial.x && ghost_position_c.z == ghost_position_initial.z)
+    {
         currentDirection = GhostDirection::LEFT;
-    } else if (ghost_position_c.x == ghost_position_final.x && ghost_position_c.z == ghost_position_final.z) {
+    }
+    else if (ghost_position_c.x == ghost_position_final.x && ghost_position_c.z == ghost_position_final.z)
+    {
         currentDirection = GhostDirection::RIGHT;
     }
 
-    if (shouldStopGhost) {
+    if (shouldStopGhost)
+    {
         return;
     }
 
-    switch (currentDirection) {
-        case GhostDirection::FORWARD:
-            ghost_position_c.z = std::max(ghost_position_c.z - GHOST_SPEED * elapsedTime, ghost_position_final.z);
-            break;
-        case GhostDirection::BACKWARD:
-            ghost_position_c.z = std::min(ghost_position_c.z + GHOST_SPEED * elapsedTime, ghost_position_initial.z);
-            break;
-        case GhostDirection::RIGHT:
-            ghost_position_c.x = std::min(ghost_position_c.x + GHOST_SPEED * elapsedTime, ghost_position_initial.x);
-            break;
-        case GhostDirection::LEFT:
-            ghost_position_c.x = std::max(ghost_position_c.x - GHOST_SPEED * elapsedTime, ghost_position_final.x);
-            break;
-        case GhostDirection::NONE:
-            break;
+    switch (currentDirection)
+    {
+    case GhostDirection::FORWARD:
+        ghost_position_c.z = std::max(ghost_position_c.z - GHOST_SPEED * elapsedTime, ghost_position_final.z);
+        break;
+    case GhostDirection::BACKWARD:
+        ghost_position_c.z = std::min(ghost_position_c.z + GHOST_SPEED * elapsedTime, ghost_position_initial.z);
+        break;
+    case GhostDirection::RIGHT:
+        ghost_position_c.x = std::min(ghost_position_c.x + GHOST_SPEED * elapsedTime, ghost_position_initial.x);
+        break;
+    case GhostDirection::LEFT:
+        ghost_position_c.x = std::max(ghost_position_c.x - GHOST_SPEED * elapsedTime, ghost_position_final.x);
+        break;
+    case GhostDirection::NONE:
+        break;
     }
 }

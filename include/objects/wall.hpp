@@ -7,7 +7,6 @@
 #include <external/glm/vec4.hpp>
 #include <external/glm/gtc/type_ptr.hpp>
 
-#include "objects/graphics.hpp"
 #include "objects/objects.hpp"
 #include "globals/globals.hpp"
 #include "matrices.h"
@@ -50,16 +49,18 @@ private:
     }
 };
 
-std::vector<Wall> instanciateWalls() {
+std::vector<Wall> instanciateWalls()
+{
     std::vector<Wall> walls;
     int objectIdCounter = 0;
     const float FLOOR_Y = -1.0f;
     const float MAX_X = 10.0f, MIN_X = -10.0f;
     const float MAX_Z = 10.0f, MIN_Z = -10.0f;
 
-    auto createWall = [&objectIdCounter](float tx, float ty, float tz, float sx, float sy, float sz, 
-                                         const std::string& texture, int labyrinth) -> Wall {
-        return {Matrix_Translate(tx, ty, tz) * Matrix_Scale(sx, sy, sz), 
+    auto createWall = [&objectIdCounter](float tx, float ty, float tz, float sx, float sy, float sz,
+                                         const std::string &texture, int labyrinth) -> Wall
+    {
+        return {Matrix_Translate(tx, ty, tz) * Matrix_Scale(sx, sy, sz),
                 objectIdCounter++, labyrinth, texture, g_VirtualScene};
     };
 
@@ -82,41 +83,46 @@ std::vector<Wall> instanciateWalls() {
         {0.0f, FLOOR_Y, 7.0f, 0.2f, 0.5f, 0.1f, "p2", LABYRINTH_2},
 
         {6.4f, FLOOR_Y, 0.0f, 0.2f, 0.5f, 0.5f, "p2", LABYRINTH_2},
-        {7.0f, FLOOR_Y, 0.0f, 0.2f, 0.5f, 0.2f, "p22", LABYRINTH_2}
-    };
+        {7.0f, FLOOR_Y, 0.0f, 0.2f, 0.5f, 0.2f, "p22", LABYRINTH_2}};
 
     std::vector<std::tuple<float, float, float, float, float, float, std::string, int>> centerWalls = {
         {0.0f, FLOOR_Y, 1.0f, 0.4f, 0.5f, 0.3f, "p3", LABYRINTH_3},
         {2.1f, FLOOR_Y, -0.2f, 0.3f, 0.5f, 0.2f, "p33", LABYRINTH_3},
         {-2.1f, FLOOR_Y, -0.2f, 0.3f, 0.5f, 0.2f, "p33", LABYRINTH_3},
         {1.5f, FLOOR_Y, -1.1f, 0.125f, 0.5f, 0.3f, "p3", LABYRINTH_3},
-        {-1.5f, FLOOR_Y, -1.1f, 0.125f, 0.5f, 0.3f, "p3", LABYRINTH_3}
-    };
+        {-1.5f, FLOOR_Y, -1.1f, 0.125f, 0.5f, 0.3f, "p3", LABYRINTH_3}};
 
-    auto addMirroredWalls = [&](float tx, float ty, float tz, float sx, float sy, float sz, 
-                                 const std::string& texture, int labyrinth) {
-        
+    auto addMirroredWalls = [&](float tx, float ty, float tz, float sx, float sy, float sz,
+                                const std::string &texture, int labyrinth)
+    {
         walls.push_back(createWall(tx, ty, tz, sx, sy, sz, texture, labyrinth));
-        
-        if (tx != 0) walls.push_back(createWall(-tx, ty, tz, sx, sy, sz, texture, labyrinth));
-        if (tz != 0) walls.push_back(createWall(tx, ty, -tz, sx, sy, sz, texture, labyrinth));
-        if (tx != 0 && tz != 0) walls.push_back(createWall(-tx, ty, -tz, sx, sy, sz, texture, labyrinth));
+
+        if (tx != 0)
+            walls.push_back(createWall(-tx, ty, tz, sx, sy, sz, texture, labyrinth));
+        if (tz != 0)
+            walls.push_back(createWall(tx, ty, -tz, sx, sy, sz, texture, labyrinth));
+        if (tx != 0 && tz != 0)
+            walls.push_back(createWall(-tx, ty, -tz, sx, sy, sz, texture, labyrinth));
     };
 
-    auto addCenterWalls = [&](float tx, float ty, float tz, float sx, float sy, float sz, 
-                                 const std::string& texture, int labyrinth) {
-        
+    auto addCenterWalls = [&](float tx, float ty, float tz, float sx, float sy, float sz,
+                              const std::string &texture, int labyrinth)
+    {
         walls.push_back(createWall(tx, ty, tz, sx, sy, sz, texture, labyrinth));
     };
 
-    for (const auto& [tx, ty, tz, sx, sy, sz, texture, labyrinth] : baseWalls) {
-        if (tx <= MAX_X && tx >= MIN_X && tz <= MAX_Z && tz >= MIN_Z) {
+    for (const auto &[tx, ty, tz, sx, sy, sz, texture, labyrinth] : baseWalls)
+    {
+        if (tx <= MAX_X && tx >= MIN_X && tz <= MAX_Z && tz >= MIN_Z)
+        {
             addMirroredWalls(tx, ty, tz, sx, sy, sz, texture, labyrinth);
         }
     }
 
-    for (const auto& [tx, ty, tz, sx, sy, sz, texture, labyrinth] : centerWalls) {
-        if (tx <= MAX_X && tx >= MIN_X && tz <= MAX_Z && tz >= MIN_Z) {
+    for (const auto &[tx, ty, tz, sx, sy, sz, texture, labyrinth] : centerWalls)
+    {
+        if (tx <= MAX_X && tx >= MIN_X && tz <= MAX_Z && tz >= MIN_Z)
+        {
             addCenterWalls(tx, ty, tz, sx, sy, sz, texture, labyrinth);
         }
     }
@@ -124,7 +130,7 @@ std::vector<Wall> instanciateWalls() {
     return walls;
 }
 
-void checkWallsCollision(std::vector<Wall>& walls, Sphere pacman_sphere, std::vector<glm::vec4>& all_collision_directions)
+void checkWallsCollision(std::vector<Wall> &walls, Sphere pacman_sphere, std::vector<glm::vec4> &all_collision_directions)
 {
     for (Wall &wall : walls)
     {

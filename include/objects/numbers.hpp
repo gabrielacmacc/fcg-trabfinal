@@ -19,7 +19,6 @@
 #include <external/glm/vec4.hpp>
 #include <external/glm/gtc/type_ptr.hpp>
 
-#include "objects/graphics.hpp"
 #include "objects/objects.hpp"
 #include "globals/globals.hpp"
 #include "matrices.h"
