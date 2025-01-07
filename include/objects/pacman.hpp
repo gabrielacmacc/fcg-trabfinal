@@ -41,6 +41,7 @@ void BoostPacmanSpeed(float& previousTime) {
         PACMAN_SPEED = PACMAN_ORIGINAL_SPEED;
         speedChanged = false;
         shouldBoostSpeed = false;
+        shouldStopGhost = false;
     }
 }
 

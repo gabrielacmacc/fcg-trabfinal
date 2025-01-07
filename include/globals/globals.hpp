@@ -72,12 +72,7 @@ const float MIN_BOUNDARY = -9.0f;
 float previousTime = (float)glfwGetTime();
 float pacmanPreviousTime = (float)glfwGetTime();
 
-bool moveForward = false;
-bool moveBackward = false;
-bool moveRight = false;
-bool moveLeft = false;
 bool isFreeCamOn = false;
-// bool isColliding = false;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -92,16 +87,10 @@ float pacman_freecam_size = 0.1f;
 float pacman_lookat_size = 0.3f;
 float pacman_size = pacman_lookat_size;
 
-float ghost_freecam_size = 0.2f;
-float ghost_lookat_size = 0.4f;
-float ghost_size = ghost_lookat_size;
-
 const float PACMAN_ORIGINAL_SPEED = 2.5f;
 const float PACMAN_BOOST = 4.0f;
 float PACMAN_SPEED = PACMAN_ORIGINAL_SPEED;
 bool shouldBoostSpeed = false;
-
-const float GHOST_SPEED = 3.0f;
 
 bool movePacmanForward = false;
 bool movePacmanBackward = false;
@@ -122,3 +111,16 @@ glm::vec4 curr_bezier_position = initial_position_bezier;
 glm::vec4 pacman_position_initial = final_position_bezier;
 glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 pacman_position_c = pacman_position_initial;
+
+// Variáveis para controle de movimento do fantasma
+float ghost_freecam_size = 0.2f;
+float ghost_lookat_size = 0.4f;
+float ghost_size = ghost_lookat_size;
+
+const float GHOST_SPEED = 5.0f;
+bool shouldStopGhost = false;
+
+glm::vec4 ghost_position_initial = glm::vec4(9.2f, -1.0f, 8.8f, 0.0f);
+glm::vec4 ghost_position_final = glm::vec4(-7.8f, -1.0f, -8.5f, 0.0f);
+glm::vec4 ghost_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+glm::vec4 ghost_position_c = ghost_position_initial;

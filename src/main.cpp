@@ -294,6 +294,7 @@ int main(int argc, char *argv[])
         all_collision_directions.push_back(collision_direction_sky);
 
         MovePacman(vertical_move_unit, camera_side_view_unit, elapsedTime, all_collision_directions);
+        MoveGhost(elapsedTime);
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -341,7 +342,7 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
 
-        model = Matrix_Translate(8.5f, -1.0f, 8.5f) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
+        model = Matrix_Translate(ghost_position_c.x, ghost_position_c.y, ghost_position_c.z) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, GHOST);
         DrawVirtualObject("ghost");
