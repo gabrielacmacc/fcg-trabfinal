@@ -228,9 +228,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     // Se o usuário apertar a tecla R, recarregamos os shaders dos arquivos "shader_fragment.glsl" e "shader_vertex.glsl".
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
-        LoadShadersFromFiles();
-        fprintf(stdout, "Shaders recarregados!\n");
-        fflush(stdout);
+        ReloadShaders();
     }
 
     // "Teste" (ruim) de colisão com as paredes inserida abaixo:

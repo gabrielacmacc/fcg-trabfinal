@@ -78,9 +78,11 @@ void LoadTexturesFromFiles()
     LoadTextureImage("../../resources/textures/skybox/walltexture.jpg");
     LoadTextureImage("../../resources/textures/skybox/floortexture.jpg");
     LoadTextureImage("../../resources/textures/labyrinth/blue.jpg");
-    LoadTextureImage("../../resources/textures/pacman/yellow.png");
+    LoadTextureImage("../../resources/textures/pacman/pacmanColor.png");
     LoadTextureImage("../../resources/textures/food/littleballtexture.jpg");
     LoadTextureImage("../../resources/textures/food/cherrytexture.jpg");
     LoadTextureImage("../../resources/textures/numbers/old-grunge-concrete.jpg");
-    LoadTextureImage("../../resources/textures/ghost/abstract-surface-textures-white-concrete-stone-wall.jpg");
+    LoadTextureImage("../../resources/textures/ghost/ghostTexture.png");
+    LoadTextureImage("../../resources/textures/ghost/ghostTexture2.png");
+    LoadTextureImage("../../resources/textures/ghost/ghostTexture3.png");
 }

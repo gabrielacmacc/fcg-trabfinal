@@ -7,6 +7,7 @@
 #include <external/glm/vec4.hpp>
 #include <external/glm/gtc/type_ptr.hpp>
 
+#include "utils/shader_utils.hpp"
 #include "objects/objects.hpp"
 #include "globals/globals.hpp"
 #include "collisions/collisions.hpp"
@@ -75,6 +76,7 @@ void checkCherriesCollision(std::vector<Cherry> &cherries, Sphere pacman_sphere)
             remove_cherry_indexes.push_back(cherry_index);
             shouldBoostSpeed = true;
             shouldStopGhost = true;
+            ReloadShaders();
         }
         else
         {

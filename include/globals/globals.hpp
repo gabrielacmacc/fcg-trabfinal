@@ -113,14 +113,17 @@ glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 pacman_position_c = pacman_position_initial;
 
 // Variáveis para controle de movimento do fantasma
-float ghost_freecam_size = 0.2f;
+float ghost_freecam_size = 0.1f;
 float ghost_lookat_size = 0.4f;
 float ghost_size = ghost_lookat_size;
 
 const float GHOST_SPEED = 5.0f;
 bool shouldStopGhost = false;
 
-glm::vec4 ghost_position_initial = glm::vec4(9.2f, -1.0f, 8.8f, 0.0f);
-glm::vec4 ghost_position_final = glm::vec4(-7.8f, -1.0f, -8.5f, 0.0f);
+glm::vec4 ghost_position_initial = glm::vec4(8.5f, -1.0f, 8.5f, 0.0f);
+glm::vec4 ghost_position_final = glm::vec4(-8.5f, -1.0f, -8.5f, 0.0f);
 glm::vec4 ghost_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 ghost_position_c = ghost_position_initial;
+
+float ghost_initial_rotation = -3.14159f / 2;
+float ghost_rotation = ghost_initial_rotation;

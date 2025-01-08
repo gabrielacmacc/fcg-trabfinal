@@ -366,11 +366,11 @@ void LoadObjects () {
     ComputeNormals(&piecethreerotated);
     BuildTrianglesAndAddToVirtualScene(&piecethreerotated);
 
-    ObjModel pacmodel("../../resources/models/pacman/pacman.obj");
+    ObjModel pacmodel("../../resources/models/pacman/newpacman.obj");
     ComputeNormals(&pacmodel);
     BuildTrianglesAndAddToVirtualScene(&pacmodel);
 
-    ObjModel ghostmodel("../../resources/models/ghost/ghost.obj");
+    ObjModel ghostmodel("../../resources/models/ghost/newghost.obj");
     ComputeNormals(&ghostmodel);
     BuildTrianglesAndAddToVirtualScene(&ghostmodel);
 

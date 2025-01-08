@@ -49,8 +49,11 @@ uniform sampler2D LittleBallTexture;
 uniform sampler2D CherryTexture;
 uniform sampler2D NumbersTexture;
 uniform sampler2D GhostTexture;
+uniform sampler2D GhostTexture2;
+uniform sampler2D GhostTexture3;
 
 uniform bool isFreeCamOn;
+uniform bool shouldStopGhost;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -190,22 +193,7 @@ void main()
     }
     else if ( object_id == PACMAN) 
     {
-        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
-
-        float radius = length(bbox_max - bbox_center);
-
-        vec4 position_sphere = bbox_center + radius * normalize(position_model - bbox_center);
-
-        float theta = atan(position_sphere.x, position_sphere.z);
-        float phi = asin(position_sphere.y / radius);
-
-        U = (theta + M_PI) / (2 * M_PI);
-        V = (phi + M_PI_2) / M_PI;
-
-        U *= 3.0f;
-        V *= 3.0f;
-
-        Kd = texture(PacmanTexture, vec2(U,V)).rgb;
+        Kd = texture(PacmanTexture, texcoords).rgb;
         lambert_diffuse_term = Kd * I * lambert;
         color.rgb = lambert_diffuse_term + ambient_term;
     }
@@ -266,9 +254,18 @@ void main()
     }
     else if (object_id == GHOST){
 
-        Kd = texture(GhostTexture, vec2(U,V)).rgb;
+        if (shouldStopGhost)
+        {
+            Kd = texture(GhostTexture3, texcoords).rgb;
+            lambert_diffuse_term = Kd * I * lambert;
+            color.rgb = lambert_diffuse_term + ambient_term;
+        }
+        else 
+        {
+            Kd = texture(GhostTexture, texcoords).rgb;
         lambert_diffuse_term = Kd * I * lambert;
         color.rgb = lambert_diffuse_term + ambient_term;
+        }
     }
     else // Objeto desconhecido = preto
     {

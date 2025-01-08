@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
 
-        model = Matrix_Translate(ghost_position_c.x, ghost_position_c.y, ghost_position_c.z) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
+        model = Matrix_Translate(ghost_position_c.x, ghost_position_c.y, ghost_position_c.z) * Matrix_Rotate_Y(ghost_rotation) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, GHOST);
         DrawVirtualObject("ghost");

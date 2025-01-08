@@ -87,15 +87,19 @@ void MoveGhost(float elapsedTime)
     {
     case GhostDirection::FORWARD:
         ghost_position_c.z = std::max(ghost_position_c.z - GHOST_SPEED * elapsedTime, ghost_position_final.z);
+        ghost_rotation = 3.14159f;
         break;
     case GhostDirection::BACKWARD:
         ghost_position_c.z = std::min(ghost_position_c.z + GHOST_SPEED * elapsedTime, ghost_position_initial.z);
+        ghost_rotation = 0.0f;
         break;
     case GhostDirection::RIGHT:
         ghost_position_c.x = std::min(ghost_position_c.x + GHOST_SPEED * elapsedTime, ghost_position_initial.x);
+        ghost_rotation = 3.14159f / 2;
         break;
     case GhostDirection::LEFT:
         ghost_position_c.x = std::max(ghost_position_c.x - GHOST_SPEED * elapsedTime, ghost_position_final.x);
+        ghost_rotation = -3.14159f / 2;
         break;
     case GhostDirection::NONE:
         break;

@@ -42,6 +42,7 @@ void BoostPacmanSpeed(float& previousTime) {
         speedChanged = false;
         shouldBoostSpeed = false;
         shouldStopGhost = false;
+        ReloadShaders();
     }
 }
 

@@ -226,8 +226,17 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "CherryTexture"), 5);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "NumbersTexture"), 6);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "GhostTexture"), 7);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "GhostTexture2"), 8);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "GhostTexture3"), 9);
 
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "isFreeCamOn"), isFreeCamOn);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "shouldStopGhost"), shouldStopGhost);
 
     glUseProgram(0);
+}
+
+void ReloadShaders() {
+    LoadShadersFromFiles();
+    fprintf(stdout,"Shaders recarregados!\n");
+    fflush(stdout);
 }
