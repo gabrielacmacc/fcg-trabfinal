@@ -135,16 +135,18 @@ Além do controle do personagem, o usuário também tem controle sob a orientaç
 Foram implementadas as câmeras 'free cam' e 'look-at cam'. Em ambas visualizações o usuário pode usar os comandos WASD para controle do personagem. A projeção ortográfica ficou limita à câmera 'look-at'.
 
 <p>
-  <img src="./docs/images/freecam.png" alt="pac model"  height="200" style="display: inline-block;">
-  <img src="./docs/images/lookat.png" alt="ghost model" height="200"  style="display: inline-block;">
+  <img src="./docs/images/freecam.png" alt="pac free cam"  height="200" style="display: inline-block;">
+  <img src="./docs/images/lookat.png" alt="pac look at" height="200"  style="display: inline-block;">
 </p>
 
 ## Testes de intersecção
 
 Em ambas as vistas (free cam e look-at) foram utilizados três tipos de testes de [colisão](./include/collisions/collisions.hpp): Esfera-Esfera, Esfera-Caixa e Esfera-Plano. A colisão Caixa-Plano foi implementada porém não está em uso.
 
-![movement free cam](./docs/images/pacgif2.gif)
-![movement look at](./docs/images/pacgif.gif)
+<p>
+  <img src="./docs/images/pacgif2.gif" alt="pac mov"  height="200" style="display: inline-block;">
+  <img src="./docs/images/pacgif.gif" alt="pac mov" height="200"  style="display: inline-block;">
+</p>
 
 ## Modelos de iluminação e interpolação
 
