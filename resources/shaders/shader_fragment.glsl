@@ -263,8 +263,8 @@ void main()
         else 
         {
             Kd = texture(GhostTexture, texcoords).rgb;
-        lambert_diffuse_term = Kd * I * lambert;
-        color.rgb = lambert_diffuse_term + ambient_term;
+            lambert_diffuse_term = Kd * I * lambert;
+            color.rgb = lambert_diffuse_term + ambient_term;
         }
     }
     else // Objeto desconhecido = preto
