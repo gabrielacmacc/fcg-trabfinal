@@ -54,6 +54,7 @@ std::vector<Wall> instanciateWalls()
     std::vector<Wall> walls;
     int objectIdCounter = 0;
     const float FLOOR_Y = -1.0f;
+    const float WALL_HEIGHT = 0.5f;
     const float MAX_X = 10.0f, MIN_X = -10.0f;
     const float MAX_Z = 10.0f, MIN_Z = -10.0f;
 
@@ -65,32 +66,32 @@ std::vector<Wall> instanciateWalls()
     };
 
     std::vector<std::tuple<float, float, float, float, float, float, std::string, int>> baseWalls = {
-        {3.5f, FLOOR_Y, 2.9f, 0.6f, 0.5f, 0.2f, "p22", LABYRINTH_2},
-        {3.0f, FLOOR_Y, 4.3f, 0.4f, 0.5f, 0.2f, "p22", LABYRINTH_2},
-        {5.7f, FLOOR_Y, 6.5f, 0.2f, 0.5f, 0.4f, "p2", LABYRINTH_2},
-        {3.3f, FLOOR_Y, 6.3f, 0.2f, 0.5f, 0.25f, "p2", LABYRINTH_2},
-        {4.5f, FLOOR_Y, 5.0f, 0.2f, 0.5f, 0.25f, "p2", LABYRINTH_2},
-        {2.2f, FLOOR_Y, 7.0f, 0.3f, 0.5f, 0.2f, "p22", LABYRINTH_2},
-        {7.0f, FLOOR_Y, 4.0f, 0.2f, 0.5f, 0.3f, "p2", LABYRINTH_2},
-        {6.5f, FLOOR_Y, 6.8f, 0.2f, 0.5f, 0.2f, "p22", LABYRINTH_2},
-        {6.4f, FLOOR_Y, 4.0f, 0.1f, 0.5f, 0.2f, "p22", LABYRINTH_2},
-        {4.5f, FLOOR_Y, 2.0f, 0.2f, 0.5f, 0.2f, "p2", LABYRINTH_2},
+        {3.5f, FLOOR_Y, 2.9f, 0.6f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2},
+        {3.0f, FLOOR_Y, 4.3f, 0.4f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2},
+        {5.7f, FLOOR_Y, 6.5f, 0.2f, WALL_HEIGHT, 0.4f, "p2", LABYRINTH_2},
+        {3.3f, FLOOR_Y, 6.3f, 0.2f, WALL_HEIGHT, 0.25f, "p2", LABYRINTH_2},
+        {4.5f, FLOOR_Y, 5.0f, 0.2f, WALL_HEIGHT, 0.25f, "p2", LABYRINTH_2},
+        {2.2f, FLOOR_Y, 7.0f, 0.3f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2},
+        {7.0f, FLOOR_Y, 4.0f, 0.2f, WALL_HEIGHT, 0.3f, "p2", LABYRINTH_2},
+        {6.5f, FLOOR_Y, 6.8f, 0.2f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2},
+        {6.4f, FLOOR_Y, 4.0f, 0.1f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2},
+        {4.5f, FLOOR_Y, 2.0f, 0.2f, WALL_HEIGHT, 0.2f, "p2", LABYRINTH_2},
 
-        {0.0f, FLOOR_Y, 7.0f, 0.2f, 0.5f, 0.1f, "p2", LABYRINTH_2},
-        {0.0f, FLOOR_Y, 5.5f, 0.6f, 0.5f, 0.2f, "p22", LABYRINTH_2},
-        {0.0f, FLOOR_Y, 4.0f, 0.2f, 0.5f, 0.4f, "p2", LABYRINTH_2},
-        {0.0f, FLOOR_Y, 5.5f, 0.6f, 0.5f, 0.2f, "p22", LABYRINTH_2},
-        {0.0f, FLOOR_Y, 7.0f, 0.2f, 0.5f, 0.1f, "p2", LABYRINTH_2},
+        {0.0f, FLOOR_Y, 7.0f, 0.2f, WALL_HEIGHT, 0.1f, "p2", LABYRINTH_2},
+        {0.0f, FLOOR_Y, 5.5f, 0.6f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2},
+        {0.0f, FLOOR_Y, 4.0f, 0.2f, WALL_HEIGHT, 0.4f, "p2", LABYRINTH_2},
+        {0.0f, FLOOR_Y, 5.5f, 0.6f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2},
+        {0.0f, FLOOR_Y, 7.0f, 0.2f, WALL_HEIGHT, 0.1f, "p2", LABYRINTH_2},
 
-        {6.4f, FLOOR_Y, 0.0f, 0.2f, 0.5f, 0.5f, "p2", LABYRINTH_2},
-        {7.0f, FLOOR_Y, 0.0f, 0.2f, 0.5f, 0.2f, "p22", LABYRINTH_2}};
+        {6.4f, FLOOR_Y, 0.0f, 0.2f, WALL_HEIGHT, 0.5f, "p2", LABYRINTH_2},
+        {7.0f, FLOOR_Y, 0.0f, 0.2f, WALL_HEIGHT, 0.2f, "p22", LABYRINTH_2}};
 
     std::vector<std::tuple<float, float, float, float, float, float, std::string, int>> centerWalls = {
-        {0.0f, FLOOR_Y, 1.0f, 0.4f, 0.5f, 0.3f, "p3", LABYRINTH_3},
-        {2.1f, FLOOR_Y, -0.2f, 0.3f, 0.5f, 0.2f, "p33", LABYRINTH_3},
-        {-2.1f, FLOOR_Y, -0.2f, 0.3f, 0.5f, 0.2f, "p33", LABYRINTH_3},
-        {1.5f, FLOOR_Y, -1.1f, 0.125f, 0.5f, 0.3f, "p3", LABYRINTH_3},
-        {-1.5f, FLOOR_Y, -1.1f, 0.125f, 0.5f, 0.3f, "p3", LABYRINTH_3}};
+        {0.0f, FLOOR_Y, 1.0f, 0.4f, WALL_HEIGHT, 0.3f, "p3", LABYRINTH_3},
+        {2.1f, FLOOR_Y, -0.2f, 0.3f, WALL_HEIGHT, 0.2f, "p33", LABYRINTH_3},
+        {-2.1f, FLOOR_Y, -0.2f, 0.3f, WALL_HEIGHT, 0.2f, "p33", LABYRINTH_3},
+        {1.5f, FLOOR_Y, -1.1f, 0.125f, WALL_HEIGHT, 0.3f, "p3", LABYRINTH_3},
+        {-1.5f, FLOOR_Y, -1.1f, 0.125f, WALL_HEIGHT, 0.3f, "p3", LABYRINTH_3}};
 
     auto addMirroredWalls = [&](float tx, float ty, float tz, float sx, float sy, float sz,
                                 const std::string &texture, int labyrinth)
