@@ -59,17 +59,15 @@ void PopMatrix(glm::mat4 &M);
 
 using namespace std;
 
-void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size);
-
 // Pilha que guardará as matrizes de modelagem.
 std::stack<glm::mat4> g_MatrixStack;
 
-glm::vec4 camera_position_c;      // Ponto "c", centro da câmera
-glm::vec4 camera_lookat_l;        // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-glm::vec4 camera_view_vector;     // Vetor "view", sentido para onde a câmera está virada
-glm::vec4 camera_view_unit;       // Vetor "view" unitário
+glm::vec4 camera_position_c;  // Ponto "c", centro da câmera
+glm::vec4 camera_lookat_l;    // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+glm::vec4 camera_view_vector; // Vetor "view", sentido para onde a câmera está virada
+glm::vec4 camera_view_unit;   // Vetor "view" unitário
 glm::vec4 camera_distance;
-glm::vec4 camera_up_vector;       // Vetor "up" fixado para apontar para o "céu" (eixo Y global)
+glm::vec4 camera_up_vector; // Vetor "up" fixado para apontar para o "céu" (eixo Y global)
 glm::vec4 camera_up_unit;
 glm::vec4 camera_side_view;
 glm::vec4 camera_side_view_unit;
@@ -224,7 +222,7 @@ int main(int argc, char *argv[])
         float x = r * g_CameraPhiCos * g_CameraThetaSin;
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
-        camera_position_c = glm::vec4(x, y, z, 1.0f);  
+        camera_position_c = glm::vec4(x, y, z, 1.0f);
         camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -258,8 +256,6 @@ int main(int argc, char *argv[])
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f; // Posição do "near plane"
         float farplane = -40.0f; // Posição do "far plane"
-
-        // TextRendering_ShowWallsAABBs(window, walls, sizeof(walls) / sizeof(walls[0]));
 
         Sphere pacman_sphere = {pacman_position_c, pacman_size + 0.1f};
         std::vector<glm::vec4> all_collision_directions;
@@ -295,6 +291,7 @@ int main(int argc, char *argv[])
 
         MovePacman(vertical_move_unit, camera_side_view_unit, elapsedTime, all_collision_directions);
         MoveGhost(elapsedTime);
+        MoveSecondGhost(elapsedTime);
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -343,6 +340,11 @@ int main(int argc, char *argv[])
         DrawVirtualObject("pacman");
 
         model = Matrix_Translate(ghost_position_c.x, ghost_position_c.y, ghost_position_c.z) * Matrix_Rotate_Y(ghost_rotation) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
+        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, GHOST);
+        DrawVirtualObject("ghost");
+
+        model = Matrix_Translate(second_ghost_position_c.x, second_ghost_position_c.y, second_ghost_position_c.z) * Matrix_Rotate_Y(second_ghost_rotation) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, GHOST);
         DrawVirtualObject("ghost");
@@ -428,36 +430,6 @@ void PopMatrix(glm::mat4 &M)
         g_MatrixStack.pop();
     }
 }
-
-// void TextRendering_ShowWallsAABBs(GLFWwindow *window, Wall walls[], size_t size)
-// {
-//     if (!g_ShowInfoText)
-//         return;
-
-//     float pad = TextRendering_LineHeight(window);
-//     char buffer[140];
-
-//     float yPosition = 1.0f - pad; // Posição inicial
-
-//     for (int i = 0; i < size; i++)
-//     {
-//         Wall &wall = walls[i];
-
-//         // Printa as coordenadas max e min de AABB para debug
-//         // snprintf(buffer, 140,
-//         //          "Wall %d coordinates: Min(X: %.2f, Y: %.2f, Z: %.2f) Max(X: %.2f, Y: %.2f, Z: %.2f, Offx:%.2f,Offy:%.2f,Offz:%.2f, Coll: %s)\n",
-//         //          i,
-//         //          wall.minMaxCorner.min.x, wall.minMaxCorner.min.y, wall.minMaxCorner.min.z,
-//         //          wall.minMaxCorner.max.x, wall.minMaxCorner.max.y, wall.minMaxCorner.max.z,
-//         //         //  wall.collisionOffset.x,
-//         //         //  wall.collisionOffset.y,
-//         //         //  wall.collisionOffset.z,
-//         //         //  wall.isColliding ? "T" : "F");
-
-//         TextRendering_PrintString(window, buffer, -1.0f + pad / 10, yPosition, 1.0f);
-//         yPosition -= pad * 1.5f;
-//     }
-// }
 
 // set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
 // vim: set spell spelllang=pt_br :

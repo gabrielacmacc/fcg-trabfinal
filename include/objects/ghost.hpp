@@ -105,3 +105,52 @@ void MoveGhost(float elapsedTime)
         break;
     }
 }
+
+void MoveSecondGhost(float elapsedTime)
+{
+    static GhostDirection currentDirection = GhostDirection::NONE;
+
+    if (second_ghost_position_c.x == second_ghost_position_initial.x && second_ghost_position_c.z != second_ghost_position_initial.z)
+    {
+        currentDirection = GhostDirection::BACKWARD;
+    }
+    else if (second_ghost_position_c.x == second_ghost_position_final.x && second_ghost_position_c.z != second_ghost_position_final.z)
+    {
+        currentDirection = GhostDirection::FORWARD;
+    }
+    else if (second_ghost_position_c.x == second_ghost_position_initial.x && second_ghost_position_c.z == second_ghost_position_initial.z)
+    {
+        currentDirection = GhostDirection::LEFT;
+    }
+    else if (second_ghost_position_c.x == second_ghost_position_final.x && second_ghost_position_c.z == second_ghost_position_final.z)
+    {
+        currentDirection = GhostDirection::RIGHT;
+    }
+
+    if (shouldStopGhost)
+    {
+        return;
+    }
+
+    switch (currentDirection)
+    {
+    case GhostDirection::FORWARD:
+        second_ghost_position_c.z = std::max(second_ghost_position_c.z - GHOST_SPEED * elapsedTime, second_ghost_position_final.z);
+        second_ghost_rotation = 3.14159f;
+        break;
+    case GhostDirection::BACKWARD:
+        second_ghost_position_c.z = std::min(second_ghost_position_c.z + GHOST_SPEED * elapsedTime, second_ghost_position_initial.z);
+        second_ghost_rotation = 0.0f;
+        break;
+    case GhostDirection::RIGHT:
+        second_ghost_position_c.x = std::min(second_ghost_position_c.x + GHOST_SPEED * elapsedTime, second_ghost_position_initial.x);
+        second_ghost_rotation = 3.14159f / 2;
+        break;
+    case GhostDirection::LEFT:
+        second_ghost_position_c.x = std::max(second_ghost_position_c.x - GHOST_SPEED * elapsedTime, second_ghost_position_final.x);
+        second_ghost_rotation = -3.14159f / 2;
+        break;
+    case GhostDirection::NONE:
+        break;
+    }
+}

@@ -76,7 +76,7 @@ void checkCherriesCollision(std::vector<Cherry> &cherries, Sphere pacman_sphere)
             remove_cherry_indexes.push_back(cherry_index);
             shouldBoostSpeed = true;
             shouldStopGhost = true;
-            ReloadShaders();
+            // ReloadShaders();
         }
         else
         {
