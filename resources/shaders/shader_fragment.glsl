@@ -214,12 +214,12 @@ void main()
         U *= 3.0f;
         V *= 3.0f;
 
-        q = 5.0;
-        phong_specular_term  = Ks * I * max(0, pow(dot(r, v), q));
+        q = 20.0;
+        blinn_phong_specular_term = Ks * I * (pow(dot(n, h), q));
 
         Kd = texture(CherryTexture, vec2(U,V)).rgb;
         lambert_diffuse_term = Kd * I * lambert;
-        color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
+        color.rgb = lambert_diffuse_term + ambient_term + blinn_phong_specular_term;
     }
     else if ( object_id == COUNT_1 || object_id == COUNT_2 || object_id == COUNT_3)
     {

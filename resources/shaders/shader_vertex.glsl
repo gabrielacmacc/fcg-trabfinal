@@ -84,7 +84,7 @@ void main()
         
         vec4 v = normalize(camera_position - p);
 
-        vec4 l = normalize(origin - position_world); //normalize(vec4(0.5,1.0,0.0,0.0));
+        vec4 l = normalize(origin - position_world);
 
         vec4 h = normalize(l + v);
 
