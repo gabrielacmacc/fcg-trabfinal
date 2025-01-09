@@ -67,7 +67,6 @@ public:
     void move(float elapsedTime)
     {
         freeze_ghosts_countdown = std::max(0.0f, freeze_ghosts_countdown - 0.01f);
-
         if (game_over)
             return;
 
@@ -118,8 +117,15 @@ public:
 
     bool collided(Sphere pacman)
     {
-        Sphere ghost_b_sphere = Sphere{current_position, radius};
-        return checkSphereToSphereCollision(ghost_b_sphere, pacman);
+        if (freeze_ghosts_countdown > 0.0f) // Se os fantasmas estão parados, a colisão não conta
+        {
+            return false;
+        }
+        else
+        {
+            Sphere ghost_b_sphere = Sphere{current_position, radius};
+            return checkSphereToSphereCollision(ghost_b_sphere, pacman);
+        }
     }
 };
 
