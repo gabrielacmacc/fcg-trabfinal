@@ -38,6 +38,8 @@
 #define COUNT_3 10
 #define GHOST 11
 
+#define INITIAL_ROTATION 3.14159f / 2
+
 GLuint g_NumLoadedTextures = 0;
 
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
@@ -54,17 +56,17 @@ float g_ScreenRatio = 1.0f;
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
-bool g_LeftMouseButtonPressed = false;
-bool g_RightMouseButtonPressed = false;  // Análogo para botão direito do mouse
-bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
+bool g_LeftMouseButtonPressed;
+bool g_RightMouseButtonPressed;  // Análogo para botão direito do mouse
+bool g_MiddleMouseButtonPressed; // Análogo para botão do meio do mouse
 
 // Variáveis que definem a câmera em coordenadas esféricas, controladas pelo
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-float g_CameraTheta = 0.0f;     // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;       // Ângulo em relação ao eixo Y
-float g_CameraDistance = 15.0f; // Distância da câmera para a origem
+float g_CameraTheta;    // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi;      // Ângulo em relação ao eixo Y
+float g_CameraDistance; // Distância da câmera para a origem
 
 const float MAX_BOUNDARY = 9.0f;
 const float MIN_BOUNDARY = -9.0f;
@@ -72,64 +74,110 @@ const float MIN_BOUNDARY = -9.0f;
 float previousTime = (float)glfwGetTime();
 float pacmanPreviousTime = (float)glfwGetTime();
 
-bool isFreeCamOn = false;
+bool isFreeCamOn;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
 
 // Variável que controla se o texto informativo será mostrado na tela.
-bool g_ShowInfoText = false;
+bool g_ShowInfoText;
 
 // Variáveis para controle de movimento do pacman
 const float PACMAN_DISTANCE = 0.5f;
 
-float pacman_freecam_size = 0.1f;
-float pacman_lookat_size = 0.3f;
-float pacman_size = pacman_lookat_size;
+float pacman_freecam_size;
+float pacman_lookat_size;
+float pacman_size;
 
 const float PACMAN_ORIGINAL_SPEED = 2.5f;
 const float PACMAN_BOOST = 4.0f;
-float PACMAN_SPEED = PACMAN_ORIGINAL_SPEED;
-bool shouldBoostSpeed = false;
+float PACMAN_SPEED;
+bool shouldBoostSpeed;
 
-bool movePacmanForward = false;
-bool movePacmanBackward = false;
-bool movePacmanRight = false;
-bool movePacmanLeft = false;
+bool movePacmanForward;
+bool movePacmanBackward;
+bool movePacmanRight;
+bool movePacmanLeft;
 
-float pacman_initial_rotation = 3.14159f / 2;
-float pacman_rotation = pacman_initial_rotation;
+float pacman_initial_rotation;
+float pacman_rotation;
 
-float t = 0.0f;
+float t;
 
-glm::vec4 initial_position_bezier = glm::vec4(1.0f, 10.0f, 3.0f, 1.0f);
-glm::vec4 intermediate_position_bezier_1 = glm::vec4(6.0f, 7.0f, 6.0f, 1.0f);
-glm::vec4 intermediate_position_bezier_2 = glm::vec4(-6.0f, 3.0f, 2.0f, 1.0f);
-glm::vec4 final_position_bezier = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
+glm::vec4 initial_position_bezier;
+glm::vec4 intermediate_position_bezier_1;
+glm::vec4 intermediate_position_bezier_2;
+glm::vec4 final_position_bezier;
 
-glm::vec4 curr_bezier_position = initial_position_bezier;
-glm::vec4 pacman_position_initial = final_position_bezier;
-glm::vec4 pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-glm::vec4 pacman_position_c = pacman_position_initial;
+glm::vec4 curr_bezier_position;
+glm::vec4 pacman_position_initial;
+glm::vec4 pacman_movement;
+glm::vec4 pacman_position_c;
 
 // Variáveis para controle de movimento do fantasma
-float ghost_lookat_size = 0.4f;
+float ghost_lookat_size;
 float ghost_size = ghost_lookat_size;
 
 const float GHOST_SPEED = 8.0f;
-bool shouldStopGhost = false;
-
-glm::vec4 ghost_position_initial = glm::vec4(8.5f, -1.4f, 8.5f, 0.0f);
-glm::vec4 ghost_position_final = glm::vec4(-8.5f, -1.4f, -8.5f, 0.0f);
-glm::vec4 ghost_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-glm::vec4 ghost_position_c = ghost_position_initial;
-float ghost_initial_rotation = -3.14159f / 2;
-float ghost_rotation = ghost_initial_rotation;
-
 const float SECOND_GHOST_SPEED = 6.0f;
+float freeze_ghosts_countdown;
 
-glm::vec4 second_ghost_position_initial = glm::vec4(3.2, -1.4f, 2.0f, 0.0f);
-glm::vec4 second_ghost_position_final = glm::vec4(-3.35, -1.4f, -2.0f, 0.0f);
-glm::vec4 second_ghost_position_c = second_ghost_position_initial;
-float second_ghost_initial_rotation = -3.14159f / 2;
-float second_ghost_rotation = second_ghost_initial_rotation;
+bool should_restart;
+bool game_over;
+bool won;
+
+void inicialize_globals()
+{
+    g_LeftMouseButtonPressed = false;
+    g_RightMouseButtonPressed = false;
+    g_MiddleMouseButtonPressed = false;
+
+    g_CameraTheta = 0.0f;
+    g_CameraPhi = 0.0f;
+    g_CameraDistance = 15.0f;
+
+    previousTime = (float)glfwGetTime();
+    pacmanPreviousTime = (float)glfwGetTime();
+
+    isFreeCamOn = false;
+
+    g_UsePerspectiveProjection = true;
+
+    g_ShowInfoText = false;
+
+    pacman_freecam_size = 0.1f;
+    pacman_lookat_size = 0.3f;
+    pacman_size = pacman_lookat_size;
+
+    PACMAN_SPEED = PACMAN_ORIGINAL_SPEED;
+    shouldBoostSpeed = false;
+
+    movePacmanForward = false;
+    movePacmanBackward = false;
+    movePacmanRight = false;
+    movePacmanLeft = false;
+
+    pacman_initial_rotation = 3.14159f / 2;
+    pacman_rotation = pacman_initial_rotation;
+
+    t = 0.0f;
+
+    initial_position_bezier = glm::vec4(1.0f, 10.0f, 3.0f, 1.0f);
+    intermediate_position_bezier_1 = glm::vec4(6.0f, 7.0f, 6.0f, 1.0f);
+    intermediate_position_bezier_2 = glm::vec4(-6.0f, 3.0f, 2.0f, 1.0f);
+    final_position_bezier = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
+
+    curr_bezier_position = initial_position_bezier;
+    pacman_position_initial = final_position_bezier;
+    pacman_movement = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    pacman_position_c = pacman_position_initial;
+
+    ghost_lookat_size = 0.4f;
+    ghost_size = ghost_lookat_size;
+
+    freeze_ghosts_countdown = 0.0f;
+
+    should_restart = false;
+    game_over = false;
+    won = false;
+}

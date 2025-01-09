@@ -14,47 +14,6 @@ bool checkAABBCollision(AABB a, AABB b)
     return false;
 }
 
-glm::vec4 checkAABBToPlaneCollision(AABB a, AABB b)
-{
-    glm::vec4 offset = {0.0f, 0.0f, 0.0f, 0.0f};
-
-    float xPenetrationMin = b.min.x - a.min.x;
-    float xPenetrationMax = b.max.x - a.max.x;
-    float yPenetrationMin = b.min.y - a.min.y;
-    float yPenetrationMax = b.max.y - a.max.y;
-    float zPenetrationMin = b.min.z - a.min.z;
-    float zPenetrationMax = b.max.z - a.max.z;
-
-    if (xPenetrationMin > 0.0f)
-    {
-        offset.x = xPenetrationMin;
-    }
-    else if (xPenetrationMax < 0.0f)
-    {
-        offset.x = xPenetrationMax;
-    }
-
-    if (yPenetrationMin > 0.0f)
-    {
-        offset.y = yPenetrationMin;
-    }
-    else if (yPenetrationMax < 0.0f)
-    {
-        offset.y = yPenetrationMax;
-    }
-
-    if (zPenetrationMin > 0.0f)
-    {
-        offset.z = zPenetrationMin;
-    }
-    else if (zPenetrationMax < 0.0f)
-    {
-        offset.z = zPenetrationMax;
-    }
-
-    return offset;
-}
-
 glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b)
 {
     glm::vec3 offset = {0.0f, 0.0f, 0.0f};
@@ -143,7 +102,6 @@ glm::vec4 cancelCollisionMovement(glm::vec4 movement, std::vector<glm::vec4> col
     for (auto &cd : collision_directions)
     {
         float result = dotproduct(cd, movement);
-        //printf("dot product: %f", result);
         if (result > 0)
         {
             if (cd.x != 0)

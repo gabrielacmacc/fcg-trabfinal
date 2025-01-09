@@ -1,3 +1,5 @@
+#pragma once
+
 // Headers das bibliotecas OpenGL
 #include <external/glad/glad.h>  // Criação de contexto OpenGL 3.3
 #include <external/GLFW/glfw3.h> // Criação de janelas do sistema operacional
@@ -11,7 +13,7 @@
 #include "globals/globals.hpp"
 #include "matrices.h"
 
-enum class GhostDirection
+enum class Direction
 {
     FORWARD = 0,
     BACKWARD = 1,
@@ -20,137 +22,118 @@ enum class GhostDirection
     NONE = 4
 };
 
+enum GhostType
+{
+    FIRST = 0,
+    SECOND = 1
+};
+
 class Ghost
 {
 public:
     // Atributos:
+    float radius;
     glm::mat4 modelMatrix;
-    int objectId;
     int objectType;
     std::string objectName;
-    AABB ghost_bbox;
+    Direction direction;
+    glm::vec4 current_position;
+    glm::vec4 initial_position;
+    glm::vec4 final_position;
+    float rotation;
 
     // Métodos:
 
     // Construtor
-    Ghost(glm::mat4 modelMatrix, int objectId, int objectType, std::string objectName, std::map<std::string, SceneObject> &g_VirtualScene)
-        : modelMatrix(modelMatrix), objectId(objectId), objectType(objectType), objectName(objectName)
+    Ghost(int objectType, std::string objectName, glm::vec4 initial_position, glm::vec4 final_position, float radius)
+        : objectType(objectType), objectName(objectName), initial_position(initial_position), final_position(final_position), radius(radius)
     {
-        this->ghost_bbox = setBoundingBox(g_VirtualScene);
+        this->direction = Direction::NONE;
+        this->current_position = initial_position;
+        this->rotation = -INITIAL_ROTATION;
     }
+
+    // inicializador vazio apenas para o início
+    Ghost() {}
 
     void render()
     {
+        modelMatrix = Matrix_Translate(current_position.x, current_position.y, current_position.z) * Matrix_Rotate_Y(rotation) * Matrix_Scale(radius, radius, radius);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glUniform1i(g_object_id_uniform, objectType);
         DrawVirtualObject(objectName.c_str());
     }
 
-private:
-    AABB setBoundingBox(std::map<std::string, SceneObject> &g_VirtualScene)
+    void move(float elapsedTime)
     {
-        glm::vec3 bbox_min = g_VirtualScene[objectName].bbox_min;
-        glm::vec3 bbox_max = g_VirtualScene[objectName].bbox_max;
-        glm::vec4 minCorner = glm::vec4(bbox_min.x, bbox_min.y, bbox_min.z, 1.0f);
-        glm::vec4 maxCorner = glm::vec4(bbox_max.x, bbox_max.y, bbox_max.z, 1.0f);
-        return {modelMatrix * minCorner, modelMatrix * maxCorner};
+        freeze_ghosts_countdown = std::max(0.0f, freeze_ghosts_countdown - 0.01f);
+
+        if (game_over)
+            return;
+
+        if (current_position.x == initial_position.x && current_position.z != initial_position.z)
+        {
+            direction = Direction::BACKWARD;
+        }
+        else if (current_position.x == final_position.x && current_position.z != final_position.z)
+        {
+            direction = Direction::FORWARD;
+        }
+        else if (current_position.x == initial_position.x && current_position.z == initial_position.z)
+        {
+            direction = Direction::LEFT;
+        }
+        else if (current_position.x == final_position.x && current_position.z == final_position.z)
+        {
+            direction = Direction::RIGHT;
+        }
+
+        if (freeze_ghosts_countdown > 0.0f)
+        {
+            return;
+        }
+
+        switch (direction)
+        {
+        case Direction::FORWARD:
+            current_position.z = std::max(current_position.z - GHOST_SPEED * elapsedTime, final_position.z);
+            rotation = 3.14159f;
+            break;
+        case Direction::BACKWARD:
+            current_position.z = std::min(current_position.z + GHOST_SPEED * elapsedTime, initial_position.z);
+            rotation = 0.0f;
+            break;
+        case Direction::RIGHT:
+            current_position.x = std::min(current_position.x + GHOST_SPEED * elapsedTime, initial_position.x);
+            rotation = 3.14159f / 2;
+            break;
+        case Direction::LEFT:
+            current_position.x = std::max(current_position.x - GHOST_SPEED * elapsedTime, final_position.x);
+            rotation = -3.14159f / 2;
+            break;
+        case Direction::NONE:
+            break;
+        }
+    }
+
+    bool collided(Sphere pacman)
+    {
+        Sphere ghost_b_sphere = Sphere{current_position, radius};
+        return checkSphereToSphereCollision(ghost_b_sphere, pacman);
     }
 };
 
-void MoveGhost(float elapsedTime)
+Ghost instanciateGhost(GhostType type)
 {
-    static GhostDirection currentDirection = GhostDirection::NONE;
+    switch (type)
+    {
+    case FIRST:
+        return {GHOST, "ghost", glm::vec4(8.5f, -1.4f, 8.5f, 0.0f), glm::vec4(-8.5f, -1.4f, -8.5f, 0.0f), ghost_size};
 
-    if (ghost_position_c.x == ghost_position_initial.x && ghost_position_c.z != ghost_position_initial.z)
-    {
-        currentDirection = GhostDirection::BACKWARD;
-    }
-    else if (ghost_position_c.x == ghost_position_final.x && ghost_position_c.z != ghost_position_final.z)
-    {
-        currentDirection = GhostDirection::FORWARD;
-    }
-    else if (ghost_position_c.x == ghost_position_initial.x && ghost_position_c.z == ghost_position_initial.z)
-    {
-        currentDirection = GhostDirection::LEFT;
-    }
-    else if (ghost_position_c.x == ghost_position_final.x && ghost_position_c.z == ghost_position_final.z)
-    {
-        currentDirection = GhostDirection::RIGHT;
-    }
+    case SECOND:
+        return {GHOST, "ghost", glm::vec4(3.2, -1.4f, 2.0f, 0.0f), glm::vec4(-3.35, -1.4f, -2.0f, 0.0f), ghost_size};
 
-    if (shouldStopGhost)
-    {
-        return;
-    }
-
-    switch (currentDirection)
-    {
-    case GhostDirection::FORWARD:
-        ghost_position_c.z = std::max(ghost_position_c.z - GHOST_SPEED * elapsedTime, ghost_position_final.z);
-        ghost_rotation = 3.14159f;
-        break;
-    case GhostDirection::BACKWARD:
-        ghost_position_c.z = std::min(ghost_position_c.z + GHOST_SPEED * elapsedTime, ghost_position_initial.z);
-        ghost_rotation = 0.0f;
-        break;
-    case GhostDirection::RIGHT:
-        ghost_position_c.x = std::min(ghost_position_c.x + GHOST_SPEED * elapsedTime, ghost_position_initial.x);
-        ghost_rotation = 3.14159f / 2;
-        break;
-    case GhostDirection::LEFT:
-        ghost_position_c.x = std::max(ghost_position_c.x - GHOST_SPEED * elapsedTime, ghost_position_final.x);
-        ghost_rotation = -3.14159f / 2;
-        break;
-    case GhostDirection::NONE:
-        break;
-    }
-}
-
-void MoveSecondGhost(float elapsedTime)
-{
-    static GhostDirection currentDirection = GhostDirection::NONE;
-
-    if (second_ghost_position_c.x == second_ghost_position_initial.x && second_ghost_position_c.z != second_ghost_position_initial.z)
-    {
-        currentDirection = GhostDirection::BACKWARD;
-    }
-    else if (second_ghost_position_c.x == second_ghost_position_final.x && second_ghost_position_c.z != second_ghost_position_final.z)
-    {
-        currentDirection = GhostDirection::FORWARD;
-    }
-    else if (second_ghost_position_c.x == second_ghost_position_initial.x && second_ghost_position_c.z == second_ghost_position_initial.z)
-    {
-        currentDirection = GhostDirection::LEFT;
-    }
-    else if (second_ghost_position_c.x == second_ghost_position_final.x && second_ghost_position_c.z == second_ghost_position_final.z)
-    {
-        currentDirection = GhostDirection::RIGHT;
-    }
-
-    if (shouldStopGhost)
-    {
-        return;
-    }
-
-    switch (currentDirection)
-    {
-    case GhostDirection::FORWARD:
-        second_ghost_position_c.z = std::max(second_ghost_position_c.z - GHOST_SPEED * elapsedTime, second_ghost_position_final.z);
-        second_ghost_rotation = 3.14159f;
-        break;
-    case GhostDirection::BACKWARD:
-        second_ghost_position_c.z = std::min(second_ghost_position_c.z + GHOST_SPEED * elapsedTime, second_ghost_position_initial.z);
-        second_ghost_rotation = 0.0f;
-        break;
-    case GhostDirection::RIGHT:
-        second_ghost_position_c.x = std::min(second_ghost_position_c.x + GHOST_SPEED * elapsedTime, second_ghost_position_initial.x);
-        second_ghost_rotation = 3.14159f / 2;
-        break;
-    case GhostDirection::LEFT:
-        second_ghost_position_c.x = std::max(second_ghost_position_c.x - GHOST_SPEED * elapsedTime, second_ghost_position_final.x);
-        second_ghost_rotation = -3.14159f / 2;
-        break;
-    case GhostDirection::NONE:
-        break;
+    default:
+        return {GHOST, "ghost", glm::vec4(8.5f, -1.4f, 8.5f, 0.0f), glm::vec4(-8.5f, -1.4f, -8.5f, 0.0f), ghost_size};
     }
 }

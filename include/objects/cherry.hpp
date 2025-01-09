@@ -51,7 +51,7 @@ std::vector<Cherry> instanciateCherries()
     float z = -7.0f;
     for (int i = 0; i < 4; i++)
     {
-        Cherry cherry = {Matrix_Translate(x, -0.5f, z) * Matrix_Rotate_X(3.14159f / 2) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.002f, 0.002f, 0.002f), objectIdCounter++, CHERRY, "Cherry", glm::vec3(x, -0.5f, z), 0.5f};
+        Cherry cherry = {Matrix_Translate(x, -0.5f, z) * Matrix_Rotate_X(3.14159f / 2) * Matrix_Rotate_Z(3.14159f) * Matrix_Scale(0.002f, 0.002f, 0.002f), objectIdCounter++, CHERRY, "Cherry", glm::vec3(x, -0.7f, z), 0.5f};
         cherries.push_back(cherry);
 
         if (i % 2 == 0)
@@ -75,7 +75,7 @@ void checkCherriesCollision(std::vector<Cherry> &cherries, Sphere pacman_sphere)
         {
             remove_cherry_indexes.push_back(cherry_index);
             shouldBoostSpeed = true;
-            shouldStopGhost = true;
+            freeze_ghosts_countdown = 10.0f;
             // ReloadShaders();
         }
         else

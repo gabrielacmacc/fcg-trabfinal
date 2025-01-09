@@ -230,13 +230,14 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "GhostTexture3"), 9);
 
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "isFreeCamOn"), isFreeCamOn);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "shouldStopGhost"), shouldStopGhost);
+    // glUniform1i(glGetUniformLocation(g_GpuProgramID, "shouldStopGhost"), shouldStopGhost);
 
     glUseProgram(0);
 }
 
-void ReloadShaders() {
+void ReloadShaders()
+{
     LoadShadersFromFiles();
-    fprintf(stdout,"Shaders recarregados!\n");
+    fprintf(stdout, "Shaders recarregados!\n");
     fflush(stdout);
 }

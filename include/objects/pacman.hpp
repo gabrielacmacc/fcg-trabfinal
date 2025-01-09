@@ -44,13 +44,15 @@ void BoostPacmanSpeed(float &previousTime)
         PACMAN_SPEED = PACMAN_ORIGINAL_SPEED;
         speedChanged = false;
         shouldBoostSpeed = false;
-        shouldStopGhost = false;
         // ReloadShaders();
     }
 }
 
 void MovePacman(glm::vec4 camera_view_unit, glm::vec4 camera_side_view_unit, float elapsedTime, std::vector<glm::vec4> collision_directions)
 {
+    if (game_over)
+        return;
+
     if (movePacmanBackward)
     {
         pacman_movement = -camera_view_unit * PACMAN_SPEED * elapsedTime;

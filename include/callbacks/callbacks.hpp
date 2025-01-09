@@ -207,6 +207,14 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+        should_restart = true;
+    }
+
+    if (game_over)
+        return;
+
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
     if (key == GLFW_KEY_P && action == GLFW_PRESS)
     {

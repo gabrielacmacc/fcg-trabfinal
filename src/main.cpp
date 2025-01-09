@@ -72,6 +72,16 @@ glm::vec4 camera_up_unit;
 glm::vec4 camera_side_view;
 glm::vec4 camera_side_view_unit;
 
+Ghost first_ghost;
+Ghost second_ghost;
+std::vector<Ball> balls;
+std::vector<Cherry> cherries;
+std::vector<Wall> walls;
+int initial_ball_count;
+int eaten_ball_count;
+
+void initialize_game();
+
 int main(int argc, char *argv[])
 {
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -163,12 +173,7 @@ int main(int argc, char *argv[])
     glFrontFace(GL_CCW);
 
     // chama a função que inicializa as bolinhas:
-    std::vector<Ball> balls = instanciateLittleBalls();
-    std::vector<Cherry> cherries = instanciateCherries();
-    std::vector<Wall> walls = instanciateWalls();
-
-    int initial_ball_count = balls.size();
-    int eaten_ball_count = 0;
+    initialize_game();
 
     char count_first_digit[4] = {0};
     char count_second_digit[4] = {0};
@@ -177,6 +182,11 @@ int main(int argc, char *argv[])
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
+
+        if (should_restart)
+        {
+            initialize_game();
+        }
         // Aqui executamos as operações de renderização
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -209,7 +219,6 @@ int main(int argc, char *argv[])
             curr_bezier_position = calculateBezierPosition(initial_position_bezier, intermediate_position_bezier_1, intermediate_position_bezier_2, final_position_bezier, t);
             pacman_position_c = curr_bezier_position;
         }
-        // printf("curr_bezier_position: %f %f %f ", curr_bezier_position.x, curr_bezier_position.y, curr_bezier_position.z);
 
         float g_CameraPhiSin = sin(g_CameraPhi);
         float g_CameraPhiCos = cos(g_CameraPhi);
@@ -217,7 +226,7 @@ int main(int argc, char *argv[])
         float g_CameraThetaCos = cos(g_CameraTheta);
 
         float r = g_CameraDistance;
-        float y = g_CameraPhiSin >= 0 ? r * g_CameraPhiSin : 0; // Limita ângulo da free camera
+        float y = 0.0f; // Limita mais ainda ângulo da free camera
         float z = r * g_CameraPhiCos * g_CameraThetaCos;
         float x = r * g_CameraPhiCos * g_CameraThetaSin;
 
@@ -277,6 +286,9 @@ int main(int argc, char *argv[])
         checkLittleBallsCollision(balls, pacman_sphere, eaten_ball_count);
         checkCherriesCollision(cherries, pacman_sphere);
 
+        // checkGhostsCollision(ghost, pacman_sphere);
+        // checkGhostsCollision(second_ghost, pacman_sphere);
+
         if (shouldBoostSpeed)
         {
             pacmanPreviousTime = previousTime;
@@ -290,8 +302,11 @@ int main(int argc, char *argv[])
         all_collision_directions.push_back(collision_direction_sky);
 
         MovePacman(vertical_move_unit, camera_side_view_unit, elapsedTime, all_collision_directions);
-        MoveGhost(elapsedTime);
-        MoveSecondGhost(elapsedTime);
+
+        first_ghost.move(elapsedTime);
+        second_ghost.move(elapsedTime);
+        won = balls.size() == 0;
+        game_over = first_ghost.collided(pacman_sphere) || second_ghost.collided(pacman_sphere) || won;
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -339,15 +354,8 @@ int main(int argc, char *argv[])
         glUniform1i(g_object_id_uniform, PACMAN);
         DrawVirtualObject("pacman");
 
-        model = Matrix_Translate(ghost_position_c.x, ghost_position_c.y, ghost_position_c.z) * Matrix_Rotate_Y(ghost_rotation) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, GHOST);
-        DrawVirtualObject("ghost");
-
-        model = Matrix_Translate(second_ghost_position_c.x, second_ghost_position_c.y, second_ghost_position_c.z) * Matrix_Rotate_Y(second_ghost_rotation) * Matrix_Scale(ghost_size, ghost_size, ghost_size);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, GHOST);
-        DrawVirtualObject("ghost");
+        first_ghost.render();
+        second_ghost.render();
 
         model = Matrix_Translate(1.0f, isFreeCamOn ? 2.0f : -1.0f, isFreeCamOn ? (farplane / 4) : 0.0f) * Matrix_Rotate_X(isFreeCamOn ? 0.0f : 3.14159f / 2) * Matrix_Rotate_Z(isFreeCamOn ? 0.0f : 3.14159f) * Matrix_Rotate_Y(isFreeCamOn ? 0.0f : 3.14159f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
@@ -409,6 +417,19 @@ int main(int argc, char *argv[])
 
     // Fim do programa
     return 0;
+}
+
+void initialize_game()
+{
+    inicialize_globals();
+    balls = instanciateLittleBalls();
+    cherries = instanciateCherries();
+    walls = instanciateWalls();
+    first_ghost = instanciateGhost(FIRST);
+    second_ghost = instanciateGhost(SECOND);
+
+    initial_ball_count = balls.size();
+    eaten_ball_count = 0;
 }
 
 // Função que pega a matriz M e guarda a mesma no topo da pilha
