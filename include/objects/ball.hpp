@@ -20,7 +20,6 @@ public:
     int objectType;
     std::string objectName;
     Sphere b_sphere;
-    // bool shouldRender;
 
     // Construtor
     Ball(glm::vec3 center, float radius, int objectType, std::string objectName)
@@ -35,7 +34,6 @@ public:
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glUniform1i(g_object_id_uniform, objectType);
         DrawVirtualObject(objectName.c_str());
-        // printf("%d [(min: %f, max:%f), (min: %f , max: %f), (min: %f , max: %f)] ", objectId, minMaxCorner.min.x, minMaxCorner.max.x, minMaxCorner.min.y, minMaxCorner.max.y, minMaxCorner.min.z, minMaxCorner.max.z);
     }
 };
 
@@ -87,7 +85,7 @@ std::vector<Ball> instanciateLittleBalls()
         Ball inner_right = {glm::vec3(-3.35f, -0.8f, z), 0.1f, SPHERE, "the_sphere"};
         balls.push_back(inner_right);
 
-        z += 0.5f; // de -1.5 a 3.0
+        z += 0.5f;
     }
     x = -2.85f;
     for (int i = 0; i < 12; i++)
@@ -123,7 +121,6 @@ void checkLittleBallsCollision(std::vector<Ball> &balls, Sphere pacman_sphere, i
         bool ate = checkSphereToSphereCollision(pacman_sphere, ball.b_sphere);
         if (ate)
         {
-            // Aplicar transformação geométrica ao comer a bolinha
             remove_indexes.push_back(index);
         }
         else

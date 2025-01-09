@@ -35,7 +35,6 @@ public:
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glUniform1i(g_object_id_uniform, objectType);
         DrawVirtualObject(objectName.c_str());
-        // printf("%d [(min: %f, max:%f), (min: %f , max: %f), (min: %f , max: %f)] ", objectId, minMaxCorner.min.x, minMaxCorner.max.x, minMaxCorner.min.y, minMaxCorner.max.y, minMaxCorner.min.z, minMaxCorner.max.z);
     }
 
 private:

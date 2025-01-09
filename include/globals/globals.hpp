@@ -37,6 +37,7 @@
 #define COUNT_2 9
 #define COUNT_3 10
 #define GHOST 11
+#define GHOST2 12
 
 #define INITIAL_ROTATION 3.14159f / 2
 

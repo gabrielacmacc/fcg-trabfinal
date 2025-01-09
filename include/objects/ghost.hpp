@@ -125,12 +125,10 @@ public:
         }
         else
         {
-            // Sphere ghost_b_sphere = Sphere{current_position, radius};
             if (isFreeCamOn)
             {
                 radius_bbox = 0.55;
             }
-            // printf("raio fantasma %f ", radius_bbox);
             Sphere ghost_b_sphere = Sphere{current_position, radius_bbox};
             return checkSphereToSphereCollision(ghost_b_sphere, pacman);
         }
@@ -145,7 +143,7 @@ Ghost instanciateGhost(GhostType type)
         return {GHOST, "ghost", glm::vec4(8.5f, -1.4f, 8.5f, 0.0f), glm::vec4(-8.5f, -1.4f, -8.5f, 0.0f), ghost_size};
 
     case SECOND:
-        return {GHOST, "ghost", glm::vec4(3.2, -1.4f, 2.0f, 0.0f), glm::vec4(-3.35, -1.4f, -2.0f, 0.0f), ghost_size};
+        return {GHOST2, "ghost", glm::vec4(3.2, -1.4f, 2.0f, 0.0f), glm::vec4(-3.35, -1.4f, -2.0f, 0.0f), ghost_size};
 
     default:
         return {GHOST, "ghost", glm::vec4(8.5f, -1.4f, 8.5f, 0.0f), glm::vec4(-8.5f, -1.4f, -8.5f, 0.0f), ghost_size};

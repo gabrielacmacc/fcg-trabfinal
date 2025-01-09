@@ -33,6 +33,7 @@ uniform mat4 projection;
 #define COUNT_2 9
 #define COUNT_3 10
 #define GHOST 11
+#define GHOST2 12
 
 uniform int object_id;
 
@@ -265,6 +266,11 @@ void main()
     }
     else if (object_id == GHOST){
         Kd = texture(GhostTexture, texcoords).rgb;
+        lambert_diffuse_term = Kd * I * lambert;
+        color.rgb = lambert_diffuse_term + ambient_term;
+    }
+    else if (object_id == GHOST2){
+        Kd = texture(GhostTexture2, texcoords).rgb;
         lambert_diffuse_term = Kd * I * lambert;
         color.rgb = lambert_diffuse_term + ambient_term;
     }
