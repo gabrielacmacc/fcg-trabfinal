@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    // chama a função que inicializa as bolinhas:
+    // chama a função que inicializa o jogo:
     initialize_game();
 
     char count_first_digit[4] = {0};
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
     while (!glfwWindowShouldClose(window))
     {
 
-        if (should_restart)
+        if (should_restart) // se o usuário restartar, a função de inicializar o jogo é chamada novamente
         {
             initialize_game();
         }
@@ -205,10 +205,6 @@ int main(int argc, char *argv[])
         float elapsedTime = currentTime - previousTime;
         previousTime = currentTime;
 
-        // Computamos a posição da câmera utilizando coordenadas esféricas.  As
-        // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
-        // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
-        // e ScrollCallback().
         if (t <= 1)
         {
             t += 0.008;
@@ -281,9 +277,6 @@ int main(int argc, char *argv[])
         checkWallsCollision(walls, pacman_sphere, all_collision_directions);
         checkLittleBallsCollision(balls, pacman_sphere, eaten_ball_count);
         checkCherriesCollision(cherries, pacman_sphere);
-
-        // checkGhostsCollision(ghost, pacman_sphere);
-        // checkGhostsCollision(second_ghost, pacman_sphere);
 
         if (shouldBoostSpeed)
         {

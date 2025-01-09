@@ -2,18 +2,6 @@
 
 #include "../objects/objects.hpp"
 
-bool checkAABBCollision(AABB a, AABB b)
-{
-    if (a.min.x <= b.max.x && a.max.x >= b.min.x &&
-        a.min.y <= b.max.y && a.max.y >= b.min.y &&
-        a.min.z <= b.max.z && a.max.z >= b.min.z)
-    {
-        return true;
-    };
-
-    return false;
-}
-
 glm::vec4 checkSphereToPlaneCollision(AABB a, Sphere b)
 {
     glm::vec3 offset = {0.0f, 0.0f, 0.0f};

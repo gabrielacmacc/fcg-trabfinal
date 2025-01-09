@@ -11,31 +11,33 @@ Para compilar e executar este projeto, você possui as seguintes opções
 ## Windows
 
 ### Windows com VSCode (Visual Studio Code)
-1) Instale o VSCode seguindo as instruções em https://code.visualstudio.com/ .
 
-2) Instale o compilador GCC no Windows seguindo as instruções em
-https://code.visualstudio.com/docs/cpp/config-mingw#_installing-the-mingww64-toolchain .
+1. Instale o VSCode seguindo as instruções em https://code.visualstudio.com/ .
+
+2. Instale o compilador GCC no Windows seguindo as instruções em
+   https://code.visualstudio.com/docs/cpp/config-mingw#_installing-the-mingww64-toolchain .
 
 Alternativamente, se você já possui o Code::Blocks instalado no seu PC (versão que inclui o MinGW), você pode utilizar o GCC que vem com esta instalação no passo 5.
 
-3) Instale o CMake seguindo as instruções em https://cmake.org/download/ .
-Alternativamente, você pode utilizar algum package manager do
-Windows para fazer esta instalação, como https://chocolatey.org/ .
+3. Instale o CMake seguindo as instruções em https://cmake.org/download/ .
+   Alternativamente, você pode utilizar algum package manager do
+   Windows para fazer esta instalação, como https://chocolatey.org/ .
 
-4) Instale as extensões "ms-vscode.cpptools" e "ms-vscode.cmake-tools" no VSCode. Se você abrir o diretório deste projeto no VSCode, automaticamente será sugerida a instalação destas extensões (pois estão listadas no arquivo ".vscode/extensions.json").
+4. Instale as extensões "ms-vscode.cpptools" e "ms-vscode.cmake-tools" no VSCode. Se você abrir o diretório deste projeto no VSCode, automaticamente será sugerida a instalação destas extensões (pois estão listadas no arquivo ".vscode/extensions.json").
 
-5) Abra as configurações da extensão cmake-tools (Ctrl-Shift-P e busque por "CMake: Open CMake Tools Extension Settings"), e adicione o caminho de instalação do GCC na opção de configuração "additionalCompilerSearchDirs".
+5. Abra as configurações da extensão cmake-tools (Ctrl-Shift-P e busque por "CMake: Open CMake Tools Extension Settings"), e adicione o caminho de instalação do GCC na opção de configuração "additionalCompilerSearchDirs".
 
 Por exemplo, se você quiser utilizar o compilador MinGW que vem junto com o Code::Blocks, pode preencher o diretório como
 "C:\Program Files\CodeBlocks\MinGW\bin" (verifique se este é o local de instalação do seu Code::Blocks).
 
-6) Clique no botão de "Play" na barra inferior do VSCode para compilar e executar o projeto. Na primeira compilação, a extensão do CMake para o VSCode irá perguntar qual compilador você quer utilizar. Selecione da lista o compilador GCC que você instalou com o MSYS/MinGW.
+6. Clique no botão de "Play" na barra inferior do VSCode para compilar e executar o projeto. Na primeira compilação, a extensão do CMake para o VSCode irá perguntar qual compilador você quer utilizar. Selecione da lista o compilador GCC que você instalou com o MSYS/MinGW.
 
 Veja mais instruções de uso do CMake no VSCode em:
 
 https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/README.md
 
 ## Linux
+
 Para compilar e executar este projeto no Linux, primeiro você precisa instalar
 as bibliotecas necessárias. Para tanto, execute o comando abaixo em um terminal.
 Esse é normalmente suficiente em uma instalação de Linux Ubuntu:
@@ -57,6 +59,7 @@ o comando "make" para compilar. Para executar o código compilado, execute o
 comando "make run".
 
 ### Linux com CMake
+
 Abra um terminal, navegue até a pasta "fcg-trabfinal", e execute os seguintes comandos:
 
     mkdir build  # Cria diretório de build
@@ -66,17 +69,19 @@ Abra um terminal, navegue até a pasta "fcg-trabfinal", e execute os seguintes c
     make run     # Executa o código compilado
 
 ### Linux com VSCode
-1) Instale o VSCode seguindo as instruções em https://code.visualstudio.com/ .
 
-2) Instale as extensões "ms-vscode.cpptools" e "ms-vscode.cmake-tools" no VSCode. Se você abrir o diretório deste projeto no VSCode, automaticamente será sugerida a instalação destas extensões (pois estão listadas no arquivo ".vscode/extensions.json").
+1. Instale o VSCode seguindo as instruções em https://code.visualstudio.com/ .
 
-3) Clique no botão de "Play" na barra inferior do VSCode para compilar e executar o projeto. Na primeira compilação, a extensão do CMake para o VSCode irá perguntar qual compilador você quer utilizar. Selecione da lista o compilador que você deseja utilizar.
+2. Instale as extensões "ms-vscode.cpptools" e "ms-vscode.cmake-tools" no VSCode. Se você abrir o diretório deste projeto no VSCode, automaticamente será sugerida a instalação destas extensões (pois estão listadas no arquivo ".vscode/extensions.json").
+
+3. Clique no botão de "Play" na barra inferior do VSCode para compilar e executar o projeto. Na primeira compilação, a extensão do CMake para o VSCode irá perguntar qual compilador você quer utilizar. Selecione da lista o compilador que você deseja utilizar.
 
 Veja mais instruções de uso do CMake no VSCode em:
 
 https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/README.md
 
 ## macOS
+
 Para compilar e executar esse projeto no macOS, primeiro você precisa instalar o HOMEBREW, um gerenciador de pacotes para facilitar a instação de bibliotecas. O HOMEBREW pode ser instalado com o seguinte comando no terminal:
 
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -86,6 +91,7 @@ Após a instalação do HOMEBREW, a biblioteca GLFW deve ser instalada. Isso pod
     brew install glfw
 
 ### macOS com Makefile
+
 Abra um terminal, navegue até a pasta "fcg-trabfinal", e execute o comando "make -f Makefile.macOS" para compilar. Para executar o código compilado, execute o comando "make -f Makefile.macOS run".
 
 Observação: a versão atual da IDE Code::Blocks é bastante desatualizada pra o macOS. A nota oficial dos desenvolvedores é: "Code::Blocks 17.12 for Mac is currently not available due to the lack of Mac developers, or developers that own a Mac. We could use an extra Mac developer (or two) to work on Mac compatibility issues."
@@ -102,12 +108,13 @@ Caso você tenha problemas em executar o código deste projeto, tente atualizar 
 
 # Controles
 
-| Tecla  | Função |
-| -------|------- |
+| Tecla | Função                                 |
+| ----- | -------------------------------------- |
 | WASD  | Movimentação do personagem e da câmera |
-| F  | Mudança de câmera (look-at/free cam) |
-| O  | Visualização em projeção ortográfica |
-| P  | Visualização em projeção perspectiva |
+| F     | Mudança de câmera (look-at/free cam)   |
+| O     | Visualização em projeção ortográfica   |
+| P     | Visualização em projeção perspectiva   |
+| SPACE | Reseta o jogo                          |
 
 # Processo de desenvolvimento e funcionalidades
 
@@ -115,7 +122,7 @@ O projeto foi construído a partir dos Laboratórios desenvolvidos em aula, espe
 
 ## Malhas poligonais
 
-O jogo possui quatro [objetos](./resources/models/) principais (Pac-man, Fantasma, Esfera, Cereja), dois modelos de paredes (quadrada e arredondada), assim como objetos correspondentes aos números de 0-9 que servem para a visualização do score do usuário. Os objetos foram editados no Blender conforme necessário.
+O jogo possui quatro [objetos](./resources/models/) principais (Pac-man, Fantasma, Esfera, Cereja), dois modelos de paredes (quadrada e arredondada), assim como objetos correspondentes aos números de 0-9 que servem para a visualização do score do usuário. Os objetos foram editados e reposicionados nos eixos no Blender conforme necessário.
 
 <p>
   <img src="./docs/images/pacman.png" alt="pac model"  height="200" style="display: inline-block;">
@@ -141,7 +148,7 @@ Foram implementadas as câmeras 'free cam' e 'look-at cam'. Em ambas visualizaç
 
 ## Testes de intersecção
 
-Em ambas as vistas (free cam e look-at) foram utilizados três tipos de testes de [colisão](./include/collisions/collisions.hpp): Esfera-Esfera, Esfera-Caixa e Esfera-Plano. As colisões Caixa-Caixa e Caixa-Plano foram implementadas porém não estão em uso.
+Em ambas as vistas (free cam e look-at) foram utilizados três tipos de testes de [colisão](./include/collisions/collisions.hpp): Esfera-Esfera, Esfera-Caixa e Esfera-Plano.
 
 <p>
   <img src="./docs/images/pacgif2.gif" alt="pac mov"  height="200" style="display: inline-block;">
@@ -165,6 +172,7 @@ Durante a inicialização do jogo foi adicionada uma animação para a entrada d
 ## Contribuição
 
 **Gabriela Copetti Maccagnan**
+
 - Adição do fundo Skybox e renderização de objetos
 - Adição das câmera livre e look-at
 - Carregamento de texturas e customização de Bake Textures
@@ -172,6 +180,7 @@ Durante a inicialização do jogo foi adicionada uma animação para a entrada d
 - Movimentação de personagem (Fantasma)
 
 **Giulia Chimini Stefainski**
+
 - Movimentação de câmera e de personagem (Pac-man)
 - Sincronização de movimento em ambas câmeras
 - Renderização de objetos com múltiplas instâncias
@@ -181,3 +190,7 @@ Durante a inicialização do jogo foi adicionada uma animação para a entrada d
 ## Uso de IA
 
 Neste projeto fez-se uso de ferramentas de IA como ChatGPT e GitHub Copilot para auxílio durante a implementação, em especial para refatoração de códigos, entendimento de funções existentes e erros de compilação, ajustes de movimentação de câmera e de testes de colisão. Essas ferramentas foram muito úteis para o ínicio do desenvolvimento, ajudando a aprimorar o código, porém em situações mais específicas, em que um contexto maior da aplicação era necessário para o entendimento dos prompts elas nem sempre geravam bons resultados.
+
+## Créditos
+
+"Pac-Man" (https://skfb.ly/6RKVq) by Gianmarco is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
