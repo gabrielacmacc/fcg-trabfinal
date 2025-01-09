@@ -61,7 +61,6 @@ glm::vec4 checkSphereToAABBCollisionDirection(AABB a, Sphere b)
 {
     glm::vec3 closestPoint = AABBPointClosestToSphereCenter(a, b);
     float dist = glm::distance(closestPoint, b.center);
-    // printf("dist: %f, radius: %f", dist, b.radius);
     if (dist <= b.radius)
     {
         glm::vec4 collision_direction = glm::vec4(closestPoint.x, closestPoint.y, closestPoint.z, 1.0f) -
