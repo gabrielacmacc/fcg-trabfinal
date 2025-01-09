@@ -141,7 +141,7 @@ Foram implementadas as câmeras 'free cam' e 'look-at cam'. Em ambas visualizaç
 
 ## Testes de intersecção
 
-Em ambas as vistas (free cam e look-at) foram utilizados três tipos de testes de [colisão](./include/collisions/collisions.hpp): Esfera-Esfera, Esfera-Caixa e Esfera-Plano. A colisão Caixa-Plano foi implementada porém não está em uso.
+Em ambas as vistas (free cam e look-at) foram utilizados três tipos de testes de [colisão](./include/collisions/collisions.hpp): Esfera-Esfera, Esfera-Caixa e Esfera-Plano. As colisões Caixa-Caixa e Caixa-Plano foram implementadas porém não estão em uso.
 
 <p>
   <img src="./docs/images/pacgif2.gif" alt="pac mov"  height="200" style="display: inline-block;">
