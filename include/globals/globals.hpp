@@ -119,12 +119,12 @@ float ghost_lookat_size;
 float ghost_size = ghost_lookat_size;
 
 const float GHOST_SPEED = 8.0f;
-const float SECOND_GHOST_SPEED = 6.0f;
 float freeze_ghosts_countdown;
 
 bool should_restart;
 bool game_over;
-bool won;
+bool won_game;
+bool should_reload;
 
 void inicialize_globals()
 {
@@ -179,5 +179,6 @@ void inicialize_globals()
 
     should_restart = false;
     game_over = false;
-    won = false;
+    won_game = false;
+    should_reload = true;
 }

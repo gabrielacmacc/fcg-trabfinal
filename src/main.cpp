@@ -301,8 +301,13 @@ int main(int argc, char *argv[])
 
         first_ghost.move(elapsedTime);
         second_ghost.move(elapsedTime);
-        won = balls.size() == 0;
-        game_over = first_ghost.collided(pacman_sphere) || second_ghost.collided(pacman_sphere) || won;
+        won_game = balls.size() == 0;
+        game_over = first_ghost.collided(pacman_sphere) || second_ghost.collided(pacman_sphere) || won_game;
+        if (game_over && should_reload)
+        {
+            ReloadShaders();
+            should_reload = false;
+        }
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -419,6 +424,8 @@ void initialize_game()
 
     initial_ball_count = balls.size();
     eaten_ball_count = 0;
+
+    ReloadShaders();
 }
 
 // Função que pega a matriz M e guarda a mesma no topo da pilha

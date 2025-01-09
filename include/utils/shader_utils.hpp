@@ -228,9 +228,12 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "GhostTexture"), 7);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "GhostTexture2"), 8);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "GhostTexture3"), 9);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabyrinthTextureRed"), 10);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "LabyrinthTextureGreen"), 11);
 
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "isFreeCamOn"), isFreeCamOn);
-    // glUniform1i(glGetUniformLocation(g_GpuProgramID, "shouldStopGhost"), shouldStopGhost);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "gameOver"), game_over);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "wonGame"), won_game);
 
     glUseProgram(0);
 }

@@ -51,9 +51,12 @@ uniform sampler2D NumbersTexture;
 uniform sampler2D GhostTexture;
 uniform sampler2D GhostTexture2;
 uniform sampler2D GhostTexture3;
+uniform sampler2D LabyrinthTextureRed;
+uniform sampler2D LabyrinthTextureGreen;
 
 uniform bool isFreeCamOn;
-uniform bool shouldStopGhost;
+uniform bool gameOver;
+uniform bool wonGame;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -187,7 +190,15 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
 
-        Kd = texture(LabyrinthTexture, vec2(U,V)).rgb;
+        if (!gameOver) {
+            Kd = texture(LabyrinthTexture, vec2(U,V)).rgb;
+        }
+        else if(wonGame) {
+            Kd = texture(LabyrinthTextureGreen, vec2(U,V)).rgb;
+        } else {
+            Kd = texture(LabyrinthTextureRed, vec2(U,V)).rgb;
+        }
+
         lambert_diffuse_term = Kd * I * lambert;
         color.rgb = lambert_diffuse_term + ambient_term;
     }
@@ -253,19 +264,9 @@ void main()
         }
     }
     else if (object_id == GHOST){
-
-        if (shouldStopGhost)
-        {
-            Kd = texture(GhostTexture3, texcoords).rgb;
-            lambert_diffuse_term = Kd * I * lambert;
-            color.rgb = lambert_diffuse_term + ambient_term;
-        }
-        else 
-        {
-            Kd = texture(GhostTexture, texcoords).rgb;
-            lambert_diffuse_term = Kd * I * lambert;
-            color.rgb = lambert_diffuse_term + ambient_term;
-        }
+        Kd = texture(GhostTexture, texcoords).rgb;
+        lambert_diffuse_term = Kd * I * lambert;
+        color.rgb = lambert_diffuse_term + ambient_term;
     }
     else // Objeto desconhecido = preto
     {

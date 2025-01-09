@@ -85,4 +85,6 @@ void LoadTexturesFromFiles()
     LoadTextureImage("../../resources/textures/ghost/ghostTexture.png");
     LoadTextureImage("../../resources/textures/ghost/ghostTexture2.png");
     LoadTextureImage("../../resources/textures/ghost/ghostTexture3.png");
+    LoadTextureImage("../../resources/textures/labyrinth/red.jpg");
+    LoadTextureImage("../../resources/textures/labyrinth/green.jpg");
 }
