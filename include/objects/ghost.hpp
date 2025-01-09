@@ -41,6 +41,7 @@ public:
     glm::vec4 initial_position;
     glm::vec4 final_position;
     float rotation;
+    float radius_bbox;
 
     // Métodos:
 
@@ -51,6 +52,7 @@ public:
         this->direction = Direction::NONE;
         this->current_position = initial_position;
         this->rotation = -INITIAL_ROTATION;
+        this->radius_bbox = radius;
     }
 
     // inicializador vazio apenas para o início
@@ -123,7 +125,13 @@ public:
         }
         else
         {
-            Sphere ghost_b_sphere = Sphere{current_position, radius};
+            // Sphere ghost_b_sphere = Sphere{current_position, radius};
+            if (isFreeCamOn)
+            {
+                radius_bbox = 0.55;
+            }
+            // printf("raio fantasma %f ", radius_bbox);
+            Sphere ghost_b_sphere = Sphere{current_position, radius_bbox};
             return checkSphereToSphereCollision(ghost_b_sphere, pacman);
         }
     }
