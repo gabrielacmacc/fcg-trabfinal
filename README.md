@@ -2,9 +2,7 @@
 
 Repositório para o trabalho final da cadeira de Fundamentos de Computação Gráfica. Implementação em C++ e OpenGL de uma aplicação gráfica interativa baseada no jogo eletrônico de labirinto criado por Toru Iwatani em 1980, Pac-Man.
 
-<p>
-  <img src="./docs/images/game.png" alt="game view"  height="300" style="display: inline-block;">
-</p>
+<img src="./docs/images/game.png" alt="game view"  height="300" style="display: inline-block;">
 
 # Setup
 
@@ -54,7 +52,7 @@ Após a instalação das bibliotecas acima, você possui várias opções para c
 
 ### Linux com Makefile
 
-Abra um terminal, navegue até a pasta "Laboratorio_0X_Codigo_Fonte", e execute
+Abra um terminal, navegue até a pasta "fcg-trabfinal", e execute
 o comando "make" para compilar. Para executar o código compilado, execute o
 comando "make run".
 
@@ -112,9 +110,12 @@ Caso você tenha problemas em executar o código deste projeto, tente atualizar 
 | P  | Visualização em projeção perspectiva |
 
 # Processo de desenvolvimento e funcionalidades
+
+O projeto foi construído a partir dos Laboratórios desenvolvidos em aula, especialmente os Laboratórios 4 e 5. Funcionalidades como movimentação de câmera, carregamento de objetos e texturas, iluminação e transformações matriciais foram em grande parte aproveitadas dos Laboratórios. Procurou-se reorganizar a distribuição de funções em diferentes arquivos para minimizar as funções do arquivo main.cpp, mas vemos que ainda poderiam ser feitas melhorias na eficiência e organização do código.
+
 ## Malhas poligonais
 
-O jogo possui 4 objetos principais (Pac-man, Fantasma, Esfera, Cereja), 2 modelos de paredes (quadrada e arredondada), assim como objetos correspondentes aos números de 0-9.
+O jogo possui quatro [objetos](./resources/models/) principais (Pac-man, Fantasma, Esfera, Cereja), dois modelos de paredes (quadrada e arredondada), assim como objetos correspondentes aos números de 0-9 que servem para a visualização do score do usuário. Os objetos foram editados no Blender conforme necessário.
 
 <p>
   <img src="./docs/images/pacman.png" alt="pac model"  height="200" style="display: inline-block;">
@@ -127,20 +128,25 @@ Todas as esferas do jogo reutilizaram o mesmo objeto, assim como as cerejas e as
 
 ## Interação com usuário
 
-Além do controle do personagem, o usuário também tem controle sob a orientação da câmera a partir do movimento do mouse (somente na visualização freem cam) e do zoom da câmera atráves do movimento de scroll do mouse (somente na visualização look-at).
+Além do controle do personagem, o usuário também tem controle sob a orientação da câmera a partir do movimento do mouse (somente na visualização free cam) e do zoom da câmera atráves do movimento de scroll do mouse (somente na visualização look-at). Transformações geométricas foram aplicadas nos personagens baseadas na movimentação realizada pelo usuário, usando as teclas WASD o Pac-man gira de acordo com a direção desejada, por exemplo. Ao colidir/comer uma cereja o Pac-man tem sua velocidade alterada por tempo determinado.
 
 ## Modelos de câmera
 
 Foram implementadas as câmeras 'free cam' e 'look-at cam'. Em ambas visualizações o usuário pode usar os comandos WASD para controle do personagem. A projeção ortográfica ficou limita à câmera 'look-at'.
 
 <p>
-  <img src="./docs/images/freecam.png" alt="pac model"  height="200" style="display: inline-block;">
-  <img src="./docs/images/lookat.png" alt="ghost model" height="200"  style="display: inline-block;">
+  <img src="./docs/images/freecam.png" alt="pac free cam"  height="200" style="display: inline-block;">
+  <img src="./docs/images/lookat.png" alt="pac look at" height="200"  style="display: inline-block;">
 </p>
 
 ## Testes de intersecção
 
-Em ambas as vistas (free cam e look-at) foram utilizados três tipos de testes de colisão: Esfera-Esfera, Esfera-Caixa e Esfera-Plano. A colisão Caixa-Plano foi implementada porém não está em uso.
+Em ambas as vistas (free cam e look-at) foram utilizados três tipos de testes de [colisão](./include/collisions/collisions.hpp): Esfera-Esfera, Esfera-Caixa e Esfera-Plano. As colisões Caixa-Caixa e Caixa-Plano foram implementadas porém não estão em uso.
+
+<p>
+  <img src="./docs/images/pacgif2.gif" alt="pac mov"  height="200" style="display: inline-block;">
+  <img src="./docs/images/pacgif.gif" alt="pac mov" height="200"  style="display: inline-block;">
+</p>
 
 ## Modelos de iluminação e interpolação
 
@@ -150,13 +156,28 @@ Para interpolação foram utilizados os modelos de Phong e Gouraud. O último fo
 
 ## Mapeamento de texturas
 
-Todos objetos do jogo possuem texturas. O objeto do Pac-man e dos Fantasmas utilizaram as coordenadas de textura presentes nos arquivos '.obj' e suas texturas foram criadas no Blender através da ferramenta de 'Bake'. Também foram utilizadas as projeções esférica, cúbica e planar para mapeamento das texturas em outros objetos.
+Todos objetos do jogo possuem [texturas](./resources/textures/). O objeto do Pac-man e dos Fantasmas utilizaram as coordenadas de textura presentes nos arquivos '.obj' e suas texturas foram criadas no Blender através da ferramenta de 'Bake'. Também foram utilizadas as projeções esférica (esferas e cerejas), cúbica (fundo) e planar (piso) para mapeamento das texturas em outros objetos.
 
 ## Curva de Bézier
-# Contribuição
 
-<b>Gabriela</b>
+Durante a inicialização do jogo foi adicionada uma animação para a entrada do Pac-man no labirinto que utiliza uma curva cúbica de Bézier.
 
-<b>Giulia</b>
+## Contribuição
 
-# Uso de AI
+**Gabriela Copetti Maccagnan**
+- Adição do fundo Skybox e renderização de objetos
+- Adição das câmera livre e look-at
+- Carregamento de texturas e customização de Bake Textures
+- Modelos de Iluminação e Interpolação
+- Movimentação de personagem (Fantasma)
+
+**Giulia Chimini Stefainski**
+- Movimentação de câmera e de personagem (Pac-man)
+- Sincronização de movimento em ambas câmeras
+- Renderização de objetos com múltiplas instâncias
+- Testes de intersecção e resolução
+- Animação com curva de Bézier
+
+## Uso de IA
+
+Neste projeto fez-se uso de ferramentas de IA como ChatGPT e GitHub Copilot para auxílio durante a implementação, em especial para refatoração de códigos, entendimento de funções existentes e erros de compilação, ajustes de movimentação de câmera e de testes de colisão. Essas ferramentas foram muito úteis para o ínicio do desenvolvimento, ajudando a aprimorar o código, porém em situações mais específicas, em que um contexto maior da aplicação era necessário para o entendimento dos prompts elas nem sempre geravam bons resultados.
