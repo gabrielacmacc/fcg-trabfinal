@@ -48,7 +48,6 @@
 #include "callbacks/callbacks.hpp"
 #include "collisions/collisions.hpp"
 #include "globals/globals.hpp"
-#include "textrendering/textrendering.hpp"
 #include "utils/error_utils.h"
 #include "utils/shader_utils.hpp"
 #include "utils/texture_utils.hpp"
@@ -160,9 +159,6 @@ int main(int argc, char *argv[])
         ObjModel model(argv[1]);
         BuildTrianglesAndAddToVirtualScene(&model);
     }
-
-    // Inicializamos o código para renderização de texto.
-    TextRendering_Init();
 
     // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
     glEnable(GL_DEPTH_TEST);
@@ -389,13 +385,6 @@ int main(int argc, char *argv[])
             glUniform1i(g_object_id_uniform, COUNT_3);
             DrawVirtualObject(count_third_digit);
         }
-
-        // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
-        TextRendering_ShowProjection(window);
-
-        // Imprimimos na tela informação sobre o número de quadros renderizados
-        // por segundo (frames per second).
-        TextRendering_ShowFramesPerSecond(window);
 
         // O framebuffer onde OpenGL executa as operações de renderização não
         // é o mesmo que está sendo mostrado para o usuário, caso contrário

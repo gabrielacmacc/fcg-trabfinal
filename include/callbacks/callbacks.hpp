@@ -27,7 +27,6 @@
 
 #include "globals/globals.hpp"
 #include "utils/shader_utils.hpp"
-#include "textrendering/textrendering.hpp"
 
 #include "matrices.h"
 
